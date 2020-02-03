@@ -20,24 +20,24 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
-public class VideoDownloadController {
+public class VideoController {
 
     private final VideoRepository videoRepository;
     private final VideoService videoService;
 
     @GetMapping("/videos")
-    public List<VideoDto> getAllMovies() {
-        return videoService.getAllMovieDtos();
+    public List<VideoDto> getAllVideos() {
+        return videoService.getAllVideoDtos();
     }
 
     @GetMapping("/download/{id}")
     public ResponseEntity<InputStreamResource> getMeasurement(@PathVariable("id") Long id) throws FileNotFoundException {
-        Optional<Video> movie = videoRepository.findById(id);
-        if (!movie.isPresent()) {
+        Optional<Video> video = videoRepository.findById(id);
+        if (!video.isPresent()) {
             return null;
         }
         
-        File file = new File(movie.get().getPath());
+        File file = new File(video.get().getPath());
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
         return ResponseEntity.ok()
