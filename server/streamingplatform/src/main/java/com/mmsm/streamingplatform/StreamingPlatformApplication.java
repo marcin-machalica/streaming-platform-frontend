@@ -8,10 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SpringBootApplication
 public class StreamingPlatformApplication {
@@ -35,7 +33,7 @@ public class StreamingPlatformApplication {
         video1.setPath("aaaaaaaaaaaaaa");
         video2.setPath("bbb");
         video3.setPath("ccc");
-        List<Video> videoList = Arrays.asList(video1,video2,video3);
+        List<Video> videoList = Arrays.asList(video1, video2, video3);
         videoRepository.saveAll(videoList);
     }
 

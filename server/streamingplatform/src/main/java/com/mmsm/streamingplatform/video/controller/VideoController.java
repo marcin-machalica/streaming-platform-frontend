@@ -26,7 +26,7 @@ public class VideoDownloadController {
     private final VideoService videoService;
 
     @GetMapping("/videos")
-    public List<VideoDto> getAllMovies() {
+    public List<VideoDto> getAllVideos() {
         return videoService.getAllMovieDtos();
     }
 
