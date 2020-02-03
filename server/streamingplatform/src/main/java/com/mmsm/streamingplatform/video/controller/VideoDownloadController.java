@@ -32,12 +32,12 @@ public class VideoDownloadController {
 
     @GetMapping("/download/{id}")
     public ResponseEntity<InputStreamResource> getMeasurement(@PathVariable("id") Long id) throws FileNotFoundException {
-        Optional<Video> movie = videoRepository.findById(id);
-        if (!movie.isPresent()) {
+        Optional<Video> video = videoRepository.findById(id);
+        if (!video.isPresent()) {
             return null;
         }
         
-        File file = new File(movie.get().getPath());
+        File file = new File(video.get().getPath());
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
         return ResponseEntity.ok()

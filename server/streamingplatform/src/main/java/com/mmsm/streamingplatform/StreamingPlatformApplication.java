@@ -8,31 +8,35 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @SpringBootApplication
 public class StreamingPlatformApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(StreamingPlatformApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(StreamingPlatformApplication.class, args);
+    }
 
-	@Bean
-	public CommandLineRunner demo(VideoRepository videoRepository) {
-		return (args) -> {
-				loadData(videoRepository);
-		};
-	}
+    @Bean
+    public CommandLineRunner demo(VideoRepository videoRepository) {
+        return (args) -> {
+            loadData(videoRepository);
+        };
+    }
 
-	@Transactional
-	public void loadData(VideoRepository videoRepository) {
-		Video movie1 = new Video();
-		Video movie2 = new Video();
-		Video movie3 = new Video();
-		movie1.setPath("aaaa");
-		movie2.setPath("bbb");
-		movie3.setPath("ccc");
-		videoRepository.save(movie2);
-		videoRepository.save(movie1);
-		videoRepository.save(movie3);
-	}
+    @Transactional
+    public void loadData(VideoRepository videoRepository) {
+        Video video1 = new Video();
+        Video video2 = new Video();
+        Video video3 = new Video();
+        video1.setPath("aaaaaaaaaaaaaa");
+        video2.setPath("bbb");
+        video3.setPath("ccc");
+        List<Video> videoList = Arrays.asList(video1,video2,video3);
+        videoRepository.saveAll(videoList);
+    }
 
 }
