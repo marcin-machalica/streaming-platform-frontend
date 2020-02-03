@@ -30,6 +30,11 @@ public class VideoDownloadController {
         return videoService.getAllMovieDtos();
     }
 
+    @GetMapping("/videosJSON")
+    public List<Video> getAllMoviesJSON() {
+        return videoRepository.findAll();
+    }
+
     @GetMapping("/download/{id}")
     public ResponseEntity<InputStreamResource> getMeasurement(@PathVariable("id") Long id) throws FileNotFoundException {
         Optional<Video> movie = videoRepository.findById(id);

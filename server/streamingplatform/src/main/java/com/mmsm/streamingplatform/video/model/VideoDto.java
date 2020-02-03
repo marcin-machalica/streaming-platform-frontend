@@ -1,13 +1,12 @@
 package com.mmsm.streamingplatform.video.model;
 
 import lombok.Builder;
-
-import java.util.Date;
+import lombok.Getter;
 
 @Builder
+@Getter
 public class VideoDto {
 
     private Long id;
     private String path;
-    private Date created_at;
 }
