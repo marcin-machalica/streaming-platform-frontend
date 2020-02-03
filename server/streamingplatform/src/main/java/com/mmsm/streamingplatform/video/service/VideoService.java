@@ -14,10 +14,10 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
 
-    public List<VideoDto> getAllMovieDtos() {
+    public List<VideoDto> getAllVideoDtos() {
         return videoRepository.findAll()
                 .stream()
-                .map(VideoMapper::fromMovie)
+                .map(VideoMapper::fromVideo)
                 .collect(Collectors.toList());
     }
 }

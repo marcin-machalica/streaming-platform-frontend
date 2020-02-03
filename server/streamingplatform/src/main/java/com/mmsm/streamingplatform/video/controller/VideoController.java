@@ -20,14 +20,14 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
-public class VideoDownloadController {
+public class VideoController {
 
     private final VideoRepository videoRepository;
     private final VideoService videoService;
 
     @GetMapping("/videos")
     public List<VideoDto> getAllVideos() {
-        return videoService.getAllMovieDtos();
+        return videoService.getAllVideoDtos();
     }
 
     @GetMapping("/download/{id}")
