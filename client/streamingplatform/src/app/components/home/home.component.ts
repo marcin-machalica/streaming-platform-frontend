@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
+import {VideoService} from '../../services/api/video.service';
+import {VideoDto} from '../../dtos/VideoDto';
 
 @Component({
   selector: 'app-home',
@@ -9,11 +11,21 @@ import { Title } from '@angular/platform-browser';
 
 export class HomeComponent implements OnInit {
 
-  constructor(private titleService: Title ) {
+  videos: VideoDto[] = [];
+
+  constructor(private titleService: Title, private videoService: VideoService) {
   }
 
   ngOnInit() {
     this.titleService.setTitle('Streaming Platform');
+    this.loadAllVideos();
   }
 
+  loadAllVideos() {
+    this.videoService.findAllVideoDtos().subscribe(data => {
+      if (data) {
+        this.videos = data.body;
+      }
+    });
+  }
 }

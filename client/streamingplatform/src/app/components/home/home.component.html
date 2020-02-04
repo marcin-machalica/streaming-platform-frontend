@@ -1,4 +1,4 @@
 <h1>Videos</h1>
-<mat-list>
-  <mat-list-item></mat-list-item>
+<mat-list *ngFor="let video of videos">
+  <mat-list-item>{{'Id: ' + video.id + ', path: ' + video.path}}</mat-list-item>
 </mat-list>
