@@ -30,7 +30,7 @@ public class StreamingPlatformApplication {
         Video video1 = new Video();
         Video video2 = new Video();
         Video video3 = new Video();
-        video1.setPath("aaaaaaaaaaaaaa");
+        video1.setPath("D://filmik.mp4");
         video2.setPath("bbb");
         video3.setPath("ccc");
         List<Video> videoList = Arrays.asList(video1, video2, video3);

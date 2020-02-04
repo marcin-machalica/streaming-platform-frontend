@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
@@ -20,23 +21,24 @@ import java.util.Optional;
 
 @AllArgsConstructor
 @RestController
+@RequestMapping("/videos")
 public class VideoController {
 
     private final VideoRepository videoRepository;
     private final VideoService videoService;
 
-    @GetMapping("/videos")
+    @GetMapping("")
     public List<VideoDto> getAllVideos() {
         return videoService.getAllVideoDtos();
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<InputStreamResource> getMeasurement(@PathVariable("id") Long id) throws FileNotFoundException {
+    public ResponseEntity<InputStreamResource> downloadVideoById(@PathVariable("id") Long id) throws FileNotFoundException {
         Optional<Video> video = videoRepository.findById(id);
-        if (!video.isPresent()) {
+        if (video.isEmpty()) {
             return null;
         }
-        
+
         File file = new File(video.get().getPath());
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
 
