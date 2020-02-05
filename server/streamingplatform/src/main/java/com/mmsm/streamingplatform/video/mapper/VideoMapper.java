@@ -5,7 +5,11 @@ import com.mmsm.streamingplatform.video.model.VideoDto;
 
 public class VideoMapper {
 
-    public static VideoDto fromVideo(Video video) {
+    public static VideoDto getVideoDtoFromEntity(Video video) {
+        if (video == null) {
+            return null;
+        }
+
         return VideoDto.builder()
                 .id(video.getId())
                 .path(video.getPath())

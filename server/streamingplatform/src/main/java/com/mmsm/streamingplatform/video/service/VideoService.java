@@ -17,7 +17,7 @@ public class VideoService {
     public List<VideoDto> getAllVideoDtos() {
         return videoRepository.findAll()
                 .stream()
-                .map(VideoMapper::fromVideo)
+                .map(VideoMapper::getVideoDtoFromEntity)
                 .collect(Collectors.toList());
     }
 }

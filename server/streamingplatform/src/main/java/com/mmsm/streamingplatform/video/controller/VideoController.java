@@ -28,8 +28,10 @@ public class VideoController {
     private final VideoService videoService;
 
     @GetMapping("")
-    public List<VideoDto> getAllVideos() {
-        return videoService.getAllVideoDtos();
+    public ResponseEntity<List<VideoDto>> getAllVideos() {
+        return ResponseEntity.ok()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(videoService.getAllVideoDtos());
     }
 
     @GetMapping("/download/{id}")
@@ -44,7 +46,7 @@ public class VideoController {
 
         return ResponseEntity.ok()
                 .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
     }
 }
