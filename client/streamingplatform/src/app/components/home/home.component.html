@@ -1,4 +1,7 @@
-<h1>Videos</h1>
+<h1>Videos List</h1>
 <mat-list *ngFor="let video of videos">
-  <mat-list-item>{{'Id: ' + video.id + ', path: ' + video.path}}</mat-list-item>
+  <mat-list-item>
+    {{'Id: ' + video.id + ', path: ' + video.path}}
+    <button><a routerLink="player">PLAY</a></button>
+  </mat-list-item>
 </mat-list>

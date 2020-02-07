@@ -12,6 +12,7 @@ import {VideoDto} from '../../dtos/VideoDto';
 export class HomeComponent implements OnInit {
 
   videos: VideoDto[] = [];
+  playViedeo: VideoDto;
 
   constructor(private titleService: Title, private videoService: VideoService) {
   }
@@ -28,4 +29,5 @@ export class HomeComponent implements OnInit {
       }
     });
   }
+
 }
