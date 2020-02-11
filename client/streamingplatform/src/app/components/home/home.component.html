@@ -2,6 +2,6 @@
 <mat-list *ngFor="let video of videos">
   <mat-list-item>
     {{'Id: ' + video.id + ', path: ' + video.path}}
-    <button><a routerLink="player">PLAY</a></button>
+    <button><a target="_blank" routerLink="player">PLAY</a></button>
   </mat-list-item>
 </mat-list>

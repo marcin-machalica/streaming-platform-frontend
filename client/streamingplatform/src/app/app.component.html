@@ -1,14 +1,15 @@
-<mat-sidenav-container>
-  <mat-sidenav class="sw-sidenav">
-  </mat-sidenav>
-
-  <mat-toolbar color="primary">
-    VIDEO STREAMING APP
-  </mat-toolbar>
-
-  <div class="footer">
-    Copyright © 2020 MMMS
-  </div>
-
-</mat-sidenav-container>
-<router-outlet></router-outlet>
+<body>
+<mat-toolbar color="primary" fxLayout="">
+  VIDEO STREAMING APP
+</mat-toolbar>
+<main>
+  <mat-sidenav-container>
+    <mat-sidenav fxLayout="column">
+    </mat-sidenav>
+    <router-outlet></router-outlet>
+  </mat-sidenav-container>
+</main>
+<footer fxLayout="column">
+  Copyright © 2020 MMMS
+</footer>
+</body>
