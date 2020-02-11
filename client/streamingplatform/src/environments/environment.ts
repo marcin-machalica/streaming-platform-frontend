@@ -5,7 +5,7 @@
 import {KeycloakConfig} from 'keycloak-angular';
 
 const keycloakConfig: KeycloakConfig = {
-  url: 'http://192.168.0.185:8180/auth/',
+  url: 'http://localhost:8180/auth/',
   realm: 'streaming-platform',
   clientId: 'streaming-platform',
 };
