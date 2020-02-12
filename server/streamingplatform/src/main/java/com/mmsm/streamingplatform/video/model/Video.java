@@ -1,22 +1,20 @@
 package com.mmsm.streamingplatform.video.model;
 
+import com.mmsm.streamingplatform.auditor.Auditor;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import java.util.Date;
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 @Getter
 @Setter
 @Entity
-public class Video {
+public class Video extends Auditor implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @NotNull
+    @Column(name = "path", nullable = false)
     private String path;
-    private Date created_at;
 }

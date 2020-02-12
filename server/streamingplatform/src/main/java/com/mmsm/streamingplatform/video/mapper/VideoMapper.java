@@ -13,6 +13,8 @@ public class VideoMapper {
         return VideoDto.builder()
                 .id(video.getId())
                 .path(video.getPath())
+                .createdBy(video.getCreatedBy())
+                .createdDate(video.getCreatedDate())
                 .build();
     }
 }
