@@ -10,7 +10,9 @@ import java.time.LocalDateTime;
 public class VideoDto {
 
     private Long id;
-    private String path;
+    private String filename;
+    private String title;
+    private String description;
     private String createdBy;
     private LocalDateTime createdDate;
 }

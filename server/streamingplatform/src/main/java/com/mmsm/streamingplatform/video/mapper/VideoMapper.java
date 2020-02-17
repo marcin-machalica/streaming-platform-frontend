@@ -5,16 +5,18 @@ import com.mmsm.streamingplatform.video.model.VideoDto;
 
 public class VideoMapper {
 
-    public static VideoDto getVideoDtoFromEntity(Video video) {
-        if (video == null) {
+    public static VideoDto getVideoDtoFromEntity(Video entity) {
+        if (entity == null) {
             return null;
         }
 
         return VideoDto.builder()
-                .id(video.getId())
-                .path(video.getPath())
-                .createdBy(video.getCreatedBy())
-                .createdDate(video.getCreatedDate())
+                .id(entity.getId())
+                .filename(entity.getFilename())
+                .title(entity.getTitle())
+                .description(entity.getDescription())
+                .createdBy(entity.getCreatedBy())
+                .createdDate(entity.getCreatedDate())
                 .build();
     }
 }
