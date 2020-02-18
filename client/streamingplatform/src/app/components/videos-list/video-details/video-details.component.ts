@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import {VideoDetailsDto} from '../../../dtos/VideoDetailsDto';
 import {VideoService} from '../../../services/api/video.service';
 import {ActivatedRoute} from '@angular/router';
-import {VideoDto} from "../../../dtos/VideoDto";
-import {VideoRatingDto} from "../../../dtos/VideoRatingDto";
+import {VideoDto} from '../../../dtos/VideoDto';
+import {VideoRatingDto} from '../../../dtos/VideoRatingDto';
 
 @Component({
   selector: 'app-video-details',
@@ -15,7 +15,8 @@ export class VideoDetailsComponent implements OnInit {
   videoDetails: VideoDetailsDto = { videoDto: new VideoDto(), videoRatingDto: new VideoRatingDto()};
   videoId: number;
 
-  constructor(private route: ActivatedRoute, private videoService: VideoService) { }
+  constructor(private route: ActivatedRoute,
+              private videoService: VideoService) { }
 
   ngOnInit() {
     this.videoId = +this.route.snapshot.paramMap.get('id');
