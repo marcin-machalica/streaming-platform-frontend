@@ -3,8 +3,9 @@ import {environment} from '../../../environments/environment';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {VideoDto} from '../../dtos/VideoDto';
+import {VideoDetailsDto} from '../../dtos/VideoDetailsDto';
 
-type EntityResponseType = HttpResponse<VideoDto>;
+type EntityDetailsResponseType = HttpResponse<VideoDetailsDto>;
 type EntityArrayResponseType = HttpResponse<VideoDto[]>;
 
 @Injectable({ providedIn: 'root' })
@@ -16,5 +17,9 @@ export class VideoService {
 
   findAllVideoDtos(): Observable<EntityArrayResponseType> {
     return this.http.get<VideoDto[]>(this.resourceUrl, { observe: 'response' });
+  }
+
+  getVideoDetails(id: number): Observable<EntityDetailsResponseType> {
+    return this.http.get<VideoDetailsDto>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 }

@@ -15,12 +15,16 @@ import {FlexModule} from '@angular/flex-layout';
 import { VideoPlayerComponent } from './video-player/video-player.component';
 import {MatVideoModule} from 'mat-video';
 import {MatTableModule} from "@angular/material/table";
+import { VideosListComponent } from './components/videos-list/videos-list.component';
+import { VideoDetailsComponent } from './components/videos-list/video-details/video-details.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    VideoPlayerComponent
+    VideoPlayerComponent,
+    VideosListComponent,
+    VideoDetailsComponent
   ],
   imports: [
     BrowserModule,
