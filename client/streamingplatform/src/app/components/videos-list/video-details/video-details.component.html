@@ -1,4 +1,8 @@
 <div class="page-content">
+  <mat-video *ngIf="videoDetails.videoDto.id"
+             [autoplay]="true" [download]="true"
+             src="{{videoResourceUrl}}{{videoDetails.videoDto.id}}"></mat-video>
+  <mat-video *ngIf="!videoDetails.videoDto.id"></mat-video>
   <h2>{{videoDetails.videoDto.title}}</h2>
   <p>Description: {{videoDetails.videoDto.description}}</p>
   <p>Views: {{videoDetails.videoRatingDto.viewCount}}</p>

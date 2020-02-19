@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {VideoDetailsDto} from '../../../dtos/VideoDetailsDto';
 import {VideoService} from '../../../services/api/video.service';
 import {ActivatedRoute} from '@angular/router';
 import {VideoDto} from '../../../dtos/VideoDto';
 import {VideoRatingDto} from '../../../dtos/VideoRatingDto';
+import {environment} from "../../../../environments/environment";
 
 @Component({
   selector: 'app-video-details',
@@ -12,6 +13,7 @@ import {VideoRatingDto} from '../../../dtos/VideoRatingDto';
 })
 export class VideoDetailsComponent implements OnInit {
 
+  videoResourceUrl = environment.serverUrl + 'api/v1/videos/download/';
   videoDetails: VideoDetailsDto = { videoDto: new VideoDto(), videoRatingDto: new VideoRatingDto()};
   videoId: number;
 

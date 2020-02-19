@@ -1,5 +1,6 @@
 package com.mmsm.streamingplatform.video.controller;
 
+import com.mmsm.streamingplatform.utils.Constants;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
@@ -8,6 +9,7 @@ import com.mmsm.streamingplatform.video.service.VideoRepository;
 import com.mmsm.streamingplatform.video.service.VideoService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -61,18 +63,23 @@ public class VideoController {
     }
 
     @GetMapping("/download/{id}")
-    public ResponseEntity<InputStreamResource> downloadVideoById(@PathVariable Long id) throws FileNotFoundException {
+    public ResponseEntity<InputStreamResource> downloadVideoById(@PathVariable Long id) {
         Optional<Video> video = videoRepository.findById(id);
         if (video.isEmpty()) {
             return null;
         }
 
-        File file = new File(video.get().getFilename());
-        InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-
-        return ResponseEntity.ok()
-                .contentLength(file.length())
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(resource);
+        try {
+            File file = new File(Constants.VIDEOS_STORAGE_PATH + "/" + video.get().getFilename());
+            InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+            return ResponseEntity.ok()
+                    .contentLength(file.length())
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } catch (FileNotFoundException ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
