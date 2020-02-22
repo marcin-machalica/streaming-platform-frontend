@@ -22,4 +22,8 @@ export class VideoService {
   getVideoDetails(id: number): Observable<EntityDetailsResponseType> {
     return this.http.get<VideoDetailsDto>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
+
+  uploadVideo(id: number, fileFormData: FormData): Observable<HttpResponse<void>> {
+    return this.http.post<void>(`${this.resourceUrl}/${id}/upload`, fileFormData, { observe: 'response' });
+  }
 }

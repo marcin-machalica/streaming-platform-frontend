@@ -15,13 +15,16 @@ import {FlexModule} from '@angular/flex-layout';
 import {MatVideoModule} from 'mat-video';
 import { VideosListComponent } from './components/videos-list/videos-list.component';
 import { VideoDetailsComponent } from './components/videos-list/video-details/video-details.component';
+import { VideoUploadComponent } from './components/video-upload/video-upload.component';
+import {MatInputModule} from '@angular/material/input';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     VideosListComponent,
-    VideoDetailsComponent
+    VideoDetailsComponent,
+    VideoUploadComponent
   ],
   imports: [
     BrowserModule,
@@ -37,6 +40,7 @@ import { VideoDetailsComponent } from './components/videos-list/video-details/vi
     MatButtonModule,
     FlexModule,
     MatVideoModule,
+    MatInputModule
   ],
   providers: [
     {

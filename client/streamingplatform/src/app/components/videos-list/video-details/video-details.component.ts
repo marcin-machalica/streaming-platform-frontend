@@ -4,7 +4,7 @@ import {VideoService} from '../../../services/api/video.service';
 import {ActivatedRoute} from '@angular/router';
 import {VideoDto} from '../../../dtos/VideoDto';
 import {VideoRatingDto} from '../../../dtos/VideoRatingDto';
-import {environment} from "../../../../environments/environment";
+import {environment} from '../../../../environments/environment';
 
 @Component({
   selector: 'app-video-details',
@@ -13,9 +13,9 @@ import {environment} from "../../../../environments/environment";
 })
 export class VideoDetailsComponent implements OnInit {
 
-  videoResourceUrl = environment.serverUrl + 'api/v1/videos/download/';
   videoDetails: VideoDetailsDto = { videoDto: new VideoDto(), videoRatingDto: new VideoRatingDto()};
   videoId: number;
+  videoResourceUrl = (id) => `${environment.serverUrl}api/v1/videos/${id}/download`;
 
   constructor(private route: ActivatedRoute,
               private videoService: VideoService) { }
