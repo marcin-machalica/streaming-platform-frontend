@@ -1,6 +1,5 @@
 package com.mmsm.streamingplatform.video.controller;
 
-import com.mmsm.streamingplatform.utils.Constants;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
@@ -8,6 +7,7 @@ import com.mmsm.streamingplatform.video.model.VideoDto;
 import com.mmsm.streamingplatform.video.service.VideoRepository;
 import com.mmsm.streamingplatform.video.service.VideoService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +29,9 @@ public class VideoController {
 
     private final VideoRepository videoRepository;
     private final VideoService videoService;
+
+    @Value("${VIDEOS_STORAGE_PATH}")
+    public String VIDEOS_STORAGE_PATH;
 
     @GetMapping("")
     public ResponseEntity<List<VideoDto>> getAllVideos() {
@@ -70,7 +73,7 @@ public class VideoController {
         }
 
         try {
-            File file = new File(Constants.VIDEOS_STORAGE_PATH + "/" + video.get().getFilename());
+            File file = new File(VIDEOS_STORAGE_PATH + "/" + video.get().getFilename());
             InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
             return ResponseEntity.ok()
                     .contentLength(file.length())

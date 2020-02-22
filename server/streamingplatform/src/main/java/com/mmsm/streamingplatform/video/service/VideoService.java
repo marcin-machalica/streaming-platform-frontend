@@ -6,7 +6,6 @@ import com.mmsm.streamingplatform.video.mapper.VideoMapper;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;
-import com.mmsm.streamingplatform.video.videorating.model.VideoRating;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
