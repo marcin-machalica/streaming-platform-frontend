@@ -1,6 +1,9 @@
 <mat-toolbar color="primary" fxLayout="">
   <span routerLink="" class="cursor-pointer">Streaming platform</span>
   <div fxFlex></div>
+  <button mat-icon-button routerLink="videos/upload">
+    <mat-icon>cloud_upload</mat-icon>
+  </button>
   <mat-icon>person</mat-icon>
   <span>{{username}}</span>
   <button mat-button (click)="logout()">

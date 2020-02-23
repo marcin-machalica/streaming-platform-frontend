@@ -1,23 +1,34 @@
 package com.mmsm.streamingplatform.video.service;
 
+import com.mmsm.streamingplatform.utils.FileUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
 import com.mmsm.streamingplatform.video.mapper.VideoDetailsMapper;
 import com.mmsm.streamingplatform.video.mapper.VideoMapper;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Optional;
+import javax.transaction.NotSupportedException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Service
 public class VideoService {
 
     private final VideoRepository videoRepository;
+
+    @Value("${VIDEOS_STORAGE_PATH}")
+    public String VIDEOS_STORAGE_PATH;
 
     public List<VideoDto> getAllVideoDtos() {
         return videoRepository.findAll()
@@ -32,15 +43,16 @@ public class VideoService {
                 .orElse(null);
     }
 
-    public VideoDto saveVideoDto(VideoDto dto) {
-        Video video = Optional.ofNullable(dto.getId())
-                .map(videoRepository::getOne)
-                .orElse(new Video());
-
-        video.setFilename(dto.getFilename());
-        video.setTitle(dto.getTitle());
-        video.setDescription(dto.getDescription());
-        return VideoMapper.getVideoDtoFromEntity(videoRepository.save(video));
+    @Transactional
+    public VideoDto createVideo(MultipartFile file, String title, String description) throws NotSupportedException, IOException {
+        String filename = generateFilename(file.getOriginalFilename());
+        Video video = new Video();
+        video.setFilename(filename);
+        video.setTitle(title);
+        video.setDescription(description);
+        Video savedVideo = videoRepository.save(video);
+        storeFile(file, filename);
+        return VideoMapper.getVideoDtoFromEntity(savedVideo);
     }
 
     public VideoDto updateVideoDto(VideoDto dto, Long id) {
@@ -54,14 +66,52 @@ public class VideoService {
         return VideoMapper.getVideoDtoFromEntity(videoRepository.save(video));
     }
 
+    @Transactional
     public boolean deleteVideoById(Long id) {
         Optional<Video> videoOptional = videoRepository.findById(id);
         Optional<String> currentUserOptional = SecurityUtils.getCurrentUser();
         if (videoOptional.isPresent() && currentUserOptional.isPresent() &&
            (SecurityUtils.hasAdminRole() || currentUserOptional.get().equals(videoOptional.get().getCreatedBy()))) {
-            videoRepository.delete(videoOptional.get());
-            return true;
+
+            Video video = videoOptional.get();
+            videoRepository.delete(video);
+            File file = new File(VIDEOS_STORAGE_PATH + "/" + video.getFilename());
+            return file.delete();
         }
         return false;
+    }
+
+    public File downloadFile(Long id) {
+        Optional<Video> video = videoRepository.findById(id);
+        if (video.isEmpty()) {
+            return null;
+        }
+        File file = new File(VIDEOS_STORAGE_PATH + "/" + video.get().getFilename());
+        return file;
+    }
+
+    private void storeFile(MultipartFile file, String filename) throws IOException {
+        Path targetPath = Path.of(VIDEOS_STORAGE_PATH, "/", filename);
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    private String generateFilename(String originalFilename) throws NotSupportedException {
+        String fileExtension = FileUtils.getFileExtension(originalFilename);
+        if (!Arrays.asList(FileUtils.allowedFileFormatsCommaSeparated
+                        .split(","))
+                    .contains(fileExtension)) {
+            throw new NotSupportedException("Not supported video extension");
+        }
+        String filename;
+        do {
+            filename = UUID.randomUUID().toString();
+        } while (doFileExists(filename));
+        return filename + "." + fileExtension;
+    }
+
+    private boolean doFileExists(String uuid) {
+        return videoRepository.getVideoCountByFilename(uuid) != 0;
     }
 }

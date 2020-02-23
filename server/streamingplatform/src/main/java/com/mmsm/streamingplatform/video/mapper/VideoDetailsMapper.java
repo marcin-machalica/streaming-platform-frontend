@@ -10,7 +10,6 @@ public class VideoDetailsMapper {
         if (entity == null) {
             return null;
         }
-
         return VideoDetailsDto.builder()
                 .videoDto(VideoMapper.getVideoDtoFromEntity(entity))
                 .videoRatingDto(VideoRatingMapper.getVideoRatingDtoFromEntity(entity))
