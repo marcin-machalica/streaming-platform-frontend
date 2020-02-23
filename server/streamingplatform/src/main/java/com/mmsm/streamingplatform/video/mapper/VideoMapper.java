@@ -9,10 +9,8 @@ public class VideoMapper {
         if (entity == null) {
             return null;
         }
-
         return VideoDto.builder()
                 .id(entity.getId())
-                .filename(entity.getFilename())
                 .title(entity.getTitle())
                 .description(entity.getDescription())
                 .createdBy(entity.getCreatedBy())

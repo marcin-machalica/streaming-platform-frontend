@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {VideoService} from '../../services/api/video.service';
+import {NgForm} from '@angular/forms';
+import {VideoSaveDto} from '../../dtos/VideoSaveDto';
 
 @Component({
   selector: 'app-video-upload',
@@ -8,7 +10,9 @@ import {VideoService} from '../../services/api/video.service';
 })
 export class VideoUploadComponent implements OnInit {
 
-  file: any;
+  videoSaveDto: VideoSaveDto = new VideoSaveDto();
+  file: File;
+  @ViewChild(NgForm, { static: false }) form;
 
   constructor(private videoService: VideoService) { }
 
@@ -30,13 +34,14 @@ export class VideoUploadComponent implements OnInit {
   }
 
   uploadFile() {
-    if (!this.file) {
+    if (this.form.invalid || !this.file) {
       return;
     }
     const formData = new FormData();
     formData.set('file', this.file);
-    this.videoService.uploadVideo(2, formData).subscribe(response => {
+    formData.set('description', this.videoSaveDto.description);
+    formData.set('title', this.videoSaveDto.title);
+    this.videoService.uploadVideo(formData).subscribe(response => {
     });
   }
-
 }

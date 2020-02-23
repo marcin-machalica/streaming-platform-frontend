@@ -8,9 +8,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class VideoDto {
-
     private Long id;
-    private String filename;
     private String title;
     private String description;
     private String createdBy;

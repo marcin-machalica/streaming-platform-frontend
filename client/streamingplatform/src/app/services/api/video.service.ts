@@ -7,6 +7,7 @@ import {VideoDetailsDto} from '../../dtos/VideoDetailsDto';
 
 type EntityDetailsResponseType = HttpResponse<VideoDetailsDto>;
 type EntityArrayResponseType = HttpResponse<VideoDto[]>;
+type EntityResponseType = HttpResponse<VideoDto>;
 
 @Injectable({ providedIn: 'root' })
 export class VideoService {
@@ -23,7 +24,7 @@ export class VideoService {
     return this.http.get<VideoDetailsDto>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  uploadVideo(id: number, fileFormData: FormData): Observable<HttpResponse<void>> {
-    return this.http.post<void>(`${this.resourceUrl}/${id}/upload`, fileFormData, { observe: 'response' });
+  uploadVideo(fileFormData: FormData): Observable<EntityResponseType> {
+    return this.http.post<VideoDto>(this.resourceUrl, fileFormData, { observe: 'response' });
   }
 }

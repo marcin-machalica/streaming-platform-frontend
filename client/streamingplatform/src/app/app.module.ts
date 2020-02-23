@@ -17,6 +17,7 @@ import { VideosListComponent } from './components/videos-list/videos-list.compon
 import { VideoDetailsComponent } from './components/videos-list/video-details/video-details.component';
 import { VideoUploadComponent } from './components/video-upload/video-upload.component';
 import {MatInputModule} from '@angular/material/input';
+import {MatFormFieldModule} from '@angular/material/form-field';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import {MatInputModule} from '@angular/material/input';
     MatButtonModule,
     FlexModule,
     MatVideoModule,
+    MatFormFieldModule,
     MatInputModule
   ],
   providers: [

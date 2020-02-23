@@ -43,15 +43,16 @@ public class VideoService {
                 .orElse(null);
     }
 
-    public VideoDto saveVideoDto(VideoDto dto) {
-        Video video = Optional.ofNullable(dto.getId())
-                .map(videoRepository::getOne)
-                .orElse(new Video());
-
-        video.setFilename(dto.getFilename());
-        video.setTitle(dto.getTitle());
-        video.setDescription(dto.getDescription());
-        return VideoMapper.getVideoDtoFromEntity(videoRepository.save(video));
+    @Transactional
+    public VideoDto createVideo(MultipartFile file, String title, String description) throws NotSupportedException, IOException {
+        String filename = generateFilename(file.getOriginalFilename());
+        Video video = new Video();
+        video.setFilename(filename);
+        video.setTitle(title);
+        video.setDescription(description);
+        Video savedVideo = videoRepository.save(video);
+        storeFile(file, filename);
+        return VideoMapper.getVideoDtoFromEntity(savedVideo);
     }
 
     public VideoDto updateVideoDto(VideoDto dto, Long id) {
@@ -89,25 +90,25 @@ public class VideoService {
         return file;
     }
 
-    public void uploadFile(MultipartFile file, Long id) throws IOException, NotSupportedException {
-        String fileExtension = FileUtils.getFileExtension(file.getOriginalFilename());
-        if (!Arrays.asList(FileUtils.allowedFileFormatsCommaSeparated.split(","))
-                .contains(fileExtension)) {
+    private void storeFile(MultipartFile file, String filename) throws IOException {
+        Path targetPath = Path.of(VIDEOS_STORAGE_PATH, "/", filename);
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
+
+    private String generateFilename(String originalFilename) throws NotSupportedException {
+        String fileExtension = FileUtils.getFileExtension(originalFilename);
+        if (!Arrays.asList(FileUtils.allowedFileFormatsCommaSeparated
+                        .split(","))
+                    .contains(fileExtension)) {
             throw new NotSupportedException("Not supported video extension");
         }
-        Video video = videoRepository.findById(id).orElseThrow(() -> new RuntimeException("Corresponding video entity not found"));
         String filename;
         do {
             filename = UUID.randomUUID().toString();
         } while (doFileExists(filename));
-        String fullFileName = filename + "." + fileExtension;
-        Path targetPath = Path.of(VIDEOS_STORAGE_PATH, "/", fullFileName);
-
-        try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-        }
-        video.setFilename(fullFileName);
-        videoRepository.save(video);
+        return filename + "." + fileExtension;
     }
 
     private boolean doFileExists(String uuid) {

@@ -3,7 +3,6 @@ package com.mmsm.streamingplatform.video.controller;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;
-import com.mmsm.streamingplatform.video.service.VideoRepository;
 import com.mmsm.streamingplatform.video.service.VideoService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -16,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.NotSupportedException;
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
 
 @AllArgsConstructor
@@ -38,12 +36,19 @@ public class VideoController {
         return ControllerUtils.getFoundResponse(videoDetailsDto);
     }
 
-    @PostMapping("")
-    public ResponseEntity<VideoDto> createVideoDetailsDto(@RequestBody VideoDto videoDto) throws URISyntaxException {
-        VideoDto savedVideoDto = videoService.saveVideoDto(videoDto);
-        URI uri = (savedVideoDto != null && savedVideoDto.getId() != null)
-                ? new URI("/api/v1/videos/" + savedVideoDto.getId()) : null;
-        return ControllerUtils.getCreatedResponse(savedVideoDto, uri);
+    @PostMapping(value = "")
+    public ResponseEntity<VideoDto> createVideoDetailsDto(@RequestParam MultipartFile file,
+                                                          @RequestParam String title,
+                                                          @RequestParam String description) {
+        try {
+            VideoDto savedVideoDto = videoService.createVideo(file, title, description);
+            URI uri = new URI("/api/v1/videos/" + savedVideoDto.getId());
+            return ControllerUtils.getCreatedResponse(savedVideoDto, uri);
+        } catch (NotSupportedException ex) {
+            return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/{id}")
@@ -56,18 +61,6 @@ public class VideoController {
     public ResponseEntity<Void> deleteVideoById(@PathVariable Long id) {
         boolean isDeleted = videoService.deleteVideoById(id);
         return ControllerUtils.getDeletedResponse(isDeleted);
-    }
-
-    @PostMapping(value = "{id}/upload")
-    public ResponseEntity<Void> uploadVideo(@RequestParam MultipartFile file, @PathVariable Long id) {
-        try {
-            videoService.uploadFile(file, id);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (NotSupportedException ex) {
-            return new ResponseEntity<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-        } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
     @GetMapping("{id}/download")
