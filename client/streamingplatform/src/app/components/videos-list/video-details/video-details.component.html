@@ -8,4 +8,41 @@
   <p>Views: {{videoDetails.videoRatingDto.viewCount}}</p>
   <p>Up votes: {{videoDetails.videoRatingDto.upVoteCount}}</p>
   <p>Down votes: {{videoDetails.videoRatingDto.downVoteCount}}</p>
+
+  <h3>Comments:</h3>
+  <div id="comment_form_0">
+    <mat-form-field>
+      <textarea matInput required placeholder="Comment" id="comment_input_0"></textarea>
+    </mat-form-field>
+    <button mat-button (click)="saveComment(0)">
+      <span>Comment</span>
+    </button>
+  </div>
+
+  <mat-list *ngFor="let comment of videoDetails.directCommentDtos">
+    <mat-list-item>
+      <div>
+        <p>{{comment.message}}</p>
+        <button mat-button *ngIf="comment.repliesCount > 0 && !comment.directReplies" (click)="getCommentDtoWithReplies(comment.id)">
+          <span>Show more ({{comment.repliesCount}})</span>
+        </button>
+        <div id="comment_form_{{comment.id}}">
+          <mat-form-field>
+            <textarea matInput required placeholder="Comment" id="comment_input_{{comment.id}}"></textarea>
+          </mat-form-field>
+          <button mat-button (click)="saveComment(comment.id)">
+            <span>Comment</span>
+          </button>
+        </div>
+      </div>
+
+      <mat-list *ngFor="let comment2 of comment.directReplies">
+        <mat-list-item>
+          <div>
+            <p>{{comment2.message}}</p>
+          </div>
+        </mat-list-item>
+      </mat-list>
+    </mat-list-item>
+  </mat-list>
 </div>
