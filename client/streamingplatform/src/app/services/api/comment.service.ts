@@ -4,8 +4,8 @@ import {Observable} from 'rxjs';
 import {CommentDto} from '../../dtos/CommentDto';
 import {environment} from '../../../environments/environment';
 
-type EntityArrayResponseType = HttpResponse<CommentDto[]>;
-type EntityResponseType = HttpResponse<CommentDto>;
+type CommentDtoArrayResponseType = HttpResponse<CommentDto[]>;
+type CommentDtoResponseType = HttpResponse<CommentDto>;
 
 @Injectable({
   providedIn: 'root'
@@ -16,11 +16,11 @@ export class CommentService {
 
   constructor(private http: HttpClient) { }
 
-  saveComment(commentDto: CommentDto, videoId: number): Observable<EntityResponseType> {
+  saveComment(commentDto: CommentDto, videoId: number): Observable<CommentDtoResponseType> {
     return this.http.post<CommentDto>(this.resourceUrl(videoId), commentDto, { observe: 'response' });
   }
 
-  getCommentDtoWithReplies(videoId: number, commentId: number): Observable<EntityResponseType> {
+  getCommentDtoWithReplies(videoId: number, commentId: number): Observable<CommentDtoResponseType> {
     return this.http.get<CommentDto>(`${this.resourceUrl(videoId)}/${commentId}`, { observe: 'response' });
   }
 }

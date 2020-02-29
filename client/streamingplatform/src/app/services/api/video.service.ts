@@ -5,9 +5,9 @@ import {Observable} from 'rxjs';
 import {VideoDto} from '../../dtos/VideoDto';
 import {VideoDetailsDto} from '../../dtos/VideoDetailsDto';
 
-type EntityDetailsResponseType = HttpResponse<VideoDetailsDto>;
-type EntityArrayResponseType = HttpResponse<VideoDto[]>;
-type EntityResponseType = HttpResponse<VideoDto>;
+type VideoDetailsDtoResponseType = HttpResponse<VideoDetailsDto>;
+type VideoDetailsDtoArrayResponseType = HttpResponse<VideoDto[]>;
+type VideoDtoResponseType = HttpResponse<VideoDto>;
 
 @Injectable({ providedIn: 'root' })
 export class VideoService {
@@ -16,15 +16,15 @@ export class VideoService {
 
   constructor(private http: HttpClient) { }
 
-  findAllVideoDtos(): Observable<EntityArrayResponseType> {
+  findAllVideoDtos(): Observable<VideoDetailsDtoArrayResponseType> {
     return this.http.get<VideoDto[]>(this.resourceUrl, { observe: 'response' });
   }
 
-  getVideoDetails(id: number): Observable<EntityDetailsResponseType> {
+  getVideoDetails(id: number): Observable<VideoDetailsDtoResponseType> {
     return this.http.get<VideoDetailsDto>(`${this.resourceUrl}/${id}`, { observe: 'response' });
   }
 
-  uploadVideo(fileFormData: FormData): Observable<EntityResponseType> {
+  uploadVideo(fileFormData: FormData): Observable<VideoDtoResponseType> {
     return this.http.post<VideoDto>(this.resourceUrl, fileFormData, { observe: 'response' });
   }
 }
