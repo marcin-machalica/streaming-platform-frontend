@@ -8,4 +8,53 @@
   <p>Views: {{videoDetails.videoRatingDto.viewCount}}</p>
   <p>Up votes: {{videoDetails.videoRatingDto.upVoteCount}}</p>
   <p>Down votes: {{videoDetails.videoRatingDto.downVoteCount}}</p>
+
+  <h3>Comments:</h3>
+  <div id="comment_form_0">
+    <mat-form-field>
+      <textarea matInput required placeholder="Comment" id="comment_input_0"></textarea>
+    </mat-form-field>
+    <button mat-button (click)="saveComment(0)">
+      <span>Comment</span>
+    </button>
+  </div>
+
+  <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+    <!-- This is the tree node template for leaf nodes -->
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <!-- use a disabled button to provide padding for tree leaf -->
+      <div>
+        <button mat-button disabled></button>
+        <p>{{node.message}}</p>
+        <p>{{node.dateCreated}}</p>
+        <div id="comment_form_{{node.id}}">
+          <mat-form-field>
+            <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
+          </mat-form-field>
+          <button mat-button (click)="saveComment(node.id)">
+            <span>Comment</span>
+          </button>
+        </div>
+      </div>
+    </mat-tree-node>
+
+    <!-- This is the tree node template for expandable nodes -->
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+      <div>
+        <p>{{node.message}}</p>
+        <p>{{node.dateCreated}}</p>
+        <div id="comment_form_{{node.id}}">
+          <mat-form-field>
+            <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
+          </mat-form-field>
+          <button mat-button (click)="saveComment(node.id)">
+            <span>Comment</span>
+          </button>
+        </div>
+        <button mat-button matTreeNodeToggle>
+          <span>{{treeControl.isExpanded(node) ? 'Hide' : ('Show more (' + node.allRepliesCount + ')')}}</span>
+        </button>
+      </div>
+    </mat-tree-node>
+  </mat-tree>
 </div>

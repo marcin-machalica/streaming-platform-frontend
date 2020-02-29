@@ -39,7 +39,7 @@ public class VideoService {
 
     public VideoDetailsDto getVideoDetailsDtoByVideoId(Long id) {
         return videoRepository.findById(id)
-                .map(VideoDetailsMapper::getVideoDetailsDtoFromEntity)
+                .map(video -> VideoDetailsMapper.getVideoDetailsDtoFromEntity(video, true))
                 .orElse(null);
     }
 
