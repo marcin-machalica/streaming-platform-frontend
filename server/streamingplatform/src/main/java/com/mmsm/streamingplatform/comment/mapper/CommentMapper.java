@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CommentMapper {
 
-    public static CommentDto getCommentDtoFromEntity(Comment entity) {
+    public static CommentDto getCommentDtoFromEntity(Comment entity, boolean withReplies) {
         if (entity == null) {
             return null;
         }
@@ -19,50 +19,23 @@ public class CommentMapper {
                 .upVoteCount(entity.getUpVoteCount())
                 .downVoteCount(entity.getDownVoteCount())
                 .favouriteVoteCount(entity.getFavouriteVoteCount())
-                .repliesCount(entity.getRepliesCount())
+                .directRepliesCount(entity.getDirectRepliesCount())
+                .allRepliesCount(entity.getAllRepliesCount())
                 .isVideoAuthorFavourite(entity.getIsVideoAuthorFavourite())
                 .isPinned(entity.getIsPinned())
+                .dateCreated(entity.getCreatedDate())
+                .directReplies(withReplies ? CommentMapper.getCommentDtosFromEntity(entity.getDirectReplies(), withReplies) : null)
                 // author todo
                 .build();
     }
 
-    public static List<CommentDto> getCommentDtosFromEntity(List<Comment> entities) {
+    public static List<CommentDto> getCommentDtosFromEntity(List<Comment> entities, boolean withReplies) {
         if (entities == null) {
             return null;
         }
         List<CommentDto> commentDtos = new ArrayList<>();
         for(Comment entity : entities) {
-            commentDtos.add(getCommentDtoFromEntity(entity));
-        }
-        return commentDtos;
-    }
-
-    public static CommentDto getCommentDtosWithRepliesFromEntity(Comment entity) {
-        if (entity == null) {
-            return null;
-        }
-        return CommentDto.builder()
-                .id(entity.getId())
-                .parentId(entity.getParentComment() != null ? entity.getParentComment().getId() : null)
-                .message(entity.getMessage())
-                .upVoteCount(entity.getUpVoteCount())
-                .downVoteCount(entity.getDownVoteCount())
-                .favouriteVoteCount(entity.getFavouriteVoteCount())
-                .repliesCount(entity.getRepliesCount())
-                .isVideoAuthorFavourite(entity.getIsVideoAuthorFavourite())
-                .isPinned(entity.getIsPinned())
-                .directReplies(CommentMapper.getCommentDtosWithRepliesFromEntity(entity.getDirectReplies()))
-                // author todo
-                .build();
-    }
-
-    private static List<CommentDto> getCommentDtosWithRepliesFromEntity(List<Comment> entities) {
-        if (entities == null) {
-            return null;
-        }
-        List<CommentDto> commentDtos = new ArrayList<>();
-        for(Comment entity : entities) {
-            commentDtos.add(getCommentDtosWithRepliesFromEntity(entity));
+            commentDtos.add(getCommentDtoFromEntity(entity, withReplies));
         }
         return commentDtos;
     }

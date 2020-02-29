@@ -18,6 +18,7 @@ import { VideoDetailsComponent } from './components/videos-list/video-details/vi
 import { VideoUploadComponent } from './components/video-upload/video-upload.component';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatTreeModule} from '@angular/material/tree';
 
 @NgModule({
   declarations: [
@@ -42,7 +43,8 @@ import {MatFormFieldModule} from '@angular/material/form-field';
     FlexModule,
     MatVideoModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatTreeModule
   ],
   providers: [
     {

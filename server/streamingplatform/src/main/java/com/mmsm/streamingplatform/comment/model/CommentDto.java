@@ -3,6 +3,7 @@ package com.mmsm.streamingplatform.comment.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -14,9 +15,11 @@ public class CommentDto {
     private Long upVoteCount;
     private Long downVoteCount;
     private Long favouriteVoteCount;
-    private Integer repliesCount;
+    private Integer directRepliesCount;
+    private Integer allRepliesCount;
     private Boolean isVideoAuthorFavourite;
     private Boolean isPinned;
+    private LocalDateTime dateCreated;
     private List<CommentDto> directReplies;
     // author todo
 }

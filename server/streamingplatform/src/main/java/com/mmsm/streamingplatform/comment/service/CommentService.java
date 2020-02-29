@@ -19,10 +19,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final VideoRepository videoRepository;
 
-    public CommentDto getCommentWithReplyDtos(Long id) {
-        return commentRepository.findById(id)
-                .map(CommentMapper::getCommentDtosWithRepliesFromEntity)
-                .orElse(null);
+    public CommentDto getCommentDtoWithReplies(Long id) {
+        return CommentMapper.getCommentDtoFromEntity(commentRepository.getOne(id), true);
     }
 
     public CommentDto saveComment(CommentDto dto, Long videoId) {
@@ -38,7 +36,7 @@ public class CommentService {
             comment.setMessage(dto.getMessage());
             parentComment.addChildrenComment(comment);
             Comment savedComment = commentRepository.save(comment);
-            return CommentMapper.getCommentDtoFromEntity(savedComment);
+            return CommentMapper.getCommentDtoFromEntity(savedComment, false);
         }
 
         Optional<Video> videoOptional = videoRepository.findById(videoId);
@@ -54,6 +52,6 @@ public class CommentService {
         }
         comments.add(comment);
         Comment savedComment = commentRepository.save(comment);
-        return CommentMapper.getCommentDtoFromEntity(savedComment);
+        return CommentMapper.getCommentDtoFromEntity(savedComment, false);
     }
 }

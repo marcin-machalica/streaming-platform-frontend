@@ -19,7 +19,7 @@ public class CommentController {
 
     @GetMapping("/{commentId}")
     public ResponseEntity<CommentDto> getCommentDtoWithReplies(@PathVariable Long videoId, @PathVariable Long commentId) {
-        CommentDto commentDto = commentService.getCommentWithReplyDtos(commentId);
+        CommentDto commentDto = commentService.getCommentDtoWithReplies(commentId);
         return ControllerUtils.getFoundResponse(commentDto);
     }
 

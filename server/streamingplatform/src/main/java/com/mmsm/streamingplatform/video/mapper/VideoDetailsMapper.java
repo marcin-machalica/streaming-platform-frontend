@@ -7,14 +7,14 @@ import com.mmsm.streamingplatform.video.videorating.mapper.VideoRatingMapper;
 
 public class VideoDetailsMapper {
 
-    public static VideoDetailsDto getVideoDetailsDtoFromEntity(Video entity) {
+    public static VideoDetailsDto getVideoDetailsDtoFromEntity(Video entity, boolean withReplies) {
         if (entity == null) {
             return null;
         }
         return VideoDetailsDto.builder()
                 .videoDto(VideoMapper.getVideoDtoFromEntity(entity))
                 .videoRatingDto(VideoRatingMapper.getVideoRatingDtoFromEntity(entity))
-                .directCommentDtos(CommentMapper.getCommentDtosFromEntity(entity.getComments()))
+                .directCommentDtos(CommentMapper.getCommentDtosFromEntity(entity.getComments(), withReplies))
                 .build();
     }
 }

@@ -5,9 +5,11 @@ export class CommentDto {
   public upVoteCount: number;
   public downVoteCount: number;
   public favouriteVoteCount: number;
-  public repliesCount: number;
+  public directRepliesCount: number;
+  public allRepliesCount: number;
   public isVideoAuthorFavourite: boolean;
   public isPinned: boolean;
+  public dateCreated: Date;
   public directReplies: CommentDto[];
   // author todo
 }

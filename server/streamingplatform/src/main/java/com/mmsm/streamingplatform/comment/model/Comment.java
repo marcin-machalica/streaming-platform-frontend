@@ -34,8 +34,12 @@ public class Comment extends Auditor implements Serializable {
     private Long favouriteVoteCount = 0L;
 
     @NotNull
-    @Column(name = "replies_count", nullable = false)
-    private Integer repliesCount = 0;
+    @Column(name = "direct_replies_count", nullable = false)
+    private Integer directRepliesCount = 0;
+
+    @NotNull
+    @Column(name = "all_replies_count", nullable = false)
+    private Integer allRepliesCount = 0;
 
     @NotNull
     @Column(name = "is_video_author_favourite", nullable = false)
@@ -56,6 +60,15 @@ public class Comment extends Auditor implements Serializable {
     public void addChildrenComment(Comment comment) {
         this.directReplies.add(comment);
         comment.setParentComment(this);
-        repliesCount++;
+        directRepliesCount++;
+        incrementParentsAllRepliesCount(this);
+    }
+
+    private void incrementParentsAllRepliesCount(Comment comment) {
+        if (comment == null) {
+            return;
+        }
+        comment.allRepliesCount++;
+        incrementParentsAllRepliesCount(comment.getParentComment());
     }
 }

@@ -19,30 +19,42 @@
     </button>
   </div>
 
-  <mat-list *ngFor="let comment of videoDetails.directCommentDtos">
-    <mat-list-item>
+  <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+    <!-- This is the tree node template for leaf nodes -->
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <!-- use a disabled button to provide padding for tree leaf -->
       <div>
-        <p>{{comment.message}}</p>
-        <button mat-button *ngIf="comment.repliesCount > 0 && !comment.directReplies" (click)="getCommentDtoWithReplies(comment.id)">
-          <span>Show more ({{comment.repliesCount}})</span>
-        </button>
-        <div id="comment_form_{{comment.id}}">
+        <button mat-button disabled></button>
+        <p>{{node.message}}</p>
+        <p>{{node.dateCreated}}</p>
+        <div id="comment_form_{{node.id}}">
           <mat-form-field>
-            <textarea matInput required placeholder="Comment" id="comment_input_{{comment.id}}"></textarea>
+            <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
           </mat-form-field>
-          <button mat-button (click)="saveComment(comment.id)">
+          <button mat-button (click)="saveComment(node.id)">
             <span>Comment</span>
           </button>
         </div>
       </div>
+    </mat-tree-node>
 
-      <mat-list *ngFor="let comment2 of comment.directReplies">
-        <mat-list-item>
-          <div>
-            <p>{{comment2.message}}</p>
-          </div>
-        </mat-list-item>
-      </mat-list>
-    </mat-list-item>
-  </mat-list>
+    <!-- This is the tree node template for expandable nodes -->
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+      <div>
+        <p>{{node.message}}</p>
+        <p>{{node.dateCreated}}</p>
+        <div id="comment_form_{{node.id}}">
+          <mat-form-field>
+            <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
+          </mat-form-field>
+          <button mat-button (click)="saveComment(node.id)">
+            <span>Comment</span>
+          </button>
+        </div>
+        <button mat-button matTreeNodeToggle>
+          <span>{{treeControl.isExpanded(node) ? 'Hide' : ('Show more (' + node.allRepliesCount + ')')}}</span>
+        </button>
+      </div>
+    </mat-tree-node>
+  </mat-tree>
 </div>
