@@ -350,6 +350,31 @@
       "subGroups": []
     },
     {
+      "id": "087ace47-efbb-4f00-8f16-934925b0ba2c",
+      "name": "admin-api",
+      "path": "/admin-api",
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {
+        "realm-management": [
+          "manage-clients",
+          "create-client",
+          "query-groups",
+          "query-users",
+          "impersonation",
+          "manage-realm",
+          "manage-identity-providers",
+          "query-realms",
+          "realm-admin",
+          "query-clients",
+          "manage-authorization",
+          "manage-users",
+          "manage-events"
+        ]
+      },
+      "subGroups": []
+    },
+    {
       "id": "2fec65fe-bf52-470d-bfb5-c126589268f8",
       "name": "user",
       "path": "/user",
