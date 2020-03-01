@@ -1,6 +1,9 @@
+import {UserDto} from './UserDto';
+
 export class CommentDto {
   public id: number;
   public parentId: number;
+  public author: UserDto;
   public message: string;
   public upVoteCount: number;
   public downVoteCount: number;

@@ -25,8 +25,8 @@
       <!-- use a disabled button to provide padding for tree leaf -->
       <div>
         <button mat-button disabled></button>
+        <p>{{node.author.username}} {{node.dateCreated}}</p>
         <p>{{node.message}}</p>
-        <p>{{node.dateCreated}}</p>
         <div id="comment_form_{{node.id}}">
           <mat-form-field>
             <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
@@ -41,8 +41,8 @@
     <!-- This is the tree node template for expandable nodes -->
     <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
       <div>
+        <p>{{node.author.username}} {{node.dateCreated}}</p>
         <p>{{node.message}}</p>
-        <p>{{node.dateCreated}}</p>
         <div id="comment_form_{{node.id}}">
           <mat-form-field>
             <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>

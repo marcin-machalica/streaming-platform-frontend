@@ -31,6 +31,7 @@ export class VideoDetailsComponent implements OnInit {
     return {
       id: node.id,
       parentId: node.parentId,
+      author: node.author,
       message: node.message,
       upVoteCount: node.upVoteCount,
       downVoteCount: node.downVoteCount,

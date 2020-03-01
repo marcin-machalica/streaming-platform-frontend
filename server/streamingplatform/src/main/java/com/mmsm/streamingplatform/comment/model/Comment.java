@@ -17,6 +17,10 @@ import java.util.List;
 public class Comment extends Auditor implements Serializable {
 
     @NotNull
+    @Column(name = "author_id", nullable = false)
+    String authorId;
+
+    @NotNull
     @Size(min = 1, max = 5000)
     @Column(name = "message", nullable = false)
     String message;
@@ -54,8 +58,6 @@ public class Comment extends Auditor implements Serializable {
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     List<Comment> directReplies;
-
-    // author todo
 
     public void addChildrenComment(Comment comment) {
         this.directReplies.add(comment);

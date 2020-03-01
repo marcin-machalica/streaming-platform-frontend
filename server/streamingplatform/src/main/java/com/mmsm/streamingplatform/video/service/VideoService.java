@@ -1,5 +1,8 @@
 package com.mmsm.streamingplatform.video.service;
 
+import com.mmsm.streamingplatform.comment.model.Comment;
+import com.mmsm.streamingplatform.keycloak.model.UserDto;
+import com.mmsm.streamingplatform.keycloak.service.KeycloakService;
 import com.mmsm.streamingplatform.utils.FileUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
 import com.mmsm.streamingplatform.video.mapper.VideoDetailsMapper;
@@ -26,6 +29,7 @@ import java.util.stream.Collectors;
 public class VideoService {
 
     private final VideoRepository videoRepository;
+    private final KeycloakService keycloakService;
 
     @Value("${VIDEOS_STORAGE_PATH}")
     public String VIDEOS_STORAGE_PATH;
@@ -38,8 +42,22 @@ public class VideoService {
     }
 
     public VideoDetailsDto getVideoDetailsDtoByVideoId(Long id) {
+        Optional<Video> videoOptional = videoRepository.findById(id);
+        if (videoOptional.isEmpty()) {
+            return null;
+        }
+        List<Comment> comments = videoOptional.get().getComments();
+        Map<Comment, UserDto> commentsAndAuthors = new HashMap<>();
+
+        for (Comment comment : comments) {
+            commentsAndAuthors.put(
+                    comment,
+                    keycloakService.getUserDtoById(comment.getAuthorId())
+            );
+        }
+
         return videoRepository.findById(id)
-                .map(video -> VideoDetailsMapper.getVideoDetailsDtoFromEntity(video, true))
+                .map(video -> VideoDetailsMapper.getVideoDetailsDtoFromEntity(video, commentsAndAuthors))
                 .orElse(null);
     }
 
