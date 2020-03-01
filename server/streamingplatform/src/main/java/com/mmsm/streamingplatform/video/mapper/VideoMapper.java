@@ -13,7 +13,7 @@ public class VideoMapper {
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .description(entity.getDescription())
-                .createdBy(entity.getCreatedBy())
+                .createdById(entity.getCreatedById())
                 .createdDate(entity.getCreatedDate())
                 .build();
     }

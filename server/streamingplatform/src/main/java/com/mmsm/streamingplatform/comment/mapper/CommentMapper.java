@@ -40,8 +40,7 @@ public class CommentMapper {
     }
 
     public static CommentDto getCommentDtoWithReplies(CommentWithRepliesAndAuthors commentWithRepliesAndAuthors) {
-        if (commentWithRepliesAndAuthors == null || commentWithRepliesAndAuthors.getComment() == null
-            || commentWithRepliesAndAuthors.getAuthor() == null) {
+        if (commentWithRepliesAndAuthors == null || commentWithRepliesAndAuthors.getComment() == null) {
             return null;
         }
         Comment comment = commentWithRepliesAndAuthors.getComment();

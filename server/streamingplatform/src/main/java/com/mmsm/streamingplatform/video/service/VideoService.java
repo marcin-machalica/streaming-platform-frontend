@@ -3,7 +3,6 @@ package com.mmsm.streamingplatform.video.service;
 import com.mmsm.streamingplatform.comment.model.Comment;
 import com.mmsm.streamingplatform.comment.model.CommentWithRepliesAndAuthors;
 import com.mmsm.streamingplatform.comment.service.CommentService;
-import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import com.mmsm.streamingplatform.keycloak.service.KeycloakService;
 import com.mmsm.streamingplatform.utils.FileUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
@@ -83,9 +82,9 @@ public class VideoService {
     @Transactional
     public boolean deleteVideoById(Long id) {
         Optional<Video> videoOptional = videoRepository.findById(id);
-        Optional<String> currentUserOptional = SecurityUtils.getCurrentUser();
+        Optional<String> currentUserOptional = SecurityUtils.getCurrentUserId();
         if (videoOptional.isPresent() && currentUserOptional.isPresent() &&
-           (SecurityUtils.hasAdminRole() || currentUserOptional.get().equals(videoOptional.get().getCreatedBy()))) {
+           (SecurityUtils.hasAdminRole() || currentUserOptional.get().equals(videoOptional.get().getCreatedById()))) {
 
             Video video = videoOptional.get();
             videoRepository.delete(video);

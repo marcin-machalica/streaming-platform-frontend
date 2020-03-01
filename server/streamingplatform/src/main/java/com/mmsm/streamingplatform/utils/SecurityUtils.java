@@ -1,6 +1,9 @@
 package com.mmsm.streamingplatform.utils;
 
+import org.keycloak.KeycloakPrincipal;
+import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
+import org.keycloak.representations.AccessToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +27,16 @@ public class SecurityUtils {
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
                 .map(Authentication::getName);
+    }
+
+    public static Optional<String> getCurrentUserId() {
+        return Optional.ofNullable(SecurityContextHolder.getContext())
+                .map(SecurityContext::getAuthentication)
+                .filter(Authentication::isAuthenticated)
+                .map(authentication -> (KeycloakPrincipal<KeycloakSecurityContext>) authentication.getPrincipal())
+                .map(KeycloakPrincipal::getKeycloakSecurityContext)
+                .map(KeycloakSecurityContext::getToken)
+                .map(AccessToken::getSubject);
     }
 
     public static String getUserIdFromRequest(HttpServletRequest request) {

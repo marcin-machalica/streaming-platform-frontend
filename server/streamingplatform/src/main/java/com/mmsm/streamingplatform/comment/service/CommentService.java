@@ -30,19 +30,19 @@ public class CommentService {
         return CommentMapper.getCommentDtoWithReplies(commentWithRepliesAndAuthors);
     }
 
-    public CommentWithRepliesAndAuthors getCommentWithRepliesAndAuthors (Comment comment) {
+    public CommentWithRepliesAndAuthors getCommentWithRepliesAndAuthors(Comment comment) {
         if (comment == null) {
             return null;
         }
 
         return CommentWithRepliesAndAuthors.builder()
                 .comment(comment)
-                .author(keycloakService.getUserDtoById(comment.getAuthorId()))
+                .author(keycloakService.getUserDtoById(comment.getCreatedById()))
                 .commentsAndAuthors(getCommentsWithRepliesAndAuthors(comment.getDirectReplies()))
                 .build();
     }
 
-    public List<CommentWithRepliesAndAuthors> getCommentsWithRepliesAndAuthors (List<Comment> comments) {
+    public List<CommentWithRepliesAndAuthors> getCommentsWithRepliesAndAuthors(List<Comment> comments) {
         List<CommentWithRepliesAndAuthors> nestedCommentsWithAuthors = new ArrayList<>();
         for (Comment comment : comments) {
             nestedCommentsWithAuthors.add(getCommentWithRepliesAndAuthors(comment));
@@ -59,14 +59,13 @@ public class CommentService {
                 .flatMap(commentRepository::findById);
 
         comment.setMessage(dto.getMessage());
-        comment.setAuthorId(authorId);
 
         if (parentCommentOptional.isPresent()) {
             Comment parentComment = parentCommentOptional.get();
             parentComment.addChildrenComment(comment);
             Comment savedComment = commentRepository.save(comment);
             return CommentMapper.getCommentDto(savedComment,
-                    keycloakService.getUserDtoById(savedComment.getAuthorId()));
+                    keycloakService.getUserDtoById(savedComment.getCreatedById()));
         }
 
         Optional<Video> videoOptional = videoRepository.findById(videoId);
@@ -82,6 +81,6 @@ public class CommentService {
         comments.add(comment);
         Comment savedComment = commentRepository.save(comment);
         return CommentMapper.getCommentDto(savedComment,
-                keycloakService.getUserDtoById(savedComment.getAuthorId()));
+                keycloakService.getUserDtoById(savedComment.getCreatedById()));
     }
 }

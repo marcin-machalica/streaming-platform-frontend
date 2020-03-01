@@ -23,16 +23,16 @@ public abstract class Auditor implements Serializable {
     private Long id;
 
     @CreatedBy
-    @Column(name = "created_by")
-    private String createdBy;
+    @Column(name = "created_by_id")
+    private String createdById;
 
     @CreatedDate
     @Column(name = "created_date")
     private LocalDateTime createdDate;
 
     @LastModifiedBy
-    @Column(name = "last_modified_by")
-    private String lastModifiedBy;
+    @Column(name = "last_modified_by_id")
+    private String lastModifiedById;
 
     @LastModifiedDate
     @Column(name = "last_modified_date")

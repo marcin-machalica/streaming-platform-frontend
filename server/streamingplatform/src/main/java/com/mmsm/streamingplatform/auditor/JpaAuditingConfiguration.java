@@ -12,6 +12,6 @@ public class JpaAuditingConfiguration {
 
     @Bean
     public AuditorAware<String> auditorProvider() {
-        return SecurityUtils::getCurrentUser;
+        return SecurityUtils::getCurrentUserId;
     }
 }
