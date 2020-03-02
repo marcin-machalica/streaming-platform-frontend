@@ -1,5 +1,6 @@
 package com.mmsm.streamingplatform.comment.model;
 
+import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public class CommentDto {
     private Long id;
     private Long parentId;
+    private UserDto author;
     private String message;
     private Long upVoteCount;
     private Long downVoteCount;

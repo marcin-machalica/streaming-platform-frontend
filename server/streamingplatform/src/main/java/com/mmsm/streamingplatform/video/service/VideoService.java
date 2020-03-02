@@ -1,5 +1,9 @@
 package com.mmsm.streamingplatform.video.service;
 
+import com.mmsm.streamingplatform.comment.model.Comment;
+import com.mmsm.streamingplatform.comment.model.CommentWithRepliesAndAuthors;
+import com.mmsm.streamingplatform.comment.service.CommentService;
+import com.mmsm.streamingplatform.keycloak.service.KeycloakService;
 import com.mmsm.streamingplatform.utils.FileUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
 import com.mmsm.streamingplatform.video.mapper.VideoDetailsMapper;
@@ -26,6 +30,8 @@ import java.util.stream.Collectors;
 public class VideoService {
 
     private final VideoRepository videoRepository;
+    private final KeycloakService keycloakService;
+    private final CommentService commentService;
 
     @Value("${VIDEOS_STORAGE_PATH}")
     public String VIDEOS_STORAGE_PATH;
@@ -38,8 +44,15 @@ public class VideoService {
     }
 
     public VideoDetailsDto getVideoDetailsDtoByVideoId(Long id) {
+        Optional<Video> videoOptional = videoRepository.findById(id);
+        if (videoOptional.isEmpty()) {
+            return null;
+        }
+        List<Comment> comments = videoOptional.get().getComments();
+        List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors = commentService.getCommentsWithRepliesAndAuthors(comments);
+
         return videoRepository.findById(id)
-                .map(video -> VideoDetailsMapper.getVideoDetailsDtoFromEntity(video, true))
+                .map(video -> VideoDetailsMapper.getVideoDetailsDtoFromEntity(video, commentWithRepliesAndAuthors))
                 .orElse(null);
     }
 
@@ -69,9 +82,9 @@ public class VideoService {
     @Transactional
     public boolean deleteVideoById(Long id) {
         Optional<Video> videoOptional = videoRepository.findById(id);
-        Optional<String> currentUserOptional = SecurityUtils.getCurrentUser();
+        Optional<String> currentUserOptional = SecurityUtils.getCurrentUserId();
         if (videoOptional.isPresent() && currentUserOptional.isPresent() &&
-           (SecurityUtils.hasAdminRole() || currentUserOptional.get().equals(videoOptional.get().getCreatedBy()))) {
+           (SecurityUtils.hasAdminRole() || currentUserOptional.get().equals(videoOptional.get().getCreatedById()))) {
 
             Video video = videoOptional.get();
             videoRepository.delete(video);

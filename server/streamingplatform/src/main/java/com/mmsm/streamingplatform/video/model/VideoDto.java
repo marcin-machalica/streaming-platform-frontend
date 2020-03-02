@@ -11,6 +11,6 @@ public class VideoDto {
     private Long id;
     private String title;
     private String description;
-    private String createdBy;
+    private String createdById;
     private LocalDateTime createdDate;
 }

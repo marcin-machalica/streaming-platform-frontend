@@ -55,8 +55,6 @@ public class Comment extends Auditor implements Serializable {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     List<Comment> directReplies;
 
-    // author todo
-
     public void addChildrenComment(Comment comment) {
         this.directReplies.add(comment);
         comment.setParentComment(this);
