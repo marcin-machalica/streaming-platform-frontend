@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -56,6 +57,9 @@ public class Comment extends Auditor implements Serializable {
     List<Comment> directReplies;
 
     public void addChildrenComment(Comment comment) {
+        if (this.directReplies == null) {
+            this.directReplies = new ArrayList<>();
+        }
         this.directReplies.add(comment);
         comment.setParentComment(this);
         directRepliesCount++;

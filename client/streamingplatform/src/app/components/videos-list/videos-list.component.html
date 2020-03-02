@@ -1,11 +1,7 @@
 <div class="page-content">
   <h1>Videos List</h1>
-  <mat-list *ngFor="let video of videos">
-    <mat-list-item>
-      <div>
-        <h4><a routerLink="{{'/videos/' + video.id}}">{{video.title}}</a></h4>
-        <h4>{{video.createdBy}}</h4>
-      </div>
-    </mat-list-item>
-  </mat-list>
+  <div *ngFor="let video of videos" routerLink="{{'/videos/' + video.id}}" class="margin-top-30 cursor-pointer">
+    <h4>{{video.title}}</h4>
+    <p>{{video.author.username}} {{video.createdDate}}</p>
+  </div>
 </div>

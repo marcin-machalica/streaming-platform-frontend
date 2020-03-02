@@ -4,6 +4,7 @@
              src="{{videoResourceUrl(videoDetails.videoDto.id)}}"></mat-video>
   <mat-video *ngIf="!videoDetails.videoDto.id"></mat-video>
   <h2>{{videoDetails.videoDto.title}}</h2>
+  <strong>{{videoDetails.videoDto.author.username}}</strong>
   <p>Description: {{videoDetails.videoDto.description}}</p>
   <p>Views: {{videoDetails.videoRatingDto.viewCount}}</p>
   <p>Up votes: {{videoDetails.videoRatingDto.upVoteCount}}</p>

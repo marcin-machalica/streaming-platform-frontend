@@ -3,6 +3,7 @@ package com.mmsm.streamingplatform.video.service;
 import com.mmsm.streamingplatform.comment.model.Comment;
 import com.mmsm.streamingplatform.comment.model.CommentWithRepliesAndAuthors;
 import com.mmsm.streamingplatform.comment.service.CommentService;
+import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import com.mmsm.streamingplatform.keycloak.service.KeycloakService;
 import com.mmsm.streamingplatform.utils.FileUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
@@ -39,7 +40,10 @@ public class VideoService {
     public List<VideoDto> getAllVideoDtos() {
         return videoRepository.findAll()
                 .stream()
-                .map(VideoMapper::getVideoDtoFromEntity)
+                .map(video -> VideoMapper.getVideoDtoFromEntity(
+                        video,
+                        keycloakService.getUserDtoById(video.getCreatedById())
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -48,11 +52,13 @@ public class VideoService {
         if (videoOptional.isEmpty()) {
             return null;
         }
-        List<Comment> comments = videoOptional.get().getComments();
+        Video video = videoOptional.get();
+        List<Comment> comments = video.getComments();
         List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors = commentService.getCommentsWithRepliesAndAuthors(comments);
+        UserDto videoAuthor = keycloakService.getUserDtoById(video.getCreatedById());
 
         return videoRepository.findById(id)
-                .map(video -> VideoDetailsMapper.getVideoDetailsDtoFromEntity(video, commentWithRepliesAndAuthors))
+                .map(foundVideo -> VideoDetailsMapper.getVideoDetailsDtoFromEntity(foundVideo, videoAuthor, commentWithRepliesAndAuthors))
                 .orElse(null);
     }
 
@@ -65,7 +71,8 @@ public class VideoService {
         video.setDescription(description);
         Video savedVideo = videoRepository.save(video);
         storeFile(file, filename);
-        return VideoMapper.getVideoDtoFromEntity(savedVideo);
+        UserDto author = keycloakService.getUserDtoById(savedVideo.getCreatedById());
+        return VideoMapper.getVideoDtoFromEntity(savedVideo, author);
     }
 
     public VideoDto updateVideoDto(VideoDto dto, Long id) {
@@ -76,7 +83,9 @@ public class VideoService {
         Video video = videoOptional.get();
         video.setTitle(dto.getTitle());
         video.setDescription(dto.getDescription());
-        return VideoMapper.getVideoDtoFromEntity(videoRepository.save(video));
+        Video updatedVideo = videoRepository.save(video);
+        UserDto author = keycloakService.getUserDtoById(updatedVideo.getCreatedById());
+        return VideoMapper.getVideoDtoFromEntity(updatedVideo, author);
     }
 
     @Transactional

@@ -18,8 +18,6 @@ import java.util.List;
 @Table(name = "video")
 public class Video extends Auditor implements Serializable {
 
-    // author todo
-
     @NotNull
     @Column(name = "filename", nullable = false)
     private String filename;
