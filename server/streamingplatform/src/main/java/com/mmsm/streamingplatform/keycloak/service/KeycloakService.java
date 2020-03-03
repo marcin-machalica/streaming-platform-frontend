@@ -50,6 +50,11 @@ public class KeycloakService {
         );
     }
 
+    public boolean isAdmin(String userId) {
+        return realmResource.groups().group(ADMIN_GROUP_ID).members().stream()
+                .anyMatch(member -> member.getId().equals(userId));
+    }
+
     private boolean isAdmin(UserRepresentation userRepresentation) {
         return realmResource.groups().group(ADMIN_GROUP_ID).members().stream()
                 .anyMatch(member -> member.getId().equals(userRepresentation.getId()));

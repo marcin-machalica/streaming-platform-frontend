@@ -21,9 +21,10 @@ public class CommentDto {
     private Integer allRepliesCount;
     private Boolean isVideoAuthorFavourite;
     private Boolean isPinned;
+    private Boolean wasEdited;
+    private Boolean isDeleted;
     private LocalDateTime dateCreated;
     private List<CommentDto> directReplies;
-    // author todo
 }
 
 

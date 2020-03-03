@@ -11,23 +11,25 @@ import java.util.Map;
 
 public class CommentMapper {
 
-    public static CommentDto getCommentDto(Comment entity, UserDto author) {
-        if (entity == null) {
+    public static CommentDto getCommentDto(Comment comment, UserDto author) {
+        if (comment == null) {
             return null;
         }
         return CommentDto.builder()
-                .id(entity.getId())
-                .parentId(entity.getParentComment() != null ? entity.getParentComment().getId() : null)
+                .id(comment.getId())
+                .parentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
                 .author(author)
-                .message(entity.getMessage())
-                .upVoteCount(entity.getUpVoteCount())
-                .downVoteCount(entity.getDownVoteCount())
-                .favouriteVoteCount(entity.getFavouriteVoteCount())
-                .directRepliesCount(entity.getDirectRepliesCount())
-                .allRepliesCount(entity.getAllRepliesCount())
-                .isVideoAuthorFavourite(entity.getIsVideoAuthorFavourite())
-                .isPinned(entity.getIsPinned())
-                .dateCreated(entity.getCreatedDate())
+                .message(comment.getIsDeleted() ? null : comment.getMessage())
+                .upVoteCount(comment.getUpVoteCount())
+                .downVoteCount(comment.getDownVoteCount())
+                .favouriteVoteCount(comment.getFavouriteVoteCount())
+                .directRepliesCount(comment.getDirectRepliesCount())
+                .allRepliesCount(comment.getAllRepliesCount())
+                .isVideoAuthorFavourite(comment.getIsVideoAuthorFavourite())
+                .isPinned(comment.getIsPinned())
+                .wasEdited(comment.getWasEdited())
+                .isDeleted(comment.getIsDeleted())
+                .dateCreated(comment.getCreatedDate())
                 .build();
     }
 
@@ -49,7 +51,7 @@ public class CommentMapper {
                 .id(comment.getId())
                 .parentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
                 .author(commentWithRepliesAndAuthors.getAuthor())
-                .message(comment.getMessage())
+                .message(comment.getIsDeleted() ? null : comment.getMessage())
                 .upVoteCount(comment.getUpVoteCount())
                 .downVoteCount(comment.getDownVoteCount())
                 .favouriteVoteCount(comment.getFavouriteVoteCount())
@@ -57,6 +59,8 @@ public class CommentMapper {
                 .allRepliesCount(comment.getAllRepliesCount())
                 .isVideoAuthorFavourite(comment.getIsVideoAuthorFavourite())
                 .isPinned(comment.getIsPinned())
+                .wasEdited(comment.getWasEdited())
+                .isDeleted(comment.getIsDeleted())
                 .dateCreated(comment.getCreatedDate())
                 .directReplies(CommentMapper.getCommentDtosWithReplies(commentWithRepliesAndAuthors.getCommentsAndAuthors()))
                 .build();

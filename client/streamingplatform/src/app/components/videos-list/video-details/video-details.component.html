@@ -15,7 +15,7 @@
     <mat-form-field>
       <textarea matInput required placeholder="Comment" id="comment_input_0"></textarea>
     </mat-form-field>
-    <button mat-button (click)="saveComment(0)">
+    <button mat-button (click)="saveComment(null)">
       <span>Comment</span>
     </button>
   </div>
@@ -26,14 +26,37 @@
       <!-- use a disabled button to provide padding for tree leaf -->
       <div>
         <button mat-button disabled></button>
-        <p>{{node.author.username}} {{node.dateCreated}}</p>
-        <p>{{node.message}}</p>
-        <div id="comment_form_{{node.id}}">
+        <p>{{node.author.username}} {{node.dateCreated}} {{node.wasEdited ? '(edited)' : ''}}</p>
+        <p [class.italic]="node.isDeleted">{{node.isDeleted ? 'Deleted' : node.message}}</p>
+        <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="deleteComment(node)">
+          <span>Delete</span>
+        </button>
+        <button mat-button (click)="setReplyActive(node)">
+          <span>Reply</span>
+        </button>
+        <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="setEditActive(node)">
+          <span>Edit</span>
+        </button>
+        <div *ngIf="node.isReplyActive && !node.isEditActive">
           <mat-form-field>
             <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
           </mat-form-field>
-          <button mat-button (click)="saveComment(node.id)">
+          <button mat-button (click)="saveComment(node)">
             <span>Comment</span>
+          </button>
+          <button mat-button (click)="cancelReplyAndEdit(node)">
+            <span>Cancel</span>
+          </button>
+        </div>
+        <div *ngIf="!node.isReplyActive && node.isEditActive">
+          <mat-form-field>
+            <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
+          </mat-form-field>
+          <button mat-button (click)="updateComment(node)">
+            <span>Save</span>
+          </button>
+          <button mat-button (click)="cancelReplyAndEdit(node)">
+            <span>Cancel</span>
           </button>
         </div>
       </div>
@@ -42,14 +65,37 @@
     <!-- This is the tree node template for expandable nodes -->
     <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
       <div>
-        <p>{{node.author.username}} {{node.dateCreated}}</p>
-        <p>{{node.message}}</p>
-        <div id="comment_form_{{node.id}}">
+        <p>{{node.author.username}} {{node.dateCreated}} {{node.wasEdited ? '(edited)' : ''}}</p>
+        <p [class.italic]="node.isDeleted">{{node.isDeleted ? 'Deleted' : node.message}}</p>
+        <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="deleteComment(node)">
+          <span>Delete</span>
+        </button>
+        <button mat-button (click)="setReplyActive(node)">
+          <span>Reply</span>
+        </button>
+        <button mat-button *ngIf="isOwner(node.author.id)" (click)="setEditActive(node)">
+          <span>Edit</span>
+        </button>
+        <div *ngIf="node.isReplyActive && !node.isEditActive">
           <mat-form-field>
             <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
           </mat-form-field>
-          <button mat-button (click)="saveComment(node.id)">
+          <button mat-button (click)="saveComment(node)">
             <span>Comment</span>
+          </button>
+          <button mat-button (click)="cancelReplyAndEdit(node)">
+            <span>Cancel</span>
+          </button>
+        </div>
+        <div *ngIf="!node.isReplyActive && node.isEditActive">
+          <mat-form-field>
+            <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
+          </mat-form-field>
+          <button mat-button (click)="updateComment(node)">
+            <span>Save</span>
+          </button>
+          <button mat-button (click)="cancelReplyAndEdit(node)">
+            <span>Cancel</span>
           </button>
         </div>
         <button mat-button matTreeNodeToggle>
