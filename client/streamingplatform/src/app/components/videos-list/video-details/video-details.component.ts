@@ -10,6 +10,8 @@ import {CommentService} from '../../../services/api/comment.service';
 import {DOCUMENT} from '@angular/common';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
+import {UserDto} from '../../../dtos/UserDto';
+import {KeycloakService} from "keycloak-angular";
 
 @Component({
   selector: 'app-video-details',
@@ -18,8 +20,9 @@ import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 })
 export class VideoDetailsComponent implements OnInit {
 
+  currentUserId: string;
   videoDetails: VideoDetailsDto = {
-    videoDto: new VideoDto(),
+    videoDto: { ...(new VideoDto()), author: new UserDto() },
     videoRatingDto: new VideoRatingDto(),
     directCommentDtos: []
   };
@@ -40,9 +43,12 @@ export class VideoDetailsComponent implements OnInit {
       allRepliesCount: node.allRepliesCount,
       isVideoAuthorFavourite: node.isVideoAuthorFavourite,
       isPinned: node.isPinned,
+      wasEdited: node.wasEdited,
+      isDeleted: node.isDeleted,
       dateCreated: node.dateCreated,
       directReplies: node.directReplies,
-      // author todo
+      isReplyActive: node.isReplyActive,
+      isEditActive: node.isEditActive,
       expandable: !!node.directReplies && node.directReplies.length > 0,
       level: level,
     };
@@ -58,6 +64,7 @@ export class VideoDetailsComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
               @Inject(DOCUMENT) document,
+              private keycloakService: KeycloakService,
               private videoService: VideoService,
               private commentService: CommentService) {
   }
@@ -65,6 +72,9 @@ export class VideoDetailsComponent implements OnInit {
   ngOnInit() {
     this.videoId = +this.route.snapshot.paramMap.get('id');
     this.loadVideoDetails();
+    this.keycloakService.getKeycloakInstance().loadUserInfo().success(user => {
+      this.currentUserId = (user as any).sub;
+    });
   }
 
   loadVideoDetails() {
@@ -81,7 +91,8 @@ export class VideoDetailsComponent implements OnInit {
     this.dataSource.data = this.videoDetails.directCommentDtos;
   }
 
-  saveComment(id: number) {
+  saveComment(node: CommentDtoNode) {
+    const id = node ? node.id : 0;
     const comment = new CommentDto();
     comment.parentId = id > 0 ? id : null;
     comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value;
@@ -91,13 +102,40 @@ export class VideoDetailsComponent implements OnInit {
 
     this.commentService.saveComment(comment, this.videoId).subscribe(response => {
       if (response.status === 201) {
-        if (!comment.parentId) {
+        if (!response.body.parentId) {
           this.videoDetails.directCommentDtos.push(response.body);
           this.reloadComments();
-          comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value = '';
+          (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value = '';
+          if (node) {
+            node.isReplyActive = false;
+          }
         } else {
           this.loadVideoDetails();
         }
+      }
+    });
+  }
+
+  updateComment(node: CommentDtoNode) {
+    const id = node.id;
+    const comment = new CommentDto();
+    comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value;
+
+    this.commentService.updateComment(comment, this.videoId, id).subscribe(response => {
+      if (response.status === 200) {
+        (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value = '';
+        node.isEditActive = false;
+        this.loadVideoDetails();
+      }
+    });
+  }
+
+  deleteComment(node: CommentDtoNode) {
+    const id = node.id;
+
+    this.commentService.deleteComment(this.videoId, id).subscribe(response => {
+      if (response.status === 204) {
+        this.loadVideoDetails();
       }
     });
   }
@@ -109,10 +147,34 @@ export class VideoDetailsComponent implements OnInit {
       this.reloadComments();
     });
   }
+
+  isOwner(authorId: string) {
+    if (authorId === null || this.currentUserId === null) {
+      return false;
+    }
+    return this.currentUserId === authorId;
+  }
+
+  setReplyActive(node: CommentDtoNode) {
+    node.isReplyActive = true;
+    node.isEditActive = false;
+  }
+
+  setEditActive(node: CommentDtoNode) {
+    node.isReplyActive = false;
+    node.isEditActive = true;
+  }
+
+  cancelReplyAndEdit(node: CommentDtoNode) {
+    node.isReplyActive = false;
+    node.isEditActive = false;
+  }
 }
 
 export class CommentDtoNode extends CommentDto {
   public directReplies: CommentDtoNode[];
   public expandable: boolean;
   public level: number;
+  public isReplyActive: boolean;
+  public isEditActive: boolean;
 }

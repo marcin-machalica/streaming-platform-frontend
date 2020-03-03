@@ -12,7 +12,8 @@ export class CommentDto {
   public allRepliesCount: number;
   public isVideoAuthorFavourite: boolean;
   public isPinned: boolean;
+  public wasEdited: boolean;
+  public isDeleted: boolean;
   public dateCreated: Date;
   public directReplies: CommentDto[];
-  // author todo
 }

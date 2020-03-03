@@ -27,7 +27,7 @@ public class ControllerUtils {
 
     public static <T> ResponseEntity<T> getUpdatedResponse(T resource) {
         if (resource == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)

@@ -50,6 +50,14 @@ public class Comment extends Auditor implements Serializable {
     @Column(name = "is_pinned", nullable = false)
     private Boolean isPinned = false;
 
+    @NotNull
+    @Column(name = "was_edited", nullable = false)
+    private Boolean wasEdited = false;
+
+    @NotNull
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
     @ManyToOne
     private Comment parentComment;
 
