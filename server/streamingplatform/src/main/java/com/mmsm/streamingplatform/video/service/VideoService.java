@@ -1,5 +1,7 @@
 package com.mmsm.streamingplatform.video.service;
 
+import com.mmsm.streamingplatform.comment.commentrating.model.CommentRating;
+import com.mmsm.streamingplatform.comment.commentrating.service.CommentRatingRepository;
 import com.mmsm.streamingplatform.comment.model.Comment;
 import com.mmsm.streamingplatform.comment.model.CommentWithRepliesAndAuthors;
 import com.mmsm.streamingplatform.comment.service.CommentService;
@@ -31,6 +33,7 @@ import java.util.stream.Collectors;
 public class VideoService {
 
     private final VideoRepository videoRepository;
+    private final CommentRatingRepository commentRatingRepository;
     private final KeycloakService keycloakService;
     private final CommentService commentService;
 
@@ -47,14 +50,21 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
-    public VideoDetailsDto getVideoDetailsDtoByVideoId(Long id) {
+    public VideoDetailsDto getVideoDetailsDtoByVideoId(Long id, String userId) {
         Optional<Video> videoOptional = videoRepository.findById(id);
         if (videoOptional.isEmpty()) {
             return null;
         }
         Video video = videoOptional.get();
         List<Comment> comments = video.getComments();
-        List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors = commentService.getCommentsWithRepliesAndAuthors(comments);
+
+        Map<Comment, CommentRating> commentsAndRatings = new HashMap<>();
+        comments.stream()
+                .forEach(comment -> commentsAndRatings.put(
+                        comment,
+                        commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), userId).orElseGet(CommentRating::new)
+                ));
+        List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors = commentService.getCommentsWithRepliesAndAuthors(commentsAndRatings, userId);
         UserDto videoAuthor = keycloakService.getUserDtoById(video.getCreatedById());
 
         return videoRepository.findById(id)

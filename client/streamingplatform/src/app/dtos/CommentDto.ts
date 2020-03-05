@@ -1,4 +1,5 @@
 import {UserDto} from './UserDto';
+import {CommentRatingDto} from "./CommentRatingDto";
 
 export class CommentDto {
   public id: number;
@@ -15,5 +16,6 @@ export class CommentDto {
   public wasEdited: boolean;
   public isDeleted: boolean;
   public dateCreated: Date;
+  public currentUserCommentRating: CommentRatingDto;
   public directReplies: CommentDto[];
 }

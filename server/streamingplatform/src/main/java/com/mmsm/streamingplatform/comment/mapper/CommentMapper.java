@@ -1,5 +1,6 @@
 package com.mmsm.streamingplatform.comment.mapper;
 
+import com.mmsm.streamingplatform.comment.commentrating.model.CommentRatingDto;
 import com.mmsm.streamingplatform.comment.model.Comment;
 import com.mmsm.streamingplatform.comment.model.CommentDto;
 import com.mmsm.streamingplatform.comment.model.CommentWithRepliesAndAuthors;
@@ -11,7 +12,7 @@ import java.util.Map;
 
 public class CommentMapper {
 
-    public static CommentDto getCommentDto(Comment comment, UserDto author) {
+    public static CommentDto getCommentDto(Comment comment, UserDto author, CommentRatingDto currentUserCommentRating) {
         if (comment == null) {
             return null;
         }
@@ -30,13 +31,14 @@ public class CommentMapper {
                 .wasEdited(comment.getWasEdited())
                 .isDeleted(comment.getIsDeleted())
                 .dateCreated(comment.getCreatedDate())
+                .currentUserCommentRating(currentUserCommentRating)
                 .build();
     }
 
-    public static List<CommentDto> getCommentDtos(Map<Comment, UserDto> commentsAndAuthors) {
+    public static List<CommentDto> getCommentDtos(Map<Comment, UserDto> commentsAndAuthors, CommentRatingDto currentUserCommentRating) {
         List<CommentDto> commentDtos = new ArrayList<>();
         commentsAndAuthors.forEach((comment, author) ->
-                commentDtos.add(getCommentDto(comment, author))
+                commentDtos.add(getCommentDto(comment, author, currentUserCommentRating))
         );
         return commentDtos;
     }
@@ -62,6 +64,7 @@ public class CommentMapper {
                 .wasEdited(comment.getWasEdited())
                 .isDeleted(comment.getIsDeleted())
                 .dateCreated(comment.getCreatedDate())
+                .currentUserCommentRating(commentWithRepliesAndAuthors.getCommentRatingDto())
                 .directReplies(CommentMapper.getCommentDtosWithReplies(commentWithRepliesAndAuthors.getCommentsAndAuthors()))
                 .build();
     }

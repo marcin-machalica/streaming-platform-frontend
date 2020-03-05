@@ -11,7 +11,8 @@ import {DOCUMENT} from '@angular/common';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {UserDto} from '../../../dtos/UserDto';
-import {KeycloakService} from "keycloak-angular";
+import {KeycloakService} from 'keycloak-angular';
+import {CommentRatingService} from '../../../services/api/comment-rating.service';
 
 @Component({
   selector: 'app-video-details',
@@ -46,6 +47,7 @@ export class VideoDetailsComponent implements OnInit {
       wasEdited: node.wasEdited,
       isDeleted: node.isDeleted,
       dateCreated: node.dateCreated,
+      currentUserCommentRating: node.currentUserCommentRating,
       directReplies: node.directReplies,
       isReplyActive: node.isReplyActive,
       isEditActive: node.isEditActive,
@@ -66,7 +68,8 @@ export class VideoDetailsComponent implements OnInit {
               @Inject(DOCUMENT) document,
               private keycloakService: KeycloakService,
               private videoService: VideoService,
-              private commentService: CommentService) {
+              private commentService: CommentService,
+              private commentRatingService: CommentRatingService) {
   }
 
   ngOnInit() {
@@ -137,6 +140,24 @@ export class VideoDetailsComponent implements OnInit {
       if (response.status === 204) {
         this.loadVideoDetails();
       }
+    });
+  }
+
+  upVoteComment(commentId: number) {
+    this.commentRatingService.upVoteComment(this.videoId, commentId).subscribe(response => {
+      this.loadVideoDetails();
+    });
+  }
+
+  downVoteComment(commentId: number) {
+    this.commentRatingService.downVoteComment(this.videoId, commentId).subscribe(response => {
+      this.loadVideoDetails();
+    });
+  }
+
+  favouriteComment(commentId: number) {
+    this.commentRatingService.favouriteComment(this.videoId, commentId).subscribe(response => {
+      this.loadVideoDetails();
     });
   }
 

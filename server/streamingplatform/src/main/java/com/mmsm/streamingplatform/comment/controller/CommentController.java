@@ -20,13 +20,16 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentDto> getCommentDtoWithReplies(@PathVariable Long videoId, @PathVariable Long commentId) {
-        CommentDto commentDto = commentService.getCommentDtoWithReplies(commentId);
+    public ResponseEntity<CommentDto> getCommentDtoWithReplies(@PathVariable Long videoId,
+                                                               @PathVariable Long commentId,
+                                                               HttpServletRequest request) {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        CommentDto commentDto = commentService.getCommentDtoWithReplies(commentId, userId);
         return ControllerUtils.getFoundResponse(commentDto);
     }
 
     @PostMapping("")
-    public ResponseEntity<CommentDto> saveCommentDto(@RequestBody CommentDto commentDto,
+    public ResponseEntity<CommentDto> saveComment(@RequestBody CommentDto commentDto,
                                                      @PathVariable Long videoId) throws URISyntaxException {
         CommentDto savedCommentDto = commentService.saveComment(commentDto, videoId);
         URI uri = savedCommentDto != null ? new URI("/api/v1/videos/" + videoId + "/comments/" + savedCommentDto.getId()) : null;
@@ -38,8 +41,8 @@ public class CommentController {
                                                     @PathVariable Long videoId,
                                                     @PathVariable Long commentId,
                                                     HttpServletRequest request) {
-        String authorId = SecurityUtils.getUserIdFromRequest(request);
-        CommentDto savedCommentDto = commentService.updateComment(commentDto, authorId, commentId);
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        CommentDto savedCommentDto = commentService.updateComment(commentDto, userId, commentId);
         return ControllerUtils.getUpdatedResponse(savedCommentDto);
     }
 

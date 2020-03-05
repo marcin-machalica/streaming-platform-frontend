@@ -1,6 +1,7 @@
 package com.mmsm.streamingplatform.video.controller;
 
 import com.mmsm.streamingplatform.utils.ControllerUtils;
+import com.mmsm.streamingplatform.utils.SecurityUtils;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;
 import com.mmsm.streamingplatform.video.service.VideoService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.NotSupportedException;
 import java.io.*;
 import java.net.URI;
@@ -31,8 +33,10 @@ public class VideoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VideoDetailsDto> getVideoDetailsDtoById(@PathVariable Long id) {
-        VideoDetailsDto videoDetailsDto = videoService.getVideoDetailsDtoByVideoId(id);
+    public ResponseEntity<VideoDetailsDto> getVideoDetailsDtoById(@PathVariable Long id,
+                                                                  HttpServletRequest request) {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        VideoDetailsDto videoDetailsDto = videoService.getVideoDetailsDtoByVideoId(id, userId);
         return ControllerUtils.getFoundResponse(videoDetailsDto);
     }
 

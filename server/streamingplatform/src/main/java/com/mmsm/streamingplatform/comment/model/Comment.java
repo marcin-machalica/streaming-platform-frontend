@@ -1,6 +1,7 @@
 package com.mmsm.streamingplatform.comment.model;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
+import com.mmsm.streamingplatform.comment.commentrating.model.CommentRating;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -62,12 +63,13 @@ public class Comment extends Auditor implements Serializable {
     private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    List<Comment> directReplies;
+    private List<Comment> directReplies = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "comment_id")
+    private List<CommentRating> commentRatings = new ArrayList<>();
 
     public void addChildrenComment(Comment comment) {
-        if (this.directReplies == null) {
-            this.directReplies = new ArrayList<>();
-        }
         this.directReplies.add(comment);
         comment.setParentComment(this);
         directRepliesCount++;
