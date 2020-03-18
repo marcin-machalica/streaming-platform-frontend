@@ -11,7 +11,8 @@ import {DOCUMENT} from '@angular/common';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {UserDto} from '../../../dtos/UserDto';
-import {KeycloakService} from "keycloak-angular";
+import {KeycloakService} from 'keycloak-angular';
+import {CommentRatingService} from '../../../services/api/comment-rating.service';
 
 @Component({
   selector: 'app-video-details',
@@ -38,7 +39,7 @@ export class VideoDetailsComponent implements OnInit {
       message: node.message,
       upVoteCount: node.upVoteCount,
       downVoteCount: node.downVoteCount,
-      favouriteVoteCount: node.favouriteVoteCount,
+      favouriteCount: node.favouriteCount,
       directRepliesCount: node.directRepliesCount,
       allRepliesCount: node.allRepliesCount,
       isVideoAuthorFavourite: node.isVideoAuthorFavourite,
@@ -46,6 +47,7 @@ export class VideoDetailsComponent implements OnInit {
       wasEdited: node.wasEdited,
       isDeleted: node.isDeleted,
       dateCreated: node.dateCreated,
+      currentUserCommentRating: node.currentUserCommentRating,
       directReplies: node.directReplies,
       isReplyActive: node.isReplyActive,
       isEditActive: node.isEditActive,
@@ -66,7 +68,8 @@ export class VideoDetailsComponent implements OnInit {
               @Inject(DOCUMENT) document,
               private keycloakService: KeycloakService,
               private videoService: VideoService,
-              private commentService: CommentService) {
+              private commentService: CommentService,
+              private commentRatingService: CommentRatingService) {
   }
 
   ngOnInit() {
@@ -130,12 +133,55 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  deleteComment(node: CommentDtoNode) {
-    const id = node.id;
+  deleteComment(comment: CommentDtoNode) {
+    const commentId = comment.id;
 
-    this.commentService.deleteComment(this.videoId, id).subscribe(response => {
+    this.commentService.deleteComment(this.videoId, commentId).subscribe(response => {
       if (response.status === 204) {
-        this.loadVideoDetails();
+        comment.isDeleted = true;
+        this.cancelReplyAndEdit(comment);
+      }
+    });
+  }
+
+  upVoteComment(comment: CommentDtoNode) {
+    this.commentRatingService.upVoteComment(this.videoId, comment.id).subscribe(response => {
+      if (response.status === 200) {
+        const wasUpVote = comment.currentUserCommentRating.isUpVote;
+        const wasDownVote = comment.currentUserCommentRating.isDownVote;
+        comment.currentUserCommentRating.isUpVote = response.body.isUpVote;
+        comment.currentUserCommentRating.isDownVote = response.body.isDownVote;
+
+        comment.upVoteCount += wasUpVote ? -1 : 1;
+        if (wasDownVote) {
+          comment.downVoteCount -= 1;
+        }
+      }
+    });
+  }
+
+  downVoteComment(comment: CommentDtoNode) {
+    this.commentRatingService.downVoteComment(this.videoId, comment.id).subscribe(response => {
+      if (response.status === 200) {
+        const wasUpVote = comment.currentUserCommentRating.isUpVote;
+        const wasDownVote = comment.currentUserCommentRating.isDownVote;
+        comment.currentUserCommentRating.isUpVote = response.body.isUpVote;
+        comment.currentUserCommentRating.isDownVote = response.body.isDownVote;
+
+        comment.downVoteCount += wasDownVote ? -1 : 1;
+        if (wasUpVote) {
+          comment.upVoteCount -= 1;
+        }
+      }
+    });
+  }
+
+  favouriteComment(comment: CommentDtoNode) {
+    this.commentRatingService.favouriteComment(this.videoId, comment.id).subscribe(response => {
+      if (response.status === 200) {
+        const wasFavourite = comment.currentUserCommentRating.isFavourite;
+        comment.currentUserCommentRating.isFavourite = response.body.isFavourite;
+        comment.favouriteCount += wasFavourite ? -1 : 1;
       }
     });
   }

@@ -28,15 +28,33 @@
         <button mat-button disabled></button>
         <p>{{node.author.username}} {{node.dateCreated}} {{node.wasEdited ? '(edited)' : ''}}</p>
         <p [class.italic]="node.isDeleted">{{node.isDeleted ? 'Deleted' : node.message}}</p>
-        <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="deleteComment(node)">
-          <span>Delete</span>
-        </button>
-        <button mat-button (click)="setReplyActive(node)">
-          <span>Reply</span>
-        </button>
-        <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="setEditActive(node)">
-          <span>Edit</span>
-        </button>
+
+        <div>
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isUpVote" (click)="upVoteComment(node)">
+            <mat-icon>thumb_up</mat-icon>
+            <span>{{node.upVoteCount}}</span>
+          </button>
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isdownVote" (click)="downVoteComment(node)">
+            <mat-icon>thumb_down</mat-icon>
+            <span>{{node.downVoteCount}}</span>
+          </button>
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isFavourite" (click)="favouriteComment(node)">
+            <mat-icon>favorite</mat-icon>
+            <span>{{node.favouriteCount}}</span>
+          </button>
+        </div>
+
+        <div>
+          <button mat-button (click)="setReplyActive(node)">
+            <span>Reply</span>
+          </button>
+          <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="setEditActive(node)">
+            <span>Edit</span>
+          </button>
+          <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="deleteComment(node)">
+            <span>Delete</span>
+          </button>
+        </div>
         <div *ngIf="node.isReplyActive && !node.isEditActive">
           <mat-form-field>
             <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
@@ -67,15 +85,37 @@
       <div>
         <p>{{node.author.username}} {{node.dateCreated}} {{node.wasEdited ? '(edited)' : ''}}</p>
         <p [class.italic]="node.isDeleted">{{node.isDeleted ? 'Deleted' : node.message}}</p>
-        <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="deleteComment(node)">
-          <span>Delete</span>
-        </button>
-        <button mat-button (click)="setReplyActive(node)">
-          <span>Reply</span>
-        </button>
-        <button mat-button *ngIf="isOwner(node.author.id)" (click)="setEditActive(node)">
-          <span>Edit</span>
-        </button>
+
+        <div>
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isUpVote" (click)="upVoteComment(node)">
+            <mat-icon>thumb_up</mat-icon>
+            <span>{{node.upVoteCount}}</span>
+          </button>
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isDownVote" (click)="downVoteComment(node)">
+            <mat-icon>thumb_down</mat-icon>
+            <span>{{node.downVoteCount}}</span>
+          </button>
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isFavourite" (click)="favouriteComment(node)">
+            <mat-icon>favorite</mat-icon>
+            <span>{{node.favouriteCount}}</span>
+          </button>
+        </div>
+
+        <div>
+          <button mat-button (click)="setReplyActive(node)">
+            <span>Reply</span>
+          </button>
+          <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="setEditActive(node)">
+            <span>Edit</span>
+          </button>
+          <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="deleteComment(node)">
+            <span>Delete</span>
+          </button>
+          <button mat-button matTreeNodeToggle>
+            <span>{{treeControl.isExpanded(node) ? 'Hide' : ('Show more (' + node.allRepliesCount + ')')}}</span>
+          </button>
+        </div>
+
         <div *ngIf="node.isReplyActive && !node.isEditActive">
           <mat-form-field>
             <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
@@ -98,9 +138,6 @@
             <span>Cancel</span>
           </button>
         </div>
-        <button mat-button matTreeNodeToggle>
-          <span>{{treeControl.isExpanded(node) ? 'Hide' : ('Show more (' + node.allRepliesCount + ')')}}</span>
-        </button>
       </div>
     </mat-tree-node>
   </mat-tree>

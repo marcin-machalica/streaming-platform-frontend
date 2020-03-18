@@ -1,5 +1,6 @@
 package com.mmsm.streamingplatform.comment.model;
 
+import com.mmsm.streamingplatform.comment.commentrating.model.CommentRatingDto;
 import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class CommentDto {
     private String message;
     private Long upVoteCount;
     private Long downVoteCount;
-    private Long favouriteVoteCount;
+    private Long favouriteCount;
     private Integer directRepliesCount;
     private Integer allRepliesCount;
     private Boolean isVideoAuthorFavourite;
@@ -24,6 +25,7 @@ public class CommentDto {
     private Boolean wasEdited;
     private Boolean isDeleted;
     private LocalDateTime dateCreated;
+    private CommentRatingDto currentUserCommentRating;
     private List<CommentDto> directReplies;
 }
 
