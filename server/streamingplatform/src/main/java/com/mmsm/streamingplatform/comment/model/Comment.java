@@ -33,7 +33,7 @@ public class Comment extends Auditor implements Serializable {
 
     @NotNull
     @Column(name = "favourite_count", nullable = false)
-    private Long favouriteVoteCount = 0L;
+    private Long favouriteCount = 0L;
 
     @NotNull
     @Column(name = "direct_replies_count", nullable = false)

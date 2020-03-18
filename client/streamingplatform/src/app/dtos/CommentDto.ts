@@ -8,7 +8,7 @@ export class CommentDto {
   public message: string;
   public upVoteCount: number;
   public downVoteCount: number;
-  public favouriteVoteCount: number;
+  public favouriteCount: number;
   public directRepliesCount: number;
   public allRepliesCount: number;
   public isVideoAuthorFavourite: boolean;

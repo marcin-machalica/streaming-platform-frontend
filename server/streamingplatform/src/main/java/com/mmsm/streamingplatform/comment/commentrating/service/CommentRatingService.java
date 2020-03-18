@@ -8,7 +8,6 @@ import com.mmsm.streamingplatform.comment.service.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -19,36 +18,73 @@ public class CommentRatingService {
     private final CommentRatingRepository commentRatingRepository;
 
     public CommentRatingDto upVoteComment(Long commentId, String userId) {
-        Optional<CommentRating> commentRatingOptional = commentRatingRepository.findCommentRatingByCommentIdAndUserId(commentId, userId);
-
-        if (commentRatingOptional.isPresent()) {
-            Comment comment = commentRepository.getOne(commentId);
-            CommentRating commentRating = commentRatingOptional.get();
-
-            Boolean isUpVote = commentRating.getIsUpVote();
-            commentRating.setIsUpVote(!isUpVote);
-            comment.setUpVoteCount(comment.getUpVoteCount() + (isUpVote ? -1 : 1));
-
-            Boolean isDownVote = commentRating.getIsDownVote();
-            if (isDownVote) {
-                commentRating.setIsDownVote(false);
-                comment.setDownVoteCount(comment.getDownVoteCount() - 1);
-            }
-
-            commentRating = commentRatingRepository.save(commentRating);
-            return CommentRatingMapper.getCommentRatingDto(commentRating, commentId);
-        }
-
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
         if (commentOptional.isEmpty()) {
             return null;
         }
         Comment comment = commentOptional.get();
-        List<CommentRating> commentRatings = comment.getCommentRatings();
-        CommentRating commentRating = new CommentRating();
-        commentRating.setIsUpVote(true);
-        comment.setUpVoteCount(comment.getUpVoteCount() + 1);
-        commentRatings.add(commentRating);
+        CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(commentId, userId).orElseGet(CommentRating::new);
+        Boolean wasUpVote = commentRating.getIsUpVote();
+        commentRating.setIsUpVote(!wasUpVote);
+        comment.setUpVoteCount(comment.getUpVoteCount() + (wasUpVote ? -1 : 1));
+
+        if (commentRating.getId() != null) {
+            Boolean wasDownVote = commentRating.getIsDownVote();
+            if (wasDownVote) {
+                commentRating.setIsDownVote(false);
+                comment.setDownVoteCount(comment.getDownVoteCount() - 1);
+            }
+        } else {
+            comment.getCommentRatings().add(commentRating);
+        }
+
+        commentRating = commentRatingRepository.save(commentRating);
+        return CommentRatingMapper.getCommentRatingDto(commentRating, commentId);
+    }
+
+    public CommentRatingDto downVoteComment(Long commentId, String userId) {
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        if (commentOptional.isEmpty()) {
+            return null;
+        }
+        Comment comment = commentOptional.get();
+        CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(commentId, userId).orElseGet(CommentRating::new);
+        Boolean wasDownVote = commentRating.getIsDownVote();
+        commentRating.setIsDownVote(!wasDownVote);
+        comment.setDownVoteCount(comment.getDownVoteCount() + (wasDownVote ? -1 : 1));
+
+        if (commentRating.getId() != null) {
+            Boolean wasUpVote = commentRating.getIsUpVote();
+            if (wasUpVote) {
+                commentRating.setIsUpVote(false);
+                comment.setUpVoteCount(comment.getUpVoteCount() - 1);
+            }
+        } else {
+            comment.getCommentRatings().add(commentRating);
+        }
+
+        commentRating = commentRatingRepository.save(commentRating);
+        return CommentRatingMapper.getCommentRatingDto(commentRating, commentId);
+    }
+
+    public CommentRatingDto favouriteComment(Long commentId, String userId) {
+        Optional<Comment> commentOptional = commentRepository.findById(commentId);
+
+        if (commentOptional.isEmpty()) {
+            return null;
+        }
+        Comment comment = commentOptional.get();
+        CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(commentId, userId).orElseGet(CommentRating::new);
+        Boolean wasFavourite = commentRating.getIsFavourite();
+        commentRating.setIsFavourite(!wasFavourite);
+        comment.setFavouriteCount(comment.getFavouriteCount() + (wasFavourite ? -1 : 1));
+
+        if (commentRating.getId() == null) {
+            comment.getCommentRatings().add(commentRating);
+        }
+
         commentRating = commentRatingRepository.save(commentRating);
         return CommentRatingMapper.getCommentRatingDto(commentRating, commentId);
     }

@@ -17,7 +17,7 @@ public class CommentDto {
     private String message;
     private Long upVoteCount;
     private Long downVoteCount;
-    private Long favouriteVoteCount;
+    private Long favouriteCount;
     private Integer directRepliesCount;
     private Integer allRepliesCount;
     private Boolean isVideoAuthorFavourite;

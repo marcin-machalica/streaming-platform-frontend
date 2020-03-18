@@ -39,7 +39,7 @@ export class VideoDetailsComponent implements OnInit {
       message: node.message,
       upVoteCount: node.upVoteCount,
       downVoteCount: node.downVoteCount,
-      favouriteVoteCount: node.favouriteVoteCount,
+      favouriteCount: node.favouriteCount,
       directRepliesCount: node.directRepliesCount,
       allRepliesCount: node.allRepliesCount,
       isVideoAuthorFavourite: node.isVideoAuthorFavourite,
@@ -133,31 +133,56 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  deleteComment(node: CommentDtoNode) {
-    const id = node.id;
+  deleteComment(comment: CommentDtoNode) {
+    const commentId = comment.id;
 
-    this.commentService.deleteComment(this.videoId, id).subscribe(response => {
+    this.commentService.deleteComment(this.videoId, commentId).subscribe(response => {
       if (response.status === 204) {
-        this.loadVideoDetails();
+        comment.isDeleted = true;
+        this.cancelReplyAndEdit(comment);
       }
     });
   }
 
-  upVoteComment(commentId: number) {
-    this.commentRatingService.upVoteComment(this.videoId, commentId).subscribe(response => {
-      this.loadVideoDetails();
+  upVoteComment(comment: CommentDtoNode) {
+    this.commentRatingService.upVoteComment(this.videoId, comment.id).subscribe(response => {
+      if (response.status === 200) {
+        const wasUpVote = comment.currentUserCommentRating.isUpVote;
+        const wasDownVote = comment.currentUserCommentRating.isDownVote;
+        comment.currentUserCommentRating.isUpVote = response.body.isUpVote;
+        comment.currentUserCommentRating.isDownVote = response.body.isDownVote;
+
+        comment.upVoteCount += wasUpVote ? -1 : 1;
+        if (wasDownVote) {
+          comment.downVoteCount -= 1;
+        }
+      }
     });
   }
 
-  downVoteComment(commentId: number) {
-    this.commentRatingService.downVoteComment(this.videoId, commentId).subscribe(response => {
-      this.loadVideoDetails();
+  downVoteComment(comment: CommentDtoNode) {
+    this.commentRatingService.downVoteComment(this.videoId, comment.id).subscribe(response => {
+      if (response.status === 200) {
+        const wasUpVote = comment.currentUserCommentRating.isUpVote;
+        const wasDownVote = comment.currentUserCommentRating.isDownVote;
+        comment.currentUserCommentRating.isUpVote = response.body.isUpVote;
+        comment.currentUserCommentRating.isDownVote = response.body.isDownVote;
+
+        comment.downVoteCount += wasDownVote ? -1 : 1;
+        if (wasUpVote) {
+          comment.upVoteCount -= 1;
+        }
+      }
     });
   }
 
-  favouriteComment(commentId: number) {
-    this.commentRatingService.favouriteComment(this.videoId, commentId).subscribe(response => {
-      this.loadVideoDetails();
+  favouriteComment(comment: CommentDtoNode) {
+    this.commentRatingService.favouriteComment(this.videoId, comment.id).subscribe(response => {
+      if (response.status === 200) {
+        const wasFavourite = comment.currentUserCommentRating.isFavourite;
+        comment.currentUserCommentRating.isFavourite = response.body.isFavourite;
+        comment.favouriteCount += wasFavourite ? -1 : 1;
+      }
     });
   }
 
