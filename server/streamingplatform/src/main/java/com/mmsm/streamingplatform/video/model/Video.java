@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -31,9 +32,26 @@ public class Video extends Auditor implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @NotNull
+    @Column(name = "view_count", nullable = false)
+    private Long viewCount = 0L;
+
+    @NotNull
+    @Column(name = "share_count", nullable = false)
+    private Long shareCount = 0L;
+
+    @NotNull
+    @Column(name = "up_vote_count", nullable = false)
+    private Long upVoteCount = 0L;
+
+    @NotNull
+    @Column(name = "down_vote_count", nullable = false)
+    private Long downVoteCount = 0L;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "video_id")
+    private List<VideoRating> videoRatings = new ArrayList<>();
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     List<Comment> comments;
-
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private VideoRating videoRating;
 }

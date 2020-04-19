@@ -1,16 +1,33 @@
 <div class="page-content">
-  <mat-video *ngIf="videoDetails.videoDto.id"
+  <mat-video *ngIf="videoDetails.id"
              [autoplay]="true" [download]="true"
-             src="{{videoResourceUrl(videoDetails.videoDto.id)}}"></mat-video>
-  <mat-video *ngIf="!videoDetails.videoDto.id"></mat-video>
-  <h2>{{videoDetails.videoDto.title}}</h2>
-  <strong>{{videoDetails.videoDto.author.username}}</strong>
-  <p>Description: {{videoDetails.videoDto.description}}</p>
-  <p>Views: {{videoDetails.videoRatingDto.viewCount}}</p>
-  <p>Up votes: {{videoDetails.videoRatingDto.upVoteCount}}</p>
-  <p>Down votes: {{videoDetails.videoRatingDto.downVoteCount}}</p>
+             src="{{videoResourceUrl(videoDetails.id)}}"></mat-video>
+  <mat-video *ngIf="!videoDetails.id"></mat-video>
+  <h2>{{videoDetails.title}}</h2>
 
-  <h3>Comments:</h3>
+  <div>
+    <strong>{{videoDetails.author.username}}</strong>
+    <span class="margin-left-right-30">{{videoDetails.createdDate}}</span>
+
+    <button mat-button disabled id="videoViewCount">
+      <mat-icon>visibility</mat-icon>
+      <span>{{videoDetails.viewCount}}</span>
+    </button>
+    <button mat-button [disabled]="isOwner(videoDetails.author.id)" [class.rating-active]="videoDetails.currentUserVideoRating.isUpVote"
+            (click)="upVoteVideo()">
+      <mat-icon>thumb_up</mat-icon>
+      <span>{{videoDetails.upVoteCount}}</span>
+    </button>
+    <button mat-button  [disabled]="isOwner(videoDetails.author.id)" [class.rating-active]="videoDetails.currentUserVideoRating.isDownVote"
+            (click)="downVoteVideo()">
+      <mat-icon>thumb_down</mat-icon>
+      <span>{{videoDetails.downVoteCount}}</span>
+    </button>
+  </div>
+
+  <p>{{videoDetails.description}}</p>
+
+  <h3 class="margin-top-30">Comments:</h3>
   <div id="comment_form_0">
     <mat-form-field>
       <textarea matInput required placeholder="Comment" id="comment_input_0"></textarea>
@@ -30,17 +47,27 @@
         <p [class.italic]="node.isDeleted">{{node.isDeleted ? 'Deleted' : node.message}}</p>
 
         <div>
-          <button mat-button [class.rating-active]="node.currentUserCommentRating.isUpVote" (click)="upVoteComment(node)">
+          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isUpVote"
+                  (click)="upVoteComment(node)">
             <mat-icon>thumb_up</mat-icon>
             <span>{{node.upVoteCount}}</span>
           </button>
-          <button mat-button [class.rating-active]="node.currentUserCommentRating.isdownVote" (click)="downVoteComment(node)">
+          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isDownVote"
+                  (click)="downVoteComment(node)">
             <mat-icon>thumb_down</mat-icon>
             <span>{{node.downVoteCount}}</span>
           </button>
-          <button mat-button [class.rating-active]="node.currentUserCommentRating.isFavourite" (click)="favouriteComment(node)">
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isFavourite"
+                  (click)="favouriteComment(node)">
             <mat-icon>favorite</mat-icon>
             <span>{{node.favouriteCount}}</span>
+          </button>
+          <button mat-icon-button *ngIf="node.isVideoAuthorFavourite && !isVideoAuthor" disabled [class.rating-active]="node.isVideoAuthorFavourite">
+            <mat-icon>favorite_border</mat-icon>
+          </button>
+          <button mat-icon-button *ngIf="isFirstLevelComment(node) && (isVideoAuthor || node.isPinned)" [disabled]="!isVideoAuthor" [class.rating-active]="node.isPinned"
+                  (click)="pinComment(node)">
+            <mat-icon>grade</mat-icon>
           </button>
         </div>
 
@@ -87,17 +114,27 @@
         <p [class.italic]="node.isDeleted">{{node.isDeleted ? 'Deleted' : node.message}}</p>
 
         <div>
-          <button mat-button [class.rating-active]="node.currentUserCommentRating.isUpVote" (click)="upVoteComment(node)">
+          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isUpVote"
+                  (click)="upVoteComment(node)">
             <mat-icon>thumb_up</mat-icon>
             <span>{{node.upVoteCount}}</span>
           </button>
-          <button mat-button [class.rating-active]="node.currentUserCommentRating.isDownVote" (click)="downVoteComment(node)">
+          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isDownVote"
+                  (click)="downVoteComment(node)">
             <mat-icon>thumb_down</mat-icon>
             <span>{{node.downVoteCount}}</span>
           </button>
-          <button mat-button [class.rating-active]="node.currentUserCommentRating.isFavourite" (click)="favouriteComment(node)">
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isFavourite"
+                  (click)="favouriteComment(node)">
             <mat-icon>favorite</mat-icon>
             <span>{{node.favouriteCount}}</span>
+          </button>
+          <button mat-icon-button *ngIf="node.isVideoAuthorFavourite && !isVideoAuthor" disabled [class.rating-active]="node.isVideoAuthorFavourite">
+            <mat-icon>favorite_border</mat-icon>
+          </button>
+          <button mat-icon-button *ngIf="isVideoAuthor || node.isPinned" [disabled]="!isVideoAuthor" [class.rating-active]="node.isPinned"
+                  (click)="pinComment(node)">
+            <mat-icon>grade</mat-icon>
           </button>
         </div>
 

@@ -17,18 +17,10 @@ import java.io.Serializable;
 public class VideoRating extends Auditor implements Serializable {
 
     @NotNull
-    @Column(name = "view_count", nullable = false)
-    private Long viewCount = 0L;
+    @Column(name = "is_up_vote", nullable = false)
+    private Boolean isUpVote = false;
 
     @NotNull
-    @Column(name = "share_count", nullable = false)
-    private Long shareCount = 0L;
-
-    @NotNull
-    @Column(name = "up_vote_count", nullable = false)
-    private Long upVoteCount = 0L;
-
-    @NotNull
-    @Column(name = "down_vote_count", nullable = false)
-    private Long downVoteCount = 0L;
+    @Column(name = "is_down_vote", nullable = false)
+    private Boolean isDownVote = false;
 }

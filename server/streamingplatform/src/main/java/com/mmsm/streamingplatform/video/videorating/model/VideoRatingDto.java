@@ -6,9 +6,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class VideoRatingDto {
-
-    private Long viewCount;
-    private Long shareCount;
-    private Long upVoteCount;
-    private Long downVoteCount;
+    private Boolean isUpVote;
+    private Boolean isDownVote;
 }

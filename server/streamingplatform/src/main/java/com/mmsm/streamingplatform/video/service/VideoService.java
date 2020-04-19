@@ -9,11 +9,14 @@ import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import com.mmsm.streamingplatform.keycloak.service.KeycloakService;
 import com.mmsm.streamingplatform.utils.FileUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
-import com.mmsm.streamingplatform.video.mapper.VideoDetailsMapper;
 import com.mmsm.streamingplatform.video.mapper.VideoMapper;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;
+import com.mmsm.streamingplatform.video.videorating.mapper.VideoRatingMapper;
+import com.mmsm.streamingplatform.video.videorating.model.VideoRating;
+import com.mmsm.streamingplatform.video.videorating.model.VideoRatingDto;
+import com.mmsm.streamingplatform.video.videorating.service.VideoRatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -32,10 +35,11 @@ import java.util.stream.Collectors;
 @Service
 public class VideoService {
 
-    private final VideoRepository videoRepository;
-    private final CommentRatingRepository commentRatingRepository;
     private final KeycloakService keycloakService;
+    private final VideoRepository videoRepository;
+    private final VideoRatingRepository videoRatingRepository;
     private final CommentService commentService;
+    private final CommentRatingRepository commentRatingRepository;
 
     @Value("${VIDEOS_STORAGE_PATH}")
     public String VIDEOS_STORAGE_PATH;
@@ -50,8 +54,8 @@ public class VideoService {
                 .collect(Collectors.toList());
     }
 
-    public VideoDetailsDto getVideoDetailsDtoByVideoId(Long id, String userId) {
-        Optional<Video> videoOptional = videoRepository.findById(id);
+    public VideoDetailsDto getVideoDetailsDtoByVideoId(Long videoId, String userId) {
+        Optional<Video> videoOptional = videoRepository.findById(videoId);
         if (videoOptional.isEmpty()) {
             return null;
         }
@@ -67,8 +71,11 @@ public class VideoService {
         List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors = commentService.getCommentsWithRepliesAndAuthors(commentsAndRatings, userId);
         UserDto videoAuthor = keycloakService.getUserDtoById(video.getCreatedById());
 
-        return videoRepository.findById(id)
-                .map(foundVideo -> VideoDetailsMapper.getVideoDetailsDtoFromEntity(foundVideo, videoAuthor, commentWithRepliesAndAuthors))
+        VideoRating videoRating = videoRatingRepository.findVideoRatingByVideoIdAndUserId(video.getId(), userId).orElseGet(VideoRating::new);
+        VideoRatingDto videoRatingDto = VideoRatingMapper.getVideoRatingDtoFromEntity(videoRating);
+
+        return videoOptional
+                .map(foundVideo -> VideoMapper.getVideoDetailsDtoFromEntity(foundVideo, videoAuthor, videoRatingDto, commentWithRepliesAndAuthors))
                 .orElse(null);
     }
 
@@ -85,8 +92,8 @@ public class VideoService {
         return VideoMapper.getVideoDtoFromEntity(savedVideo, author);
     }
 
-    public VideoDto updateVideoDto(VideoDto dto, Long id) {
-        Optional<Video> videoOptional = videoRepository.findById(id);
+    public VideoDto updateVideoDto(VideoDto dto, Long videoId) {
+        Optional<Video> videoOptional = videoRepository.findById(videoId);
         if (dto == null || videoOptional.isEmpty()) {
             return null;
         }
@@ -99,8 +106,8 @@ public class VideoService {
     }
 
     @Transactional
-    public boolean deleteVideoById(Long id) {
-        Optional<Video> videoOptional = videoRepository.findById(id);
+    public boolean deleteVideoById(Long videoId) {
+        Optional<Video> videoOptional = videoRepository.findById(videoId);
         Optional<String> currentUserOptional = SecurityUtils.getCurrentUserId();
         if (videoOptional.isPresent() && currentUserOptional.isPresent() &&
            (SecurityUtils.hasAdminRole() || currentUserOptional.get().equals(videoOptional.get().getCreatedById()))) {
@@ -113,8 +120,8 @@ public class VideoService {
         return false;
     }
 
-    public File downloadFile(Long id) {
-        Optional<Video> video = videoRepository.findById(id);
+    public File downloadFile(Long videoId) {
+        Optional<Video> video = videoRepository.findById(videoId);
         if (video.isEmpty()) {
             return null;
         }

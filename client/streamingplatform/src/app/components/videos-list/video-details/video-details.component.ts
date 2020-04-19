@@ -2,17 +2,15 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {VideoDetailsDto} from '../../../dtos/VideoDetailsDto';
 import {VideoService} from '../../../services/api/video.service';
 import {ActivatedRoute} from '@angular/router';
-import {VideoDto} from '../../../dtos/VideoDto';
-import {VideoRatingDto} from '../../../dtos/VideoRatingDto';
 import {environment} from '../../../../environments/environment';
 import {CommentDto} from '../../../dtos/CommentDto';
 import {CommentService} from '../../../services/api/comment.service';
 import {DOCUMENT} from '@angular/common';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
-import {UserDto} from '../../../dtos/UserDto';
 import {KeycloakService} from 'keycloak-angular';
 import {CommentRatingService} from '../../../services/api/comment-rating.service';
+import {VideoRatingService} from '../../../services/api/video-rating.service';
 
 @Component({
   selector: 'app-video-details',
@@ -21,12 +19,9 @@ import {CommentRatingService} from '../../../services/api/comment-rating.service
 })
 export class VideoDetailsComponent implements OnInit {
 
+  isVideoAuthor = false;
   currentUserId: string;
-  videoDetails: VideoDetailsDto = {
-    videoDto: { ...(new VideoDto()), author: new UserDto() },
-    videoRatingDto: new VideoRatingDto(),
-    directCommentDtos: []
-  };
+  videoDetails: VideoDetailsDto = new VideoDetailsDto();
   videoId: number;
   dataSource;
   videoResourceUrl = (id) => `${environment.serverUrl}api/v1/videos/${id}/download`;
@@ -69,6 +64,7 @@ export class VideoDetailsComponent implements OnInit {
               private keycloakService: KeycloakService,
               private videoService: VideoService,
               private commentService: CommentService,
+              private videoRatingService: VideoRatingService,
               private commentRatingService: CommentRatingService) {
   }
 
@@ -77,6 +73,7 @@ export class VideoDetailsComponent implements OnInit {
     this.loadVideoDetails();
     this.keycloakService.getKeycloakInstance().loadUserInfo().success(user => {
       this.currentUserId = (user as any).sub;
+      this.isVideoAuthor = this.currentUserId !== null && this.currentUserId === this.videoDetails.author.id;
     });
   }
 
@@ -84,6 +81,7 @@ export class VideoDetailsComponent implements OnInit {
     this.videoService.getVideoDetails(this.videoId).subscribe(response => {
       if (response.body) {
         this.videoDetails = response.body;
+        this.isVideoAuthor = this.currentUserId !== null && this.currentUserId === this.videoDetails.author.id;
         this.reloadComments();
       }
     });
@@ -92,6 +90,38 @@ export class VideoDetailsComponent implements OnInit {
   reloadComments() {
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
     this.dataSource.data = this.videoDetails.directCommentDtos;
+  }
+
+  upVoteVideo() {
+    this.videoRatingService.upVoteVideo(this.videoId).subscribe(response => {
+      if (response.status === 200) {
+        const wasUpVote = this.videoDetails.currentUserVideoRating.isUpVote;
+        const wasDownVote = this.videoDetails.currentUserVideoRating.isDownVote;
+        this.videoDetails.currentUserVideoRating.isUpVote = response.body.isUpVote;
+        this.videoDetails.currentUserVideoRating.isDownVote = response.body.isDownVote;
+
+        this.videoDetails.upVoteCount += wasUpVote ? -1 : 1;
+        if (wasDownVote) {
+          this.videoDetails.downVoteCount -= 1;
+        }
+      }
+    });
+  }
+
+  downVoteVideo() {
+    this.videoRatingService.downVoteVideo(this.videoId).subscribe(response => {
+      if (response.status === 200) {
+        const wasUpVote = this.videoDetails.currentUserVideoRating.isUpVote;
+        const wasDownVote = this.videoDetails.currentUserVideoRating.isDownVote;
+        this.videoDetails.currentUserVideoRating.isUpVote = response.body.isUpVote;
+        this.videoDetails.currentUserVideoRating.isDownVote = response.body.isDownVote;
+
+        this.videoDetails.downVoteCount += wasDownVote ? -1 : 1;
+        if (wasUpVote) {
+          this.videoDetails.upVoteCount -= 1;
+        }
+      }
+    });
   }
 
   saveComment(node: CommentDtoNode) {
@@ -167,7 +197,6 @@ export class VideoDetailsComponent implements OnInit {
         const wasDownVote = comment.currentUserCommentRating.isDownVote;
         comment.currentUserCommentRating.isUpVote = response.body.isUpVote;
         comment.currentUserCommentRating.isDownVote = response.body.isDownVote;
-
         comment.downVoteCount += wasDownVote ? -1 : 1;
         if (wasUpVote) {
           comment.upVoteCount -= 1;
@@ -179,9 +208,17 @@ export class VideoDetailsComponent implements OnInit {
   favouriteComment(comment: CommentDtoNode) {
     this.commentRatingService.favouriteComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 200) {
-        const wasFavourite = comment.currentUserCommentRating.isFavourite;
+        comment.favouriteCount = response.body.favouriteCount;
         comment.currentUserCommentRating.isFavourite = response.body.isFavourite;
-        comment.favouriteCount += wasFavourite ? -1 : 1;
+        comment.isVideoAuthorFavourite = response.body.isVideoAuthorFavourite;
+      }
+    });
+  }
+
+  pinComment(comment: CommentDtoNode) {
+    this.commentRatingService.pinComment(this.videoId, comment.id).subscribe(response => {
+      if (response.status === 204) {
+        comment.isPinned = !comment.isPinned;
       }
     });
   }
@@ -195,10 +232,14 @@ export class VideoDetailsComponent implements OnInit {
   }
 
   isOwner(authorId: string) {
-    if (authorId === null || this.currentUserId === null) {
+    if (!authorId || this.currentUserId === null) {
       return false;
     }
     return this.currentUserId === authorId;
+  }
+
+  isFirstLevelComment(node: CommentDtoNode) {
+    return this.videoDetails.directCommentDtos.find(comment => comment.id === node.id);
   }
 
   setReplyActive(node: CommentDtoNode) {

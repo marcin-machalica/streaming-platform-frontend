@@ -1,5 +1,5 @@
 import {UserDto} from './UserDto';
-import {CommentRatingDto} from "./CommentRatingDto";
+import {CommentRatingDto} from './CommentRatingDto';
 
 export class CommentDto {
   public id: number;
