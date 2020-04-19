@@ -57,10 +57,17 @@
             <mat-icon>thumb_down</mat-icon>
             <span>{{node.downVoteCount}}</span>
           </button>
-          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isFavourite"
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isFavourite"
                   (click)="favouriteComment(node)">
             <mat-icon>favorite</mat-icon>
             <span>{{node.favouriteCount}}</span>
+          </button>
+          <button mat-icon-button *ngIf="node.isVideoAuthorFavourite && !isVideoAuthor" disabled [class.rating-active]="node.isVideoAuthorFavourite">
+            <mat-icon>favorite_border</mat-icon>
+          </button>
+          <button mat-icon-button *ngIf="isFirstLevelComment(node) && (isVideoAuthor || node.isPinned)" [disabled]="!isVideoAuthor" [class.rating-active]="node.isPinned"
+                  (click)="pinComment(node)">
+            <mat-icon>grade</mat-icon>
           </button>
         </div>
 
@@ -117,10 +124,17 @@
             <mat-icon>thumb_down</mat-icon>
             <span>{{node.downVoteCount}}</span>
           </button>
-          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isFavourite"
+          <button mat-button [class.rating-active]="node.currentUserCommentRating.isFavourite"
                   (click)="favouriteComment(node)">
             <mat-icon>favorite</mat-icon>
             <span>{{node.favouriteCount}}</span>
+          </button>
+          <button mat-icon-button *ngIf="node.isVideoAuthorFavourite && !isVideoAuthor" disabled [class.rating-active]="node.isVideoAuthorFavourite">
+            <mat-icon>favorite_border</mat-icon>
+          </button>
+          <button mat-icon-button *ngIf="isVideoAuthor || node.isPinned" [disabled]="!isVideoAuthor" [class.rating-active]="node.isPinned"
+                  (click)="pinComment(node)">
+            <mat-icon>grade</mat-icon>
           </button>
         </div>
 

@@ -52,7 +52,7 @@ public class CommentService {
         return CommentWithRepliesAndAuthors.builder()
                 .comment(comment)
                 .author(keycloakService.getUserDtoById(comment.getCreatedById()))
-                .commentRatingDto(CommentRatingMapper.getCommentRatingDto(commentRating, comment.getId()))
+                .commentRatingDto(CommentRatingMapper.toCommentRatingDto(commentRating, comment.getId()))
                 .commentsAndAuthors(getCommentsWithRepliesAndAuthors(commentsAndRatings, userId))
                 .build();
     }
@@ -79,7 +79,7 @@ public class CommentService {
             Comment parentComment = parentCommentOptional.get();
             parentComment.addChildrenComment(comment);
             comment = commentRepository.save(comment);
-            CommentRatingDto commentRatingDto = CommentRatingMapper.getCommentRatingDto(commentRating, comment.getId());
+            CommentRatingDto commentRatingDto = CommentRatingMapper.toCommentRatingDto(commentRating, comment.getId());
             return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingDto);
         }
 
@@ -95,7 +95,7 @@ public class CommentService {
         }
         comments.add(comment);
         comment = commentRepository.save(comment);
-        CommentRatingDto commentRatingDto = CommentRatingMapper.getCommentRatingDto(commentRating, comment.getId());
+        CommentRatingDto commentRatingDto = CommentRatingMapper.toCommentRatingDto(commentRating, comment.getId());
         return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingDto);
     }
 
@@ -113,7 +113,7 @@ public class CommentService {
 
         comment = commentRepository.save(comment);
         CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), authorId).orElse(null);
-        CommentRatingDto commentRatingDto = CommentRatingMapper.getCommentRatingDto(commentRating, comment.getId());
+        CommentRatingDto commentRatingDto = CommentRatingMapper.toCommentRatingDto(commentRating, comment.getId());
         return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingDto);
     }
 

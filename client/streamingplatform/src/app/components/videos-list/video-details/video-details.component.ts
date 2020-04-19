@@ -19,6 +19,7 @@ import {VideoRatingService} from '../../../services/api/video-rating.service';
 })
 export class VideoDetailsComponent implements OnInit {
 
+  isVideoAuthor = false;
   currentUserId: string;
   videoDetails: VideoDetailsDto = new VideoDetailsDto();
   videoId: number;
@@ -72,6 +73,7 @@ export class VideoDetailsComponent implements OnInit {
     this.loadVideoDetails();
     this.keycloakService.getKeycloakInstance().loadUserInfo().success(user => {
       this.currentUserId = (user as any).sub;
+      this.isVideoAuthor = this.currentUserId !== null && this.currentUserId === this.videoDetails.author.id;
     });
   }
 
@@ -79,6 +81,7 @@ export class VideoDetailsComponent implements OnInit {
     this.videoService.getVideoDetails(this.videoId).subscribe(response => {
       if (response.body) {
         this.videoDetails = response.body;
+        this.isVideoAuthor = this.currentUserId !== null && this.currentUserId === this.videoDetails.author.id;
         this.reloadComments();
       }
     });
@@ -205,9 +208,17 @@ export class VideoDetailsComponent implements OnInit {
   favouriteComment(comment: CommentDtoNode) {
     this.commentRatingService.favouriteComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 200) {
-        const wasFavourite = comment.currentUserCommentRating.isFavourite;
+        comment.favouriteCount = response.body.favouriteCount;
         comment.currentUserCommentRating.isFavourite = response.body.isFavourite;
-        comment.favouriteCount += wasFavourite ? -1 : 1;
+        comment.isVideoAuthorFavourite = response.body.isVideoAuthorFavourite;
+      }
+    });
+  }
+
+  pinComment(comment: CommentDtoNode) {
+    this.commentRatingService.pinComment(this.videoId, comment.id).subscribe(response => {
+      if (response.status === 204) {
+        comment.isPinned = !comment.isPinned;
       }
     });
   }
@@ -221,10 +232,14 @@ export class VideoDetailsComponent implements OnInit {
   }
 
   isOwner(authorId: string) {
-    if (authorId === null || this.currentUserId === null) {
+    if (!authorId || this.currentUserId === null) {
       return false;
     }
     return this.currentUserId === authorId;
+  }
+
+  isFirstLevelComment(node: CommentDtoNode) {
+    return this.videoDetails.directCommentDtos.find(comment => comment.id === node.id);
   }
 
   setReplyActive(node: CommentDtoNode) {
