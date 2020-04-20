@@ -6,7 +6,7 @@ import com.mmsm.streamingplatform.video.videorating.model.VideoRatingDto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -20,7 +20,7 @@ public class VideoDetailsDto {
     private Long downVoteCount;
     private Long viewCount;
     private Long shareCount;
-    private LocalDateTime createdDate;
+    private Instant createdDate;
     private VideoRatingDto currentUserVideoRating;
     private List<CommentDto> directCommentDtos;
 }

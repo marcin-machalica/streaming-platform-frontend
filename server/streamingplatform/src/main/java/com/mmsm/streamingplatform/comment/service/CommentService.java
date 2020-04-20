@@ -1,9 +1,8 @@
 package com.mmsm.streamingplatform.comment.service;
 
-import com.mmsm.streamingplatform.comment.commentrating.mapper.CommentRatingMapper;
-import com.mmsm.streamingplatform.comment.commentrating.model.CommentRating;
-import com.mmsm.streamingplatform.comment.commentrating.model.CommentRatingDto;
-import com.mmsm.streamingplatform.comment.commentrating.service.CommentRatingRepository;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingRepository;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.comment.mapper.CommentMapper;
 import com.mmsm.streamingplatform.comment.model.Comment;
 import com.mmsm.streamingplatform.comment.model.CommentDto;
@@ -52,7 +51,7 @@ public class CommentService {
         return CommentWithRepliesAndAuthors.builder()
                 .comment(comment)
                 .author(keycloakService.getUserDtoById(comment.getCreatedById()))
-                .commentRatingDto(CommentRatingMapper.toCommentRatingDto(commentRating, comment.getId()))
+                .commentRatingRepresentation(commentRating.toCommentRatingRepresentation(comment.getId()))
                 .commentsAndAuthors(getCommentsWithRepliesAndAuthors(commentsAndRatings, userId))
                 .build();
     }
@@ -79,8 +78,8 @@ public class CommentService {
             Comment parentComment = parentCommentOptional.get();
             parentComment.addChildrenComment(comment);
             comment = commentRepository.save(comment);
-            CommentRatingDto commentRatingDto = CommentRatingMapper.toCommentRatingDto(commentRating, comment.getId());
-            return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingDto);
+            CommentRatingRepresentation commentRatingRepresentation = commentRating.toCommentRatingRepresentation(comment.getId());
+            return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
         }
 
         Optional<Video> videoOptional = videoRepository.findById(videoId);
@@ -95,8 +94,8 @@ public class CommentService {
         }
         comments.add(comment);
         comment = commentRepository.save(comment);
-        CommentRatingDto commentRatingDto = CommentRatingMapper.toCommentRatingDto(commentRating, comment.getId());
-        return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingDto);
+        CommentRatingRepresentation commentRatingRepresentation = commentRating.toCommentRatingRepresentation(comment.getId());
+        return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
     }
 
     public CommentDto updateComment(CommentDto dto, String authorId, Long commentId) {
@@ -113,8 +112,8 @@ public class CommentService {
 
         comment = commentRepository.save(comment);
         CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), authorId).orElse(null);
-        CommentRatingDto commentRatingDto = CommentRatingMapper.toCommentRatingDto(commentRating, comment.getId());
-        return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingDto);
+        CommentRatingRepresentation commentRatingRepresentation = commentRating.toCommentRatingRepresentation(comment.getId());
+        return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
     }
 
     public boolean deleteCommentById(Long videoId, Long commentId, String userId) {

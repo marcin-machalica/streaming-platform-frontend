@@ -5,19 +5,24 @@ import com.mmsm.streamingplatform.comment.model.Comment;
 import com.mmsm.streamingplatform.video.videorating.model.VideoRating;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "video")
-public class Video extends Auditor implements Serializable {
+public class Video {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="id_sequence")
+    private Long id;
 
     @NotNull
     @Column(name = "filename", nullable = false)
@@ -54,4 +59,7 @@ public class Video extends Auditor implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     List<Comment> comments;
+
+    @Embedded
+    private Auditor auditor;
 }

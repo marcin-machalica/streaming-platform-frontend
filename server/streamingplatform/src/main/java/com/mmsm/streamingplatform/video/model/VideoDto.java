@@ -4,7 +4,7 @@ import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Builder
 @Getter
@@ -13,5 +13,5 @@ public class VideoDto {
     private UserDto author;
     private String title;
     private String description;
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 }

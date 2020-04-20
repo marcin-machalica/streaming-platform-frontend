@@ -1,6 +1,6 @@
 package com.mmsm.streamingplatform.comment.mapper;
 
-import com.mmsm.streamingplatform.comment.commentrating.model.CommentRatingDto;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.comment.model.Comment;
 import com.mmsm.streamingplatform.comment.model.CommentDto;
 import com.mmsm.streamingplatform.comment.model.CommentWithRepliesAndAuthors;
@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class CommentMapper {
 
-    public static CommentDto getCommentDto(Comment comment, UserDto author, CommentRatingDto currentUserCommentRating) {
+    public static CommentDto getCommentDto(Comment comment, UserDto author, CommentRatingRepresentation currentUserCommentRating) {
         if (comment == null) {
             return null;
         }
@@ -35,7 +35,7 @@ public class CommentMapper {
                 .build();
     }
 
-    public static List<CommentDto> getCommentDtos(Map<Comment, UserDto> commentsAndAuthors, CommentRatingDto currentUserCommentRating) {
+    public static List<CommentDto> getCommentDtos(Map<Comment, UserDto> commentsAndAuthors, CommentRatingRepresentation currentUserCommentRating) {
         List<CommentDto> commentDtos = new ArrayList<>();
         commentsAndAuthors.forEach((comment, author) ->
                 commentDtos.add(getCommentDto(comment, author, currentUserCommentRating))
@@ -64,7 +64,7 @@ public class CommentMapper {
                 .wasEdited(comment.getWasEdited())
                 .isDeleted(comment.getIsDeleted())
                 .dateCreated(comment.getCreatedDate())
-                .currentUserCommentRating(commentWithRepliesAndAuthors.getCommentRatingDto())
+                .currentUserCommentRating(commentWithRepliesAndAuthors.getCommentRatingRepresentation())
                 .directReplies(CommentMapper.getCommentDtosWithReplies(commentWithRepliesAndAuthors.getCommentsAndAuthors()))
                 .build();
     }

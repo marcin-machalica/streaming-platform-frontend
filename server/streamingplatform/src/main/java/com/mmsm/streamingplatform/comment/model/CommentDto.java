@@ -1,11 +1,11 @@
 package com.mmsm.streamingplatform.comment.model;
 
-import com.mmsm.streamingplatform.comment.commentrating.model.CommentRatingDto;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Getter
@@ -24,8 +24,8 @@ public class CommentDto {
     private Boolean isPinned;
     private Boolean wasEdited;
     private Boolean isDeleted;
-    private LocalDateTime dateCreated;
-    private CommentRatingDto currentUserCommentRating;
+    private Instant dateCreated;
+    private CommentRatingRepresentation currentUserCommentRating;
     private List<CommentDto> directReplies;
 }
 

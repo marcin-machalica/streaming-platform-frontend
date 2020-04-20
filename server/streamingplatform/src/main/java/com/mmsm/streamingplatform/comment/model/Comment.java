@@ -1,22 +1,27 @@
 package com.mmsm.streamingplatform.comment.model;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
-import com.mmsm.streamingplatform.comment.commentrating.model.CommentRating;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Setter
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "comment")
-public class Comment extends Auditor implements Serializable {
+public class Comment {
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="id_sequence")
+    private Long id;
 
     @NotNull
     @Size(min = 1, max = 5000)
@@ -68,6 +73,9 @@ public class Comment extends Auditor implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "comment_id")
     private List<CommentRating> commentRatings = new ArrayList<>();
+
+    @Embedded
+    private Auditor auditor;
 
     public void addChildrenComment(Comment comment) {
         this.directReplies.add(comment);
