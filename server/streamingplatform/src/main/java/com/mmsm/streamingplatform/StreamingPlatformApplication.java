@@ -1,7 +1,7 @@
 package com.mmsm.streamingplatform;
 
-import com.mmsm.streamingplatform.comment.model.Comment;
-import com.mmsm.streamingplatform.comment.service.CommentRepository;
+import com.mmsm.streamingplatform.comment.Comment;
+import com.mmsm.streamingplatform.comment.CommentRepository;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.service.VideoRepository;
 import org.springframework.boot.CommandLineRunner;

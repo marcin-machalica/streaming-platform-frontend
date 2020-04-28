@@ -2,9 +2,8 @@ package com.mmsm.streamingplatform.video.service;
 
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingRepository;
-import com.mmsm.streamingplatform.comment.model.Comment;
-import com.mmsm.streamingplatform.comment.model.CommentWithRepliesAndAuthors;
-import com.mmsm.streamingplatform.comment.service.CommentService;
+import com.mmsm.streamingplatform.comment.Comment;
+import com.mmsm.streamingplatform.comment.CommentService;
 import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import com.mmsm.streamingplatform.keycloak.service.KeycloakService;
 import com.mmsm.streamingplatform.utils.FileUtils;
@@ -68,7 +67,7 @@ public class VideoService {
                         comment,
                         commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), userId).orElseGet(CommentRating::new)
                 ));
-        List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors = commentService.getCommentsWithRepliesAndAuthors(commentsAndRatings, userId);
+        List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors = commentService.getCommentsListWithRepliesAndAuthors(commentsAndRatings, userId);
         UserDto videoAuthor = keycloakService.getUserDtoById(video.getCreatedById());
 
         VideoRating videoRating = videoRatingRepository.findVideoRatingByVideoIdAndUserId(video.getId(), userId).orElseGet(VideoRating::new);

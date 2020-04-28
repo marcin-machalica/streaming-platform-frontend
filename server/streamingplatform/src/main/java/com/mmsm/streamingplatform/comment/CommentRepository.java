@@ -1,6 +1,6 @@
-package com.mmsm.streamingplatform.comment.service;
+package com.mmsm.streamingplatform.comment;
 
-import com.mmsm.streamingplatform.comment.model.Comment;
+import com.mmsm.streamingplatform.comment.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

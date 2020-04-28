@@ -1,4 +1,4 @@
-export class CommentRatingDto {
+export class CommentRatingRepresentation {
   public commentId: number;
   public isUpVote: boolean;
   public isDownVote: boolean;

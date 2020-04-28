@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
-import {CommentFavouriteDto, CommentRatingDto} from '../../dtos/CommentRatingDto';
+import {CommentFavouriteDto, CommentRatingRepresentation} from '../../dtos/CommentRatingRepresentation';
 import {environment} from '../../../environments/environment';
 import {Observable} from 'rxjs';
 
-type CommentRatingDtoResponseType = HttpResponse<CommentRatingDto>;
+type CommentRatingDtoResponseType = HttpResponse<CommentRatingRepresentation>;
 type CommentFavouriteDtoResponseType = HttpResponse<CommentFavouriteDto>;
 
 @Injectable({
@@ -17,11 +17,11 @@ export class CommentRatingService {
   constructor(private http: HttpClient) { }
 
   upVoteComment(videoId: number, commentId: number): Observable<CommentRatingDtoResponseType> {
-    return this.http.post<CommentRatingDto>(this.resourceUrl(videoId, commentId) + '/up-vote', null, { observe: 'response' });
+    return this.http.post<CommentRatingRepresentation>(this.resourceUrl(videoId, commentId) + '/up-vote', null, { observe: 'response' });
   }
 
   downVoteComment(videoId: number, commentId: number): Observable<CommentRatingDtoResponseType> {
-    return this.http.post<CommentRatingDto>(this.resourceUrl(videoId, commentId) + '/down-vote', null, { observe: 'response' });
+    return this.http.post<CommentRatingRepresentation>(this.resourceUrl(videoId, commentId) + '/down-vote', null, { observe: 'response' });
   }
 
   favouriteComment(videoId: number, commentId: number): Observable<CommentFavouriteDtoResponseType> {
@@ -29,6 +29,6 @@ export class CommentRatingService {
   }
 
   pinComment(videoId: number, commentId: number): Observable<CommentRatingDtoResponseType> {
-    return this.http.post<CommentRatingDto>(this.resourceUrl(videoId, commentId) + '/pin', null, { observe: 'response' });
+    return this.http.post<CommentRatingRepresentation>(this.resourceUrl(videoId, commentId) + '/pin', null, { observe: 'response' });
   }
 }

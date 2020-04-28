@@ -1,7 +1,7 @@
 package com.mmsm.streamingplatform.video.model;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
-import com.mmsm.streamingplatform.comment.model.Comment;
+import com.mmsm.streamingplatform.comment.Comment;
 import com.mmsm.streamingplatform.video.videorating.model.VideoRating;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,4 +63,16 @@ public class Video {
 
     @Embedded
     private Auditor auditor;
+
+    public Instant getCreatedDate() {
+        return auditor.getCreatedDate();
+    }
+
+    public String getCreatedById() {
+        return auditor.getCreatedById();
+    }
+
+    public void setCreatedById(String id) {
+        auditor.setCreatedById(id);
+    }
 }

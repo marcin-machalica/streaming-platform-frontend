@@ -3,7 +3,7 @@ import {VideoDetailsDto} from '../../../dtos/VideoDetailsDto';
 import {VideoService} from '../../../services/api/video.service';
 import {ActivatedRoute} from '@angular/router';
 import {environment} from '../../../../environments/environment';
-import {CommentDto} from '../../../dtos/CommentDto';
+import {CommentRepresentation} from '../../../dtos/CommentRepresentation';
 import {CommentService} from '../../../services/api/comment.service';
 import {DOCUMENT} from '@angular/common';
 import {FlatTreeControl} from '@angular/cdk/tree';
@@ -26,7 +26,7 @@ export class VideoDetailsComponent implements OnInit {
   dataSource;
   videoResourceUrl = (id) => `${environment.serverUrl}api/v1/videos/${id}/download`;
 
-  private _transformer = (node: CommentDtoNode, level: number) => {
+  private _transformer = (node: CommentNode, level: number) => {
     return {
       id: node.id,
       parentId: node.parentId,
@@ -51,13 +51,13 @@ export class VideoDetailsComponent implements OnInit {
     };
   }
 
-  treeControl = new FlatTreeControl<CommentDtoNode>(
+  treeControl = new FlatTreeControl<CommentNode>(
     node => node.level, node => node.expandable);
 
   treeFlattener = new MatTreeFlattener(
     this._transformer, node => node.level, node => node.expandable, node => node.directReplies);
 
-  hasChild = (_: number, node: CommentDtoNode) => node.expandable;
+  hasChild = (_: number, node: CommentNode) => node.expandable;
 
   constructor(private route: ActivatedRoute,
               @Inject(DOCUMENT) document,
@@ -89,7 +89,7 @@ export class VideoDetailsComponent implements OnInit {
 
   reloadComments() {
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-    this.dataSource.data = this.videoDetails.directCommentDtos;
+    this.dataSource.data = this.videoDetails.directComments;
   }
 
   upVoteVideo() {
@@ -124,9 +124,9 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  saveComment(node: CommentDtoNode) {
+  saveComment(node: CommentNode) {
     const id = node ? node.id : 0;
-    const comment = new CommentDto();
+    const comment = new CommentRepresentation();
     comment.parentId = id > 0 ? id : null;
     comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value;
     if (comment.message.length < 1 || comment.message.length > 5000) {
@@ -136,7 +136,7 @@ export class VideoDetailsComponent implements OnInit {
     this.commentService.saveComment(comment, this.videoId).subscribe(response => {
       if (response.status === 201) {
         if (!response.body.parentId) {
-          this.videoDetails.directCommentDtos.push(response.body);
+          this.videoDetails.directComments.push(response.body);
           this.reloadComments();
           (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value = '';
           if (node) {
@@ -149,9 +149,9 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  updateComment(node: CommentDtoNode) {
+  updateComment(node: CommentNode) {
     const id = node.id;
-    const comment = new CommentDto();
+    const comment = new CommentRepresentation();
     comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value;
 
     this.commentService.updateComment(comment, this.videoId, id).subscribe(response => {
@@ -163,7 +163,7 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  deleteComment(comment: CommentDtoNode) {
+  deleteComment(comment: CommentNode) {
     const commentId = comment.id;
 
     this.commentService.deleteComment(this.videoId, commentId).subscribe(response => {
@@ -174,7 +174,7 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  upVoteComment(comment: CommentDtoNode) {
+  upVoteComment(comment: CommentNode) {
     this.commentRatingService.upVoteComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 200) {
         const wasUpVote = comment.currentUserCommentRating.isUpVote;
@@ -190,7 +190,7 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  downVoteComment(comment: CommentDtoNode) {
+  downVoteComment(comment: CommentNode) {
     this.commentRatingService.downVoteComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 200) {
         const wasUpVote = comment.currentUserCommentRating.isUpVote;
@@ -205,7 +205,7 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  favouriteComment(comment: CommentDtoNode) {
+  favouriteComment(comment: CommentNode) {
     this.commentRatingService.favouriteComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 200) {
         comment.favouriteCount = response.body.favouriteCount;
@@ -215,7 +215,7 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  pinComment(comment: CommentDtoNode) {
+  pinComment(comment: CommentNode) {
     this.commentRatingService.pinComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 204) {
         comment.isPinned = !comment.isPinned;
@@ -223,10 +223,10 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  getCommentDtoWithReplies(commentId: number) {
-    this.commentService.getCommentDtoWithReplies(this.videoId, commentId).subscribe(response => {
-      const loadedCommentIndex = this.videoDetails.directCommentDtos.findIndex(comment => comment.id === commentId);
-      this.videoDetails.directCommentDtos[loadedCommentIndex] = response.body;
+  getCommentRepresentationWithReplies(commentId: number) {
+    this.commentService.getCommentRepresentationWithReplies(this.videoId, commentId).subscribe(response => {
+      const loadedCommentIndex = this.videoDetails.directComments.findIndex(comment => comment.id === commentId);
+      this.videoDetails.directComments[loadedCommentIndex] = response.body;
       this.reloadComments();
     });
   }
@@ -238,28 +238,28 @@ export class VideoDetailsComponent implements OnInit {
     return this.currentUserId === authorId;
   }
 
-  isFirstLevelComment(node: CommentDtoNode) {
-    return this.videoDetails.directCommentDtos.find(comment => comment.id === node.id);
+  isFirstLevelComment(node: CommentNode) {
+    return this.videoDetails.directComments.find(comment => comment.id === node.id);
   }
 
-  setReplyActive(node: CommentDtoNode) {
+  setReplyActive(node: CommentNode) {
     node.isReplyActive = true;
     node.isEditActive = false;
   }
 
-  setEditActive(node: CommentDtoNode) {
+  setEditActive(node: CommentNode) {
     node.isReplyActive = false;
     node.isEditActive = true;
   }
 
-  cancelReplyAndEdit(node: CommentDtoNode) {
+  cancelReplyAndEdit(node: CommentNode) {
     node.isReplyActive = false;
     node.isEditActive = false;
   }
 }
 
-export class CommentDtoNode extends CommentDto {
-  public directReplies: CommentDtoNode[];
+export class CommentNode extends CommentRepresentation {
+  public directReplies: CommentNode[];
   public expandable: boolean;
   public level: number;
   public isReplyActive: boolean;

@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {CommentDto} from '../../dtos/CommentDto';
+import {CommentRepresentation} from '../../dtos/CommentRepresentation';
 import {environment} from '../../../environments/environment';
 
-type CommentDtoArrayResponseType = HttpResponse<CommentDto[]>;
-type CommentDtoResponseType = HttpResponse<CommentDto>;
+type CommentRepresentationResponseType = HttpResponse<CommentRepresentation>;
 
 @Injectable({
   providedIn: 'root'
@@ -16,19 +15,19 @@ export class CommentService {
 
   constructor(private http: HttpClient) { }
 
-  saveComment(commentDto: CommentDto, videoId: number): Observable<CommentDtoResponseType> {
-    return this.http.post<CommentDto>(this.resourceUrl(videoId), commentDto, { observe: 'response' });
+  saveComment(dto: CommentRepresentation, videoId: number): Observable<CommentRepresentationResponseType> {
+    return this.http.post<CommentRepresentation>(this.resourceUrl(videoId), dto, { observe: 'response' });
   }
 
-  updateComment(commentDto: CommentDto, videoId: number, commentId: number): Observable<CommentDtoResponseType> {
-    return this.http.put<CommentDto>(`${this.resourceUrl(videoId)}/${commentId}`, commentDto, { observe: 'response' });
+  updateComment(dto: CommentRepresentation, videoId: number, commentId: number): Observable<CommentRepresentationResponseType> {
+    return this.http.put<CommentRepresentation>(`${this.resourceUrl(videoId)}/${commentId}`, dto, { observe: 'response' });
   }
 
   deleteComment(videoId: number, commentId: number): Observable<HttpResponse<void>> {
     return this.http.delete<void>(`${this.resourceUrl(videoId)}/${commentId}`, { observe: 'response' });
   }
 
-  getCommentDtoWithReplies(videoId: number, commentId: number): Observable<CommentDtoResponseType> {
-    return this.http.get<CommentDto>(`${this.resourceUrl(videoId)}/${commentId}`, { observe: 'response' });
+  getCommentRepresentationWithReplies(videoId: number, commentId: number): Observable<CommentRepresentationResponseType> {
+    return this.http.get<CommentRepresentation>(`${this.resourceUrl(videoId)}/${commentId}`, { observe: 'response' });
   }
 }

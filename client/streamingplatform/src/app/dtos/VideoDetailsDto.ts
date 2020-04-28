@@ -1,5 +1,5 @@
 import {VideoRatingDto} from './VideoRatingDto';
-import {CommentDto} from './CommentDto';
+import {CommentRepresentation} from './CommentRepresentation';
 import {UserDto} from './UserDto';
 
 export class VideoDetailsDto {
@@ -13,7 +13,7 @@ export class VideoDetailsDto {
   shareCount: number;
   createdDate: Date;
   currentUserVideoRating: VideoRatingDto;
-  directCommentDtos: CommentDto[];
+  directComments: CommentRepresentation[];
 
   constructor() {
     this.author = new UserDto();

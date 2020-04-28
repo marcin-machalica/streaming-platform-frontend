@@ -38,7 +38,7 @@ public class CommentRating {
     @Embedded
     private Auditor auditor;
 
-    static CommentRating of() {
+    public static CommentRating of() {
         return new CommentRating(null, false, false, false, Auditor.of());
     }
 

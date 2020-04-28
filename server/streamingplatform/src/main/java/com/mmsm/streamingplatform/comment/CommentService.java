@@ -1,17 +1,16 @@
-package com.mmsm.streamingplatform.comment.service;
+package com.mmsm.streamingplatform.comment;
 
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingRepository;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
-import com.mmsm.streamingplatform.comment.mapper.CommentMapper;
-import com.mmsm.streamingplatform.comment.model.Comment;
-import com.mmsm.streamingplatform.comment.model.CommentDto;
-import com.mmsm.streamingplatform.comment.model.CommentWithRepliesAndAuthors;
+import com.mmsm.streamingplatform.comment.CommentController.*;
 import com.mmsm.streamingplatform.keycloak.service.KeycloakService;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.service.VideoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.*;
 
@@ -19,66 +18,69 @@ import java.util.*;
 @Service
 public class CommentService {
 
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    static class VideoNotFoundException extends RuntimeException {
+        VideoNotFoundException(Long id) {
+            super("Video not found with id: " + id);
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    static class CommentNotFoundException extends RuntimeException {
+        CommentNotFoundException(Long id) {
+            super("Comment not found with id: " + id);
+        }
+    }
+
     private final CommentRepository commentRepository;
     private final CommentRatingRepository commentRatingRepository;
     private final VideoRepository videoRepository;
     private final KeycloakService keycloakService;
 
-    public CommentDto getCommentDtoWithReplies(Long id, String userId) {
-        Optional<Comment> commentOptional = commentRepository.findById(id);
-        if (commentOptional.isEmpty()) {
-            return null;
-        }
-        Comment comment = commentOptional.get();
+    CommentRepresentation getCommentDtoWithReplies(Long commentId, String userId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
         CommentRating commentRating = commentRatingRepository
-                .findCommentRatingByCommentIdAndUserId(comment.getId(), userId).orElseGet(CommentRating::new);
+            .findCommentRatingByCommentIdAndUserId(comment.getId(), userId)
+            .orElseGet(CommentRating::new);
         CommentWithRepliesAndAuthors commentWithRepliesAndAuthors = getCommentWithRepliesAndAuthors(comment, commentRating, userId);
-        return CommentMapper.getCommentDtoWithReplies(commentWithRepliesAndAuthors);
+        return Comment.getCommentRepresentationWithReplies(commentWithRepliesAndAuthors);
     }
 
-    public CommentWithRepliesAndAuthors getCommentWithRepliesAndAuthors(Comment comment, CommentRating commentRating, String userId) {
-        if (comment == null) {
-            return null;
-        }
+    CommentWithRepliesAndAuthors getCommentWithRepliesAndAuthors(Comment comment, CommentRating commentRating, String userId) {
+//        if (comment == null) {
+//            return null;
+//        }
 
         Map<Comment, CommentRating> commentsAndRatings = new HashMap<>();
         comment.getDirectReplies().stream()
-                .forEach(reply -> commentsAndRatings.put(
-                        reply,
-                        commentRatingRepository.findCommentRatingByCommentIdAndUserId(reply.getId(), userId).orElseGet(CommentRating::new)
-                ));
+            .forEach(reply -> commentsAndRatings.put(
+                    reply,
+                    commentRatingRepository.findCommentRatingByCommentIdAndUserId(reply.getId(), userId).orElseGet(CommentRating::new)
+            ));
 
-        return CommentWithRepliesAndAuthors.builder()
-                .comment(comment)
-                .author(keycloakService.getUserDtoById(comment.getCreatedById()))
-                .commentRatingRepresentation(commentRating.toCommentRatingRepresentation(comment.getId()))
-                .commentsAndAuthors(getCommentsWithRepliesAndAuthors(commentsAndRatings, userId))
-                .build();
+        return new CommentWithRepliesAndAuthors(comment, keycloakService.getUserDtoById(comment.getCreatedById()),
+            commentRating.toCommentRatingRepresentation(comment.getId()), getCommentsListWithRepliesAndAuthors(commentsAndRatings, userId));
     }
 
-    public List<CommentWithRepliesAndAuthors> getCommentsWithRepliesAndAuthors(Map<Comment, CommentRating> commentsAndRatings, String userId) {
+    List<CommentWithRepliesAndAuthors> getCommentsListWithRepliesAndAuthors(Map<Comment, CommentRating> commentsAndRatings, String userId) {
         List<CommentWithRepliesAndAuthors> nestedCommentsWithAuthors = new ArrayList<>();
         commentsAndRatings.forEach((comment, rating) -> nestedCommentsWithAuthors.add(getCommentWithRepliesAndAuthors(comment, rating, userId)));
         return nestedCommentsWithAuthors;
     }
 
-    public CommentDto saveComment(CommentDto dto, Long videoId) {
-        if (dto == null || videoId == null) {
-            return null;
-        }
-        Comment comment = new Comment();
-        CommentRating commentRating = new CommentRating();
-        comment.setCommentRatings(Arrays.asList(commentRating));
+    CommentRepresentation saveComment(CommentRepresentation dto, Long videoId) {
+        Comment comment = Comment.of(dto.getMessage());
+//        CommentRating commentRating = new CommentRating();
+//        comment.setCommentRatings(Arrays.asList(commentRating));
 
         Optional<Comment> parentCommentOptional = Optional.ofNullable(dto.getParentId())
-                .flatMap(commentRepository::findById);
-        comment.setMessage(dto.getMessage());
+            .flatMap(commentRepository::findById);
 
         if (parentCommentOptional.isPresent()) {
             Comment parentComment = parentCommentOptional.get();
             parentComment.addChildrenComment(comment);
             comment = commentRepository.save(comment);
-            CommentRatingRepresentation commentRatingRepresentation = commentRating.toCommentRatingRepresentation(comment.getId());
+//            CommentRatingRepresentation commentRatingRepresentation = commentRating.toCommentRatingRepresentation(comment.getId());
             return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
         }
 
@@ -98,7 +100,7 @@ public class CommentService {
         return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
     }
 
-    public CommentDto updateComment(CommentDto dto, String authorId, Long commentId) {
+    CommentRepresentation updateComment(CommentRepresentation dto, String authorId, Long commentId) {
         if (dto == null || authorId == null || commentId == null) {
             return null;
         }
@@ -116,7 +118,7 @@ public class CommentService {
         return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
     }
 
-    public boolean deleteCommentById(Long videoId, Long commentId, String userId) {
+    void deleteCommentById(Long videoId, Long commentId, String userId) {
         Optional<Video> videoOptional = videoRepository.findById(videoId);
         Optional<Comment> commentOptional = commentRepository.findById(commentId);
         if (videoOptional.isEmpty() || commentOptional.isEmpty() || userId == null) {

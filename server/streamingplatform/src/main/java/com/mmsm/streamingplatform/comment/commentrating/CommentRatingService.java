@@ -1,7 +1,7 @@
 package com.mmsm.streamingplatform.comment.commentrating;
 
-import com.mmsm.streamingplatform.comment.model.Comment;
-import com.mmsm.streamingplatform.comment.service.CommentRepository;
+import com.mmsm.streamingplatform.comment.Comment;
+import com.mmsm.streamingplatform.comment.CommentRepository;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentFavouriteDto;
 import com.mmsm.streamingplatform.video.model.Video;

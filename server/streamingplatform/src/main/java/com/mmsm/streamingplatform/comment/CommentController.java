@@ -1,34 +1,69 @@
-package com.mmsm.streamingplatform.comment.controller;
+package com.mmsm.streamingplatform.comment;
 
-import com.mmsm.streamingplatform.comment.model.CommentDto;
-import com.mmsm.streamingplatform.comment.service.CommentService;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
+import com.mmsm.streamingplatform.keycloak.model.UserDto;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/videos/{videoId}/comments")
 public class CommentController {
 
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommentRepresentation {
+        private Long id;
+        private Long parentId;
+        private UserDto author;
+        private String message;
+        private Long upVoteCount;
+        private Long downVoteCount;
+        private Long favouriteCount;
+        private Integer directRepliesCount;
+        private Integer allRepliesCount;
+        private Boolean isVideoAuthorFavourite;
+        private Boolean isPinned;
+        private Boolean wasEdited;
+        private Boolean isDeleted;
+        private Instant dateCreated;
+        private CommentRatingController.CommentRatingRepresentation currentUserCommentRating;
+        private List<CommentRepresentation> directReplies;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CommentWithRepliesAndAuthors {
+        Comment comment;
+        UserDto author;
+        CommentRatingRepresentation commentRatingRepresentation;
+        List<CommentWithRepliesAndAuthors> commentsAndAuthors;
+    }
+
     private final CommentService commentService;
 
     @GetMapping("/{commentId}")
-    public ResponseEntity<CommentDto> getCommentDtoWithReplies(@PathVariable Long videoId,
-                                                               @PathVariable Long commentId,
-                                                               HttpServletRequest request) {
+    public CommentRepresentation getCommentDtoWithReplies(@PathVariable Long videoId, @PathVariable Long commentId,
+                                                          HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
-        CommentDto commentDto = commentService.getCommentDtoWithReplies(commentId, userId);
-        return ControllerUtils.getFoundResponse(commentDto);
+        return commentService.getCommentDtoWithReplies(commentId, userId);
     }
 
-    @PostMapping("")
+    @PostMapping
     public ResponseEntity<CommentDto> saveComment(@RequestBody CommentDto commentDto,
                                                      @PathVariable Long videoId) throws URISyntaxException {
         CommentDto savedCommentDto = commentService.saveComment(commentDto, videoId);

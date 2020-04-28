@@ -1,7 +1,7 @@
 import {UserDto} from './UserDto';
-import {CommentRatingDto} from './CommentRatingDto';
+import {CommentRatingRepresentation} from './CommentRatingRepresentation';
 
-export class CommentDto {
+export class CommentRepresentation {
   public id: number;
   public parentId: number;
   public author: UserDto;
@@ -16,6 +16,6 @@ export class CommentDto {
   public wasEdited: boolean;
   public isDeleted: boolean;
   public dateCreated: Date;
-  public currentUserCommentRating: CommentRatingDto;
-  public directReplies: CommentDto[];
+  public currentUserCommentRating: CommentRatingRepresentation;
+  public directReplies: CommentRepresentation[];
 }
