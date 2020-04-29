@@ -1,16 +1,16 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {VideoDetailsDto} from '../../../dtos/VideoDetailsDto';
-import {VideoService} from '../../../services/api/video.service';
+import {VideoService} from '../../../services/api/video/video.service';
 import {ActivatedRoute} from '@angular/router';
 import {environment} from '../../../../environments/environment';
-import {CommentRepresentation} from '../../../dtos/CommentRepresentation';
-import {CommentService} from '../../../services/api/comment.service';
+import {CommentService} from '../../../services/api/comment/comment.service';
 import {DOCUMENT} from '@angular/common';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {KeycloakService} from 'keycloak-angular';
-import {CommentRatingService} from '../../../services/api/comment-rating.service';
-import {VideoRatingService} from '../../../services/api/video-rating.service';
+import {CommentRatingService} from '../../../services/api/comment/comment-rating/comment-rating.service';
+import {VideoRatingService} from '../../../services/api/video/video-rating/video-rating.service';
+import {VideoDetailsDto} from '../../../services/api/video/VideoDto';
+import {CommentRepresentation, SaveComment, UpdateComment} from '../../../services/api/comment/CommentDto';
 
 @Component({
   selector: 'app-video-details',
@@ -89,7 +89,7 @@ export class VideoDetailsComponent implements OnInit {
 
   reloadComments() {
     this.dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
-    this.dataSource.data = this.videoDetails.directComments;
+    this.dataSource.data = this.videoDetails.directCommentDtos;
   }
 
   upVoteVideo() {
@@ -125,20 +125,20 @@ export class VideoDetailsComponent implements OnInit {
   }
 
   saveComment(node: CommentNode) {
-    const id = node ? node.id : 0;
-    const comment = new CommentRepresentation();
-    comment.parentId = id > 0 ? id : null;
-    comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value;
-    if (comment.message.length < 1 || comment.message.length > 5000) {
+    const commentId = node ? node.id : 0;
+    const saveComment = new SaveComment();
+    saveComment.parentId = commentId > 0 ? commentId : null;
+    saveComment.message = (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value;
+    if (saveComment.message.length < 1 || saveComment.message.length > 5000) {
       return;
     }
 
-    this.commentService.saveComment(comment, this.videoId).subscribe(response => {
+    this.commentService.saveComment(saveComment, this.videoId).subscribe(response => {
       if (response.status === 201) {
         if (!response.body.parentId) {
-          this.videoDetails.directComments.push(response.body);
+          this.videoDetails.directCommentDtos.push(response.body);
           this.reloadComments();
-          (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value = '';
+          (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value = '';
           if (node) {
             node.isReplyActive = false;
           }
@@ -150,13 +150,17 @@ export class VideoDetailsComponent implements OnInit {
   }
 
   updateComment(node: CommentNode) {
-    const id = node.id;
-    const comment = new CommentRepresentation();
-    comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value;
+    const commentId = node.id;
+    const updateComment = new UpdateComment();
+    updateComment.message = (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value;
 
-    this.commentService.updateComment(comment, this.videoId, id).subscribe(response => {
+    if (updateComment.message.length < 1 || updateComment.message.length > 5000) {
+      return;
+    }
+
+    this.commentService.updateComment(updateComment, this.videoId, commentId).subscribe(response => {
       if (response.status === 200) {
-        (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value = '';
+        (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value = '';
         node.isEditActive = false;
         this.loadVideoDetails();
       }
@@ -167,10 +171,8 @@ export class VideoDetailsComponent implements OnInit {
     const commentId = comment.id;
 
     this.commentService.deleteComment(this.videoId, commentId).subscribe(response => {
-      if (response.status === 204) {
-        comment.isDeleted = true;
-        this.cancelReplyAndEdit(comment);
-      }
+      comment.isDeleted = true;
+      this.cancelReplyAndEdit(comment);
     });
   }
 
@@ -225,8 +227,8 @@ export class VideoDetailsComponent implements OnInit {
 
   getCommentRepresentationWithReplies(commentId: number) {
     this.commentService.getCommentRepresentationWithReplies(this.videoId, commentId).subscribe(response => {
-      const loadedCommentIndex = this.videoDetails.directComments.findIndex(comment => comment.id === commentId);
-      this.videoDetails.directComments[loadedCommentIndex] = response.body;
+      const loadedCommentIndex = this.videoDetails.directCommentDtos.findIndex(comment => comment.id === commentId);
+      this.videoDetails.directCommentDtos[loadedCommentIndex] = response.body;
       this.reloadComments();
     });
   }
@@ -239,7 +241,7 @@ export class VideoDetailsComponent implements OnInit {
   }
 
   isFirstLevelComment(node: CommentNode) {
-    return this.videoDetails.directComments.find(comment => comment.id === node.id);
+    return this.videoDetails.directCommentDtos.find(comment => comment.id === node.id);
   }
 
   setReplyActive(node: CommentNode) {

@@ -32,6 +32,20 @@ public class CommentService {
         }
     }
 
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    static class CanOnlyBePerformedByAuthorException extends RuntimeException {
+        CanOnlyBePerformedByAuthorException() {
+            super("This action can only be performed by the author");
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    static class NotSufficientPermissionsException extends RuntimeException {
+        NotSufficientPermissionsException() {
+            super("Not sufficient permissions to perform this operations");
+        }
+    }
+
     private final CommentRepository commentRepository;
     private final CommentRatingRepository commentRatingRepository;
     private final VideoRepository videoRepository;
@@ -47,91 +61,64 @@ public class CommentService {
     }
 
     CommentWithRepliesAndAuthors getCommentWithRepliesAndAuthors(Comment comment, CommentRating commentRating, String userId) {
-//        if (comment == null) {
-//            return null;
-//        }
-
         Map<Comment, CommentRating> commentsAndRatings = new HashMap<>();
         comment.getDirectReplies().stream()
             .forEach(reply -> commentsAndRatings.put(
                     reply,
-                    commentRatingRepository.findCommentRatingByCommentIdAndUserId(reply.getId(), userId).orElseGet(CommentRating::new)
+                    commentRatingRepository.findCommentRatingByCommentIdAndUserId(reply.getId(), userId).orElseGet(CommentRating::of)
             ));
 
         return new CommentWithRepliesAndAuthors(comment, keycloakService.getUserDtoById(comment.getCreatedById()),
-            commentRating.toCommentRatingRepresentation(comment.getId()), getCommentsListWithRepliesAndAuthors(commentsAndRatings, userId));
+            commentRating.toRepresentation(comment.getId()), getCommentsListWithRepliesAndAuthors(commentsAndRatings, userId));
     }
 
-    List<CommentWithRepliesAndAuthors> getCommentsListWithRepliesAndAuthors(Map<Comment, CommentRating> commentsAndRatings, String userId) {
+    public List<CommentWithRepliesAndAuthors> getCommentsListWithRepliesAndAuthors(Map<Comment, CommentRating> commentsAndRatings, String userId) {
         List<CommentWithRepliesAndAuthors> nestedCommentsWithAuthors = new ArrayList<>();
         commentsAndRatings.forEach((comment, rating) -> nestedCommentsWithAuthors.add(getCommentWithRepliesAndAuthors(comment, rating, userId)));
         return nestedCommentsWithAuthors;
     }
 
-    CommentRepresentation saveComment(CommentRepresentation dto, Long videoId) {
-        Comment comment = Comment.of(dto.getMessage());
-//        CommentRating commentRating = new CommentRating();
-//        comment.setCommentRatings(Arrays.asList(commentRating));
-
-        Optional<Comment> parentCommentOptional = Optional.ofNullable(dto.getParentId())
+    CommentRepresentation saveComment(SaveComment saveComment, Long videoId) {
+        Comment comment = Comment.of(saveComment.getMessage());
+        Optional<Comment> parentCommentOptional = Optional.ofNullable(saveComment.getParentId())
             .flatMap(commentRepository::findById);
 
-        if (parentCommentOptional.isPresent()) {
-            Comment parentComment = parentCommentOptional.get();
-            parentComment.addChildrenComment(comment);
-            comment = commentRepository.save(comment);
-//            CommentRatingRepresentation commentRatingRepresentation = commentRating.toCommentRatingRepresentation(comment.getId());
-            return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
-        }
+        Comment finalComment = comment;
+        parentCommentOptional.ifPresentOrElse(parentComment -> {
+            parentComment.addChildrenComment(finalComment);
+        }, () -> {
+            Video video = videoRepository.findById(videoId).orElseThrow(() -> new VideoNotFoundException(videoId));
+            video.addComment(finalComment);
+        });
 
-        Optional<Video> videoOptional = videoRepository.findById(videoId);
-        if (videoOptional.isEmpty()) {
-            return null;
-        }
-        Video video = videoOptional.get();
-        List<Comment> comments = video.getComments();
-        if (comments == null) {
-            comments = new ArrayList<>();
-            video.setComments(comments);
-        }
-        comments.add(comment);
         comment = commentRepository.save(comment);
-        CommentRatingRepresentation commentRatingRepresentation = commentRating.toCommentRatingRepresentation(comment.getId());
-        return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
+        CommentRatingRepresentation commentRatingRepresentation = CommentRating.of().toRepresentation(comment.getId());
+        return comment.toRepresentation(keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
     }
 
-    CommentRepresentation updateComment(CommentRepresentation dto, String authorId, Long commentId) {
-        if (dto == null || authorId == null || commentId == null) {
-            return null;
-        }
-        Optional<Comment> commentOptional = commentRepository.findById(commentId);
-        if (commentOptional.isEmpty() || !authorId.equals(commentOptional.get().getCreatedById())) {
-            return null;
-        }
-        Comment comment = commentOptional.get();
-        comment.setMessage(dto.getMessage());
-        comment.setWasEdited(true);
+    CommentRepresentation updateComment(UpdateComment updateComment, String authorId, Long commentId) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
 
+        if (!authorId.equals(comment.getCreatedById())) {
+            throw new CanOnlyBePerformedByAuthorException();
+        }
+
+        comment.updateComment(updateComment);
         comment = commentRepository.save(comment);
-        CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), authorId).orElse(null);
-        CommentRatingRepresentation commentRatingRepresentation = commentRating.toCommentRatingRepresentation(comment.getId());
-        return CommentMapper.getCommentDto(comment, keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
+        CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), authorId).orElseGet(CommentRating::of);
+        CommentRatingRepresentation commentRatingRepresentation = commentRating.toRepresentation(comment.getId());
+        return comment.toRepresentation(keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
     }
 
     void deleteCommentById(Long videoId, Long commentId, String userId) {
-        Optional<Video> videoOptional = videoRepository.findById(videoId);
-        Optional<Comment> commentOptional = commentRepository.findById(commentId);
-        if (videoOptional.isEmpty() || commentOptional.isEmpty() || userId == null) {
-            return false;
+        Video video = videoRepository.findById(videoId).orElseThrow(() -> new VideoNotFoundException(videoId));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
+
+        if (!userId.equals(comment.getCreatedById()) && !userId.equals(video.getCreatedById()) && !keycloakService.isAdmin(userId)) {
+            throw new NotSufficientPermissionsException();
         }
-        Video video = videoOptional.get();
-        Comment comment = commentOptional.get();
-        if (!userId.equals(comment.getCreatedById()) && !userId.equals(video.getCreatedById())
-            && !keycloakService.isAdmin(userId)) {
-            return false;
-        }
-        comment.setIsDeleted(true);
+
+        comment = comment.setDeleted();
         commentRepository.save(comment);
-        return true;
     }
 }

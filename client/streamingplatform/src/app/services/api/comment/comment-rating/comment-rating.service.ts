@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
-import {CommentFavouriteDto, CommentRatingRepresentation} from '../../dtos/CommentRatingRepresentation';
-import {environment} from '../../../environments/environment';
+import {environment} from '../../../../../environments/environment';
 import {Observable} from 'rxjs';
+import {CommentFavouriteDto, CommentRatingRepresentation} from './CommentRatingDto';
 
 type CommentRatingDtoResponseType = HttpResponse<CommentRatingRepresentation>;
 type CommentFavouriteDtoResponseType = HttpResponse<CommentFavouriteDto>;

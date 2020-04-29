@@ -42,7 +42,7 @@ public class CommentRating {
         return new CommentRating(null, false, false, false, Auditor.of());
     }
 
-    public CommentRatingRepresentation toCommentRatingRepresentation(Long commentId) {
+    public CommentRatingRepresentation toRepresentation(Long commentId) {
         return new CommentRatingRepresentation(commentId, isUpVote, isDownVote, isFavourite);
     }
 

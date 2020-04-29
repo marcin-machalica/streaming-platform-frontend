@@ -91,7 +91,7 @@ public class Comment {
             false, false, null, new ArrayList<>(), new ArrayList<>() , Auditor.of());
     }
 
-    public CommentRepresentation toCommentRepresentation(UserDto author, CommentRatingRepresentation currentUserCommentRating) {
+    public CommentRepresentation toRepresentation(UserDto author, CommentRatingRepresentation currentUserCommentRating) {
         return new CommentRepresentation(id, parentComment != null ? parentComment.id : null, author, isDeleted ? null : message,
             upVoteCount, downVoteCount, favouriteCount, directRepliesCount, allRepliesCount, isVideoAuthorFavourite, isPinned,
             wasEdited, isDeleted, getCreatedDate(), currentUserCommentRating, null);
@@ -124,6 +124,17 @@ public class Comment {
         comment.setParentComment(this);
         directRepliesCount++;
         incrementParentsAllRepliesCount(this);
+    }
+
+    public Comment updateComment(UpdateComment updateComment) {
+        message = updateComment.getMessage();
+        wasEdited = true;
+        return this;
+    }
+
+    public Comment setDeleted() {
+        isDeleted = true;
+        return this;
     }
 
     private void incrementParentsAllRepliesCount(Comment comment) {

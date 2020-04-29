@@ -1,5 +1,5 @@
-import {UserDto} from './UserDto';
-import {CommentRatingRepresentation} from './CommentRatingRepresentation';
+import {UserDto} from '../keycloak-admin-api/UserDto';
+import {CommentRatingRepresentation} from './comment-rating/CommentRatingDto';
 
 export class CommentRepresentation {
   public id: number;
@@ -18,4 +18,13 @@ export class CommentRepresentation {
   public dateCreated: Date;
   public currentUserCommentRating: CommentRatingRepresentation;
   public directReplies: CommentRepresentation[];
+}
+
+export class SaveComment {
+  public parentId: number;
+  public message: string;
+}
+
+export class UpdateComment {
+  public message: string;
 }

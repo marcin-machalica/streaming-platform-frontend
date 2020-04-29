@@ -48,45 +48,52 @@ public class CommentController {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CommentWithRepliesAndAuthors {
-        Comment comment;
-        UserDto author;
-        CommentRatingRepresentation commentRatingRepresentation;
-        List<CommentWithRepliesAndAuthors> commentsAndAuthors;
+        private Comment comment;
+        private UserDto author;
+        private CommentRatingRepresentation commentRatingRepresentation;
+        private List<CommentWithRepliesAndAuthors> commentsAndAuthors;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SaveComment {
+        private Long parentId;
+        private String message;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateComment {
+        private String message;
     }
 
     private final CommentService commentService;
 
     @GetMapping("/{commentId}")
-    public CommentRepresentation getCommentDtoWithReplies(@PathVariable Long videoId, @PathVariable Long commentId,
-                                                          HttpServletRequest request) {
+    CommentRepresentation getCommentDtoWithReplies(@PathVariable Long videoId, @PathVariable Long commentId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
         return commentService.getCommentDtoWithReplies(commentId, userId);
     }
 
     @PostMapping
-    public ResponseEntity<CommentDto> saveComment(@RequestBody CommentDto commentDto,
-                                                     @PathVariable Long videoId) throws URISyntaxException {
-        CommentDto savedCommentDto = commentService.saveComment(commentDto, videoId);
+    ResponseEntity<CommentRepresentation> saveComment(@RequestBody SaveComment saveComment, @PathVariable Long videoId) throws URISyntaxException {
+        CommentRepresentation savedCommentDto = commentService.saveComment(saveComment, videoId);
         URI uri = savedCommentDto != null ? new URI("/api/v1/videos/" + videoId + "/comments/" + savedCommentDto.getId()) : null;
         return ControllerUtils.getCreatedResponse(savedCommentDto, uri);
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<CommentDto> updateComment(@RequestBody CommentDto commentDto,
-                                                    @PathVariable Long videoId,
-                                                    @PathVariable Long commentId,
-                                                    HttpServletRequest request) {
+    CommentRepresentation updateComment(@RequestBody UpdateComment updateComment, @PathVariable Long videoId,
+                                               @PathVariable Long commentId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
-        CommentDto savedCommentDto = commentService.updateComment(commentDto, userId, commentId);
-        return ControllerUtils.getUpdatedResponse(savedCommentDto);
+        return commentService.updateComment(updateComment, userId, commentId);
     }
 
     @DeleteMapping("/{commentId}")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long videoId,
-                                              @PathVariable Long commentId,
-                                              HttpServletRequest request) {
+    void deleteComment(@PathVariable Long videoId, @PathVariable Long commentId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
-        boolean isDeleted = commentService.deleteCommentById(videoId, commentId, userId);
-        return ControllerUtils.getDeletedResponse(isDeleted);
+        commentService.deleteCommentById(videoId, commentId, userId);
     }
 }

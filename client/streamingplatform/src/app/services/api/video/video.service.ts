@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import {environment} from '../../../environments/environment';
+import {environment} from '../../../../environments/environment';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {VideoDto} from '../../dtos/VideoDto';
-import {VideoDetailsDto} from '../../dtos/VideoDetailsDto';
+import {VideoDetailsDto, VideoDto} from './VideoDto';
 
 type VideoDetailsDtoResponseType = HttpResponse<VideoDetailsDto>;
 type VideoDetailsDtoArrayResponseType = HttpResponse<VideoDto[]>;

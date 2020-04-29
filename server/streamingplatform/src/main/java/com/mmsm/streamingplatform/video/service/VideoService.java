@@ -1,5 +1,6 @@
 package com.mmsm.streamingplatform.video.service;
 
+import com.mmsm.streamingplatform.comment.CommentController.*;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingRepository;
 import com.mmsm.streamingplatform.comment.Comment;

@@ -74,7 +74,7 @@ public class CommentRatingService {
 
         commentRepository.save(comment);
         commentRating = commentRatingRepository.save(commentRating);
-        return commentRating.toCommentRatingRepresentation(commentId);
+        return commentRating.toRepresentation(commentId);
     }
 
     @Transactional
@@ -94,7 +94,7 @@ public class CommentRatingService {
 
         commentRepository.save(comment);
         commentRating = commentRatingRepository.save(commentRating);
-        return commentRating.toCommentRatingRepresentation(commentId);
+        return commentRating.toRepresentation(commentId);
     }
 
     @Transactional
@@ -103,9 +103,9 @@ public class CommentRatingService {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
         CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(commentId, userId).orElseGet(CommentRating::of);
 
+        Boolean wasFavourite = commentRating.getIsFavourite();
         commentRating = commentRating.favourite();
 
-        Boolean wasFavourite = commentRating.getIsFavourite();
         comment.setFavouriteCount(comment.getFavouriteCount() + (wasFavourite ? -1 : 1));
 
         if (video.getCreatedById().equals(userId)) {

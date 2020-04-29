@@ -59,7 +59,7 @@ public class Video {
     private List<VideoRating> videoRatings = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    List<Comment> comments;
+    List<Comment> comments = new ArrayList<>();
 
     @Embedded
     private Auditor auditor;
@@ -74,5 +74,9 @@ public class Video {
 
     public void setCreatedById(String id) {
         auditor.setCreatedById(id);
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
     }
 }

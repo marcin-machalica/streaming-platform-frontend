@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {VideoDto} from '../../dtos/VideoDto';
-import {VideoService} from '../../services/api/video.service';
+import {VideoService} from '../../services/api/video/video.service';
+import {VideoDto} from '../../services/api/video/VideoDto';
 
 @Component({
   selector: 'app-videos-list',

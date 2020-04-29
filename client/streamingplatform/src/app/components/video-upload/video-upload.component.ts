@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {VideoService} from '../../services/api/video.service';
+import {VideoService} from '../../services/api/video/video.service';
 import {NgForm} from '@angular/forms';
-import {VideoSaveDto} from '../../dtos/VideoSaveDto';
+import {VideoSaveDto} from '../../services/api/video/VideoDto';
 
 @Component({
   selector: 'app-video-upload',

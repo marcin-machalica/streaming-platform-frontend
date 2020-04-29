@@ -5,6 +5,8 @@ import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;
 import com.mmsm.streamingplatform.video.videorating.model.VideoRatingDto;
+import com.mmsm.streamingplatform.comment.Comment;
+import com.mmsm.streamingplatform.comment.CommentController.*;
 
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class VideoMapper {
                 .shareCount(video.getShareCount())
                 .createdDate(video.getCreatedDate())
                 .currentUserVideoRating(currentUserVideoRating)
-                .directCommentDtos(CommentMapper.getCommentDtosWithReplies(commentWithRepliesAndAuthors))
+                .directCommentDtos(Comment.getCommentRepresentationListWithReplies(commentWithRepliesAndAuthors))
                 .build();
     }
 }

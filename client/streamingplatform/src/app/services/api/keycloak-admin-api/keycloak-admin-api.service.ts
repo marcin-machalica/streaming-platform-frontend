@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
-import {UserDto} from '../../dtos/UserDto';
-import {environment} from '../../../environments/environment';
+import {UserDto} from './UserDto';
+import {environment} from '../../../../environments/environment';
 import {Observable} from 'rxjs';
 
 type UserDtoArrayResponseType = HttpResponse<UserDto[]>;
