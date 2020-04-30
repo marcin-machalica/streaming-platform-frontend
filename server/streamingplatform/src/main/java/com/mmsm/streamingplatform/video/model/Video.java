@@ -2,7 +2,7 @@ package com.mmsm.streamingplatform.video.model;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
 import com.mmsm.streamingplatform.comment.Comment;
-import com.mmsm.streamingplatform.video.videorating.model.VideoRating;
+import com.mmsm.streamingplatform.video.videorating.VideoRating;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -63,6 +63,33 @@ public class Video {
 
     @Embedded
     private Auditor auditor;
+
+    public Video upVote(VideoRating videoRating) {
+        Boolean wasUpVote = videoRating.getIsUpVote();
+        Boolean wasDownVote = videoRating.getIsDownVote();
+
+        upVoteCount += wasUpVote ? -1 : 1;
+        if (videoRating.getId() != null && wasDownVote) {
+            downVoteCount -= 1;
+        }
+        return this;
+    }
+
+    public Video downVote(VideoRating videoRating) {
+        Boolean wasUpVote = videoRating.getIsUpVote();
+        Boolean wasDownVote = videoRating.getIsDownVote();
+
+        downVoteCount += wasDownVote ? -1 : 1;
+        if (videoRating.getId() != null && wasUpVote) {
+            upVoteCount -= 1;
+        }
+        return this;
+    }
+
+    public VideoRating addVideoRating(VideoRating videoRating) {
+        videoRatings.add(videoRating);
+        return videoRating;
+    }
 
     public Instant getCreatedDate() {
         return auditor.getCreatedDate();

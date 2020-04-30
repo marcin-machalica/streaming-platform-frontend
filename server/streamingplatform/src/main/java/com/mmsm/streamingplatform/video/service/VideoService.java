@@ -13,10 +13,10 @@ import com.mmsm.streamingplatform.video.mapper.VideoMapper;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;
-import com.mmsm.streamingplatform.video.videorating.mapper.VideoRatingMapper;
-import com.mmsm.streamingplatform.video.videorating.model.VideoRating;
-import com.mmsm.streamingplatform.video.videorating.model.VideoRatingDto;
-import com.mmsm.streamingplatform.video.videorating.service.VideoRatingRepository;
+import com.mmsm.streamingplatform.video.videorating.VideoRating;
+import com.mmsm.streamingplatform.video.videorating.VideoRatingController;
+import com.mmsm.streamingplatform.video.videorating.VideoRatingController.*;
+import com.mmsm.streamingplatform.video.videorating.VideoRatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -72,10 +72,10 @@ public class VideoService {
         UserDto videoAuthor = keycloakService.getUserDtoById(video.getCreatedById());
 
         VideoRating videoRating = videoRatingRepository.findVideoRatingByVideoIdAndUserId(video.getId(), userId).orElseGet(VideoRating::new);
-        VideoRatingDto videoRatingDto = VideoRatingMapper.getVideoRatingDtoFromEntity(videoRating);
+        VideoRatingRepresentation videoRatingRepresentation = videoRating.toRepresentation();
 
         return videoOptional
-                .map(foundVideo -> VideoMapper.getVideoDetailsDtoFromEntity(foundVideo, videoAuthor, videoRatingDto, commentWithRepliesAndAuthors))
+                .map(foundVideo -> VideoMapper.getVideoDetailsDtoFromEntity(foundVideo, videoAuthor, videoRatingRepresentation, commentWithRepliesAndAuthors))
                 .orElse(null);
     }
 

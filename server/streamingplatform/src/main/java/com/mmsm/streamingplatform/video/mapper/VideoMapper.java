@@ -4,7 +4,7 @@ import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;
-import com.mmsm.streamingplatform.video.videorating.model.VideoRatingDto;
+import com.mmsm.streamingplatform.video.videorating.VideoRatingController.*;
 import com.mmsm.streamingplatform.comment.Comment;
 import com.mmsm.streamingplatform.comment.CommentController.*;
 
@@ -25,7 +25,7 @@ public class VideoMapper {
                 .build();
     }
 
-    public static VideoDetailsDto getVideoDetailsDtoFromEntity(Video video, UserDto videoAuthor, VideoRatingDto currentUserVideoRating,
+    public static VideoDetailsDto getVideoDetailsDtoFromEntity(Video video, UserDto videoAuthor, VideoRatingRepresentation currentUserVideoRating,
                                                                List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors) {
         if (video == null) {
             return null;

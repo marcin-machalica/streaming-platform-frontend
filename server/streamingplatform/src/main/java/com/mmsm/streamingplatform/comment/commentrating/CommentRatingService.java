@@ -61,16 +61,10 @@ public class CommentRatingService {
     CommentRatingRepresentation upVoteComment(Long commentId, String userId) {
         Comment comment = getCommentIfNotAuthor(commentId, userId);
         CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(commentId, userId).orElseGet(CommentRating::of);
+        commentRating = commentRating.getId() != null ? commentRating : comment.addCommentRating(commentRating);
 
+        comment = comment.upVote(commentRating);
         commentRating = commentRating.upVote();
-
-        Boolean wasUpVote = commentRating.getIsUpVote();
-        comment.setUpVoteCount(comment.getUpVoteCount() + (wasUpVote ? -1 : 1));
-        if (commentRating.getIsDownVote()) {
-            comment.setDownVoteCount(comment.getDownVoteCount() - 1);
-        } else {
-            comment.getCommentRatings().add(commentRating);
-        }
 
         commentRepository.save(comment);
         commentRating = commentRatingRepository.save(commentRating);
@@ -81,16 +75,10 @@ public class CommentRatingService {
     CommentRatingRepresentation downVoteComment(Long commentId, String userId) {
         Comment comment = getCommentIfNotAuthor(commentId, userId);
         CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(commentId, userId).orElseGet(CommentRating::of);
+        commentRating = commentRating.getId() != null ? commentRating : comment.addCommentRating(commentRating);
 
+        comment = comment.downVote(commentRating);
         commentRating = commentRating.downVote();
-
-        Boolean wasDownVote = commentRating.getIsDownVote();
-        comment.setDownVoteCount(comment.getDownVoteCount() + (wasDownVote ? -1 : 1));
-        if (commentRating.getIsUpVote()) {
-            comment.setUpVoteCount(comment.getUpVoteCount() - 1);
-        } else {
-            comment.getCommentRatings().add(commentRating);
-        }
 
         commentRepository.save(comment);
         commentRating = commentRatingRepository.save(commentRating);
@@ -102,19 +90,10 @@ public class CommentRatingService {
         Video video = videoRepository.findById(videoId).orElseThrow(() -> new VideoNotFoundException(videoId));
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
         CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(commentId, userId).orElseGet(CommentRating::of);
+        commentRating = commentRating.getId() != null ? commentRating : comment.addCommentRating(commentRating);
 
-        Boolean wasFavourite = commentRating.getIsFavourite();
+        comment = comment.favourite(commentRating, video.getCreatedById().equals(userId));
         commentRating = commentRating.favourite();
-
-        comment.setFavouriteCount(comment.getFavouriteCount() + (wasFavourite ? -1 : 1));
-
-        if (video.getCreatedById().equals(userId)) {
-            comment.setIsVideoAuthorFavourite(!comment.getIsVideoAuthorFavourite());
-        }
-
-        if (commentRating.getId() == null) {
-            comment.getCommentRatings().add(commentRating);
-        }
 
         commentRating = commentRatingRepository.save(commentRating);
         comment = commentRepository.save(comment);

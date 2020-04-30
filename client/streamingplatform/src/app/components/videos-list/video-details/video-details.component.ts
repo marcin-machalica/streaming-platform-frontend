@@ -219,9 +219,7 @@ export class VideoDetailsComponent implements OnInit {
 
   pinComment(comment: CommentNode) {
     this.commentRatingService.pinComment(this.videoId, comment.id).subscribe(response => {
-      if (response.status === 204) {
-        comment.isPinned = !comment.isPinned;
-      }
+      comment.isPinned = !comment.isPinned;
     });
   }
 

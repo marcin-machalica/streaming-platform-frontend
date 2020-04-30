@@ -137,6 +137,43 @@ public class Comment {
         return this;
     }
 
+    public Comment upVote(CommentRating commentRating) {
+        Boolean wasUpVote = commentRating.getIsUpVote();
+        Boolean wasDownVote = commentRating.getIsDownVote();
+
+        upVoteCount += wasUpVote ? -1 : 1;
+        if (commentRating.getId() != null && wasDownVote) {
+            downVoteCount -= 1;
+        }
+        return this;
+    }
+
+    public Comment downVote(CommentRating commentRating) {
+        Boolean wasUpVote = commentRating.getIsUpVote();
+        Boolean wasDownVote = commentRating.getIsDownVote();
+
+        downVoteCount += wasDownVote ? -1 : 1;
+        if (commentRating.getId() != null && wasUpVote) {
+            upVoteCount -= 1;
+        }
+        return this;
+    }
+
+    public Comment favourite(CommentRating commentRating, boolean isVideoAuthorRating) {
+        Boolean wasFavourite = commentRating.getIsFavourite();
+
+        favouriteCount += wasFavourite ? -1 : 1;
+        if (isVideoAuthorRating) {
+            isVideoAuthorFavourite = !isVideoAuthorFavourite;
+        }
+        return this;
+    }
+
+    public CommentRating addCommentRating(CommentRating commentRating) {
+        commentRatings.add(commentRating);
+        return commentRating;
+    }
+
     private void incrementParentsAllRepliesCount(Comment comment) {
         if (comment == null) {
             return;

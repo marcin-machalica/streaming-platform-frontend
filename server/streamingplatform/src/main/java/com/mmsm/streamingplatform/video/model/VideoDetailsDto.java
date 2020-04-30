@@ -2,7 +2,7 @@ package com.mmsm.streamingplatform.video.model;
 
 import com.mmsm.streamingplatform.comment.CommentController.*;
 import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
-import com.mmsm.streamingplatform.video.videorating.model.VideoRatingDto;
+import com.mmsm.streamingplatform.video.videorating.VideoRatingController.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -21,6 +21,6 @@ public class VideoDetailsDto {
     private Long viewCount;
     private Long shareCount;
     private Instant createdDate;
-    private VideoRatingDto currentUserVideoRating;
+    private VideoRatingRepresentation currentUserVideoRating;
     private List<CommentRepresentation> directCommentDtos;
 }
