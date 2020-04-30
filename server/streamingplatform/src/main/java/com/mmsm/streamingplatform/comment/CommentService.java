@@ -4,7 +4,7 @@ import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingRepository;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.comment.CommentController.*;
-import com.mmsm.streamingplatform.keycloak.service.KeycloakService;
+import com.mmsm.streamingplatform.keycloak.KeycloakService;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.service.VideoRepository;
 import lombok.RequiredArgsConstructor;

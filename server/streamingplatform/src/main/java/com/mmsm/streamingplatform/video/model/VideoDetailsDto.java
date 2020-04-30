@@ -1,7 +1,7 @@
 package com.mmsm.streamingplatform.video.model;
 
 import com.mmsm.streamingplatform.comment.CommentController.*;
-import com.mmsm.streamingplatform.keycloak.model.UserDto;
+import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
 import com.mmsm.streamingplatform.video.videorating.model.VideoRatingDto;
 import lombok.Builder;
 import lombok.Getter;

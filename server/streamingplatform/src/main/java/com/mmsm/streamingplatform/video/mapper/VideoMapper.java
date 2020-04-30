@@ -1,6 +1,6 @@
 package com.mmsm.streamingplatform.video.mapper;
 
-import com.mmsm.streamingplatform.keycloak.model.UserDto;
+import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
 import com.mmsm.streamingplatform.video.model.Video;
 import com.mmsm.streamingplatform.video.model.VideoDetailsDto;
 import com.mmsm.streamingplatform.video.model.VideoDto;

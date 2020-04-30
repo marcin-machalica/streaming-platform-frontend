@@ -1,4 +1,4 @@
-package com.mmsm.streamingplatform.keycloak.security;
+package com.mmsm.streamingplatform.security;
 
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;

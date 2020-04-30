@@ -4,7 +4,7 @@ import com.mmsm.streamingplatform.auditor.Auditor;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.*;
 import com.mmsm.streamingplatform.comment.CommentController.*;
-import com.mmsm.streamingplatform.keycloak.model.UserDto;
+import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

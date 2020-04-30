@@ -2,7 +2,7 @@ package com.mmsm.streamingplatform.comment;
 
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
-import com.mmsm.streamingplatform.keycloak.model.UserDto;
+import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
 import lombok.AllArgsConstructor;

@@ -1,7 +1,6 @@
-package com.mmsm.streamingplatform.keycloak.service;
+package com.mmsm.streamingplatform.keycloak;
 
-import com.mmsm.streamingplatform.keycloak.mapper.KeycloakMapper;
-import com.mmsm.streamingplatform.keycloak.model.UserDto;
+import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -35,19 +34,17 @@ public class KeycloakService {
 
     public List<UserDto> getAllUserDtos() {
         return realmResource.users().list().stream()
-                .filter(userRepresentation -> !userRepresentation.getId().equals(API_USER_ID))
-                .filter(userRepresentation -> !isAdmin(userRepresentation))
-                .map(KeycloakMapper::getUserDtoFromUserRepresentation)
-                .collect(Collectors.toList());
+            .filter(userRepresentation -> !userRepresentation.getId().equals(API_USER_ID))
+            .filter(userRepresentation -> !isAdmin(userRepresentation))
+            .map(UserDto::of)
+            .collect(Collectors.toList());
     }
 
     public UserDto getUserDtoById(String id) {
         if (id == null) {
             return null;
         }
-        return KeycloakMapper.getUserDtoFromUserRepresentation(
-                realmResource.users().get(id).toRepresentation()
-        );
+        return UserDto.of(realmResource.users().get(id).toRepresentation());
     }
 
     public boolean isAdmin(String userId) {
