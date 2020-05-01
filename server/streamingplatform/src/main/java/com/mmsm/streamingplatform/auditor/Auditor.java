@@ -9,18 +9,13 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Getter
 @Setter
-@MappedSuperclass
+@Embeddable
 @EntityListeners(AuditingEntityListener.class)
-public abstract class Auditor implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="id_sequence")
-    private Long id;
+public class Auditor {
 
     @CreatedBy
     @Column(name = "created_by_id")
@@ -28,7 +23,7 @@ public abstract class Auditor implements Serializable {
 
     @CreatedDate
     @Column(name = "created_date")
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @LastModifiedBy
     @Column(name = "last_modified_by_id")
@@ -36,5 +31,9 @@ public abstract class Auditor implements Serializable {
 
     @LastModifiedDate
     @Column(name = "last_modified_date")
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
+
+    public static Auditor of() {
+        return new Auditor();
+    }
 }

@@ -1,16 +1,16 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {VideoDetailsDto} from '../../../dtos/VideoDetailsDto';
-import {VideoService} from '../../../services/api/video.service';
+import {VideoService} from '../../../services/api/video/video.service';
 import {ActivatedRoute} from '@angular/router';
 import {environment} from '../../../../environments/environment';
-import {CommentDto} from '../../../dtos/CommentDto';
-import {CommentService} from '../../../services/api/comment.service';
+import {CommentService} from '../../../services/api/comment/comment.service';
 import {DOCUMENT} from '@angular/common';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {KeycloakService} from 'keycloak-angular';
-import {CommentRatingService} from '../../../services/api/comment-rating.service';
-import {VideoRatingService} from '../../../services/api/video-rating.service';
+import {CommentRatingService} from '../../../services/api/comment/comment-rating/comment-rating.service';
+import {VideoRatingService} from '../../../services/api/video/video-rating/video-rating.service';
+import {VideoDetails} from '../../../services/api/video/VideoDto';
+import {CommentRepresentation, SaveComment, UpdateComment} from '../../../services/api/comment/CommentDto';
 
 @Component({
   selector: 'app-video-details',
@@ -21,12 +21,12 @@ export class VideoDetailsComponent implements OnInit {
 
   isVideoAuthor = false;
   currentUserId: string;
-  videoDetails: VideoDetailsDto = new VideoDetailsDto();
+  videoDetails: VideoDetails = new VideoDetails();
   videoId: number;
   dataSource;
   videoResourceUrl = (id) => `${environment.serverUrl}api/v1/videos/${id}/download`;
 
-  private _transformer = (node: CommentDtoNode, level: number) => {
+  private _transformer = (node: CommentNode, level: number) => {
     return {
       id: node.id,
       parentId: node.parentId,
@@ -51,13 +51,13 @@ export class VideoDetailsComponent implements OnInit {
     };
   }
 
-  treeControl = new FlatTreeControl<CommentDtoNode>(
+  treeControl = new FlatTreeControl<CommentNode>(
     node => node.level, node => node.expandable);
 
   treeFlattener = new MatTreeFlattener(
     this._transformer, node => node.level, node => node.expandable, node => node.directReplies);
 
-  hasChild = (_: number, node: CommentDtoNode) => node.expandable;
+  hasChild = (_: number, node: CommentNode) => node.expandable;
 
   constructor(private route: ActivatedRoute,
               @Inject(DOCUMENT) document,
@@ -124,21 +124,21 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  saveComment(node: CommentDtoNode) {
-    const id = node ? node.id : 0;
-    const comment = new CommentDto();
-    comment.parentId = id > 0 ? id : null;
-    comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value;
-    if (comment.message.length < 1 || comment.message.length > 5000) {
+  saveComment(node: CommentNode) {
+    const commentId = node ? node.id : 0;
+    const saveComment = new SaveComment();
+    saveComment.parentId = commentId > 0 ? commentId : null;
+    saveComment.message = (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value;
+    if (saveComment.message.length < 1 || saveComment.message.length > 5000) {
       return;
     }
 
-    this.commentService.saveComment(comment, this.videoId).subscribe(response => {
+    this.commentService.saveComment(saveComment, this.videoId).subscribe(response => {
       if (response.status === 201) {
         if (!response.body.parentId) {
           this.videoDetails.directCommentDtos.push(response.body);
           this.reloadComments();
-          (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value = '';
+          (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value = '';
           if (node) {
             node.isReplyActive = false;
           }
@@ -149,32 +149,34 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  updateComment(node: CommentDtoNode) {
-    const id = node.id;
-    const comment = new CommentDto();
-    comment.message = (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value;
+  updateComment(node: CommentNode) {
+    const commentId = node.id;
+    const updateComment = new UpdateComment();
+    updateComment.message = (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value;
 
-    this.commentService.updateComment(comment, this.videoId, id).subscribe(response => {
+    if (updateComment.message.length < 1 || updateComment.message.length > 5000) {
+      return;
+    }
+
+    this.commentService.updateComment(updateComment, this.videoId, commentId).subscribe(response => {
       if (response.status === 200) {
-        (document.getElementById(`comment_input_${id}`) as HTMLInputElement).value = '';
+        (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value = '';
         node.isEditActive = false;
         this.loadVideoDetails();
       }
     });
   }
 
-  deleteComment(comment: CommentDtoNode) {
+  deleteComment(comment: CommentNode) {
     const commentId = comment.id;
 
     this.commentService.deleteComment(this.videoId, commentId).subscribe(response => {
-      if (response.status === 204) {
-        comment.isDeleted = true;
-        this.cancelReplyAndEdit(comment);
-      }
+      comment.isDeleted = true;
+      this.cancelReplyAndEdit(comment);
     });
   }
 
-  upVoteComment(comment: CommentDtoNode) {
+  upVoteComment(comment: CommentNode) {
     this.commentRatingService.upVoteComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 200) {
         const wasUpVote = comment.currentUserCommentRating.isUpVote;
@@ -190,7 +192,7 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  downVoteComment(comment: CommentDtoNode) {
+  downVoteComment(comment: CommentNode) {
     this.commentRatingService.downVoteComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 200) {
         const wasUpVote = comment.currentUserCommentRating.isUpVote;
@@ -205,7 +207,7 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  favouriteComment(comment: CommentDtoNode) {
+  favouriteComment(comment: CommentNode) {
     this.commentRatingService.favouriteComment(this.videoId, comment.id).subscribe(response => {
       if (response.status === 200) {
         comment.favouriteCount = response.body.favouriteCount;
@@ -215,16 +217,14 @@ export class VideoDetailsComponent implements OnInit {
     });
   }
 
-  pinComment(comment: CommentDtoNode) {
+  pinComment(comment: CommentNode) {
     this.commentRatingService.pinComment(this.videoId, comment.id).subscribe(response => {
-      if (response.status === 204) {
-        comment.isPinned = !comment.isPinned;
-      }
+      comment.isPinned = !comment.isPinned;
     });
   }
 
-  getCommentDtoWithReplies(commentId: number) {
-    this.commentService.getCommentDtoWithReplies(this.videoId, commentId).subscribe(response => {
+  getCommentRepresentationWithReplies(commentId: number) {
+    this.commentService.getCommentRepresentationWithReplies(this.videoId, commentId).subscribe(response => {
       const loadedCommentIndex = this.videoDetails.directCommentDtos.findIndex(comment => comment.id === commentId);
       this.videoDetails.directCommentDtos[loadedCommentIndex] = response.body;
       this.reloadComments();
@@ -238,28 +238,28 @@ export class VideoDetailsComponent implements OnInit {
     return this.currentUserId === authorId;
   }
 
-  isFirstLevelComment(node: CommentDtoNode) {
+  isFirstLevelComment(node: CommentNode) {
     return this.videoDetails.directCommentDtos.find(comment => comment.id === node.id);
   }
 
-  setReplyActive(node: CommentDtoNode) {
+  setReplyActive(node: CommentNode) {
     node.isReplyActive = true;
     node.isEditActive = false;
   }
 
-  setEditActive(node: CommentDtoNode) {
+  setEditActive(node: CommentNode) {
     node.isReplyActive = false;
     node.isEditActive = true;
   }
 
-  cancelReplyAndEdit(node: CommentDtoNode) {
+  cancelReplyAndEdit(node: CommentNode) {
     node.isReplyActive = false;
     node.isEditActive = false;
   }
 }
 
-export class CommentDtoNode extends CommentDto {
-  public directReplies: CommentDtoNode[];
+export class CommentNode extends CommentRepresentation {
+  public directReplies: CommentNode[];
   public expandable: boolean;
   public level: number;
   public isReplyActive: boolean;
