@@ -79,14 +79,14 @@ public class CommentController {
 
     @PostMapping
     ResponseEntity<CommentRepresentation> saveComment(@RequestBody SaveComment saveComment, @PathVariable Long videoId) throws URISyntaxException {
-        CommentRepresentation savedCommentDto = commentService.saveComment(saveComment, videoId);
-        URI uri = savedCommentDto != null ? new URI("/api/v1/videos/" + videoId + "/comments/" + savedCommentDto.getId()) : null;
-        return ControllerUtils.getCreatedResponse(savedCommentDto, uri);
+        CommentRepresentation savedComment = commentService.saveComment(saveComment, videoId);
+        URI uri = savedComment != null ? new URI("/api/v1/videos/" + videoId + "/comments/" + savedComment.getId()) : null;
+        return ControllerUtils.getCreatedResponse(savedComment, uri);
     }
 
     @PutMapping("/{commentId}")
     CommentRepresentation updateComment(@RequestBody UpdateComment updateComment, @PathVariable Long videoId,
-                                               @PathVariable Long commentId, HttpServletRequest request) {
+                                        @PathVariable Long commentId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
         return commentService.updateComment(updateComment, userId, commentId);
     }

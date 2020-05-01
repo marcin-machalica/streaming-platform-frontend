@@ -1,7 +1,7 @@
 package com.mmsm.streamingplatform.video.videorating;
 
-import com.mmsm.streamingplatform.video.model.Video;
-import com.mmsm.streamingplatform.video.service.VideoRepository;
+import com.mmsm.streamingplatform.video.Video;
+import com.mmsm.streamingplatform.video.VideoRepository;
 import com.mmsm.streamingplatform.video.videorating.VideoRatingController.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

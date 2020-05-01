@@ -1,6 +1,5 @@
-package com.mmsm.streamingplatform.video.service;
+package com.mmsm.streamingplatform.video;
 
-import com.mmsm.streamingplatform.video.model.Video;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -9,7 +9,7 @@ import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
 import {KeycloakService} from 'keycloak-angular';
 import {CommentRatingService} from '../../../services/api/comment/comment-rating/comment-rating.service';
 import {VideoRatingService} from '../../../services/api/video/video-rating/video-rating.service';
-import {VideoDetailsDto} from '../../../services/api/video/VideoDto';
+import {VideoDetails} from '../../../services/api/video/VideoDto';
 import {CommentRepresentation, SaveComment, UpdateComment} from '../../../services/api/comment/CommentDto';
 
 @Component({
@@ -21,7 +21,7 @@ export class VideoDetailsComponent implements OnInit {
 
   isVideoAuthor = false;
   currentUserId: string;
-  videoDetails: VideoDetailsDto = new VideoDetailsDto();
+  videoDetails: VideoDetails = new VideoDetails();
   videoId: number;
   dataSource;
   videoResourceUrl = (id) => `${environment.serverUrl}api/v1/videos/${id}/download`;

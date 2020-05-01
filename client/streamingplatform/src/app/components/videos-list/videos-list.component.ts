@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {VideoService} from '../../services/api/video/video.service';
-import {VideoDto} from '../../services/api/video/VideoDto';
+import {VideoRepresentation} from '../../services/api/video/VideoDto';
 
 @Component({
   selector: 'app-videos-list',
@@ -9,7 +9,7 @@ import {VideoDto} from '../../services/api/video/VideoDto';
 })
 export class VideosListComponent implements OnInit {
 
-  videos: VideoDto[] = [];
+  videos: VideoRepresentation[] = [];
 
   constructor(private videoService: VideoService) { }
 
@@ -18,7 +18,7 @@ export class VideosListComponent implements OnInit {
   }
 
   loadAllVideos() {
-    this.videoService.findAllVideoDtos().subscribe(response => {
+    this.videoService.findAllVideos().subscribe(response => {
       if (response.body) {
         this.videos = response.body;
       }

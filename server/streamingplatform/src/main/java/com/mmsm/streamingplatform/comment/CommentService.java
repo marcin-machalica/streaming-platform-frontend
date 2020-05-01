@@ -5,8 +5,8 @@ import com.mmsm.streamingplatform.comment.commentrating.CommentRatingRepository;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.comment.CommentController.*;
 import com.mmsm.streamingplatform.keycloak.KeycloakService;
-import com.mmsm.streamingplatform.video.model.Video;
-import com.mmsm.streamingplatform.video.service.VideoRepository;
+import com.mmsm.streamingplatform.video.Video;
+import com.mmsm.streamingplatform.video.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -96,16 +96,16 @@ public class CommentService {
         return comment.toRepresentation(keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
     }
 
-    CommentRepresentation updateComment(UpdateComment updateComment, String authorId, Long commentId) {
+    CommentRepresentation updateComment(UpdateComment updateComment, String userId, Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
 
-        if (!authorId.equals(comment.getCreatedById())) {
+        if (!userId.equals(comment.getCreatedById())) {
             throw new CanOnlyBePerformedByAuthorException();
         }
 
         comment.updateComment(updateComment);
         comment = commentRepository.save(comment);
-        CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), authorId).orElseGet(CommentRating::of);
+        CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), userId).orElseGet(CommentRating::of);
         CommentRatingRepresentation commentRatingRepresentation = commentRating.toRepresentation(comment.getId());
         return comment.toRepresentation(keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
     }

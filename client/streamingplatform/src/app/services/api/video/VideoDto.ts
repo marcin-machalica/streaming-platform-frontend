@@ -2,7 +2,7 @@ import {UserDto} from '../keycloak-admin-api/UserDto';
 import {VideoRatingDto} from './video-rating/VideoRatingDto';
 import {CommentRepresentation} from '../comment/CommentDto';
 
-export class VideoDto {
+export class VideoRepresentation {
   public id: number;
   public author: UserDto;
   public title: string;
@@ -10,7 +10,7 @@ export class VideoDto {
   public createdDate: Date;
 }
 
-export class VideoDetailsDto {
+export class VideoDetails {
   id: number;
   author: UserDto;
   title: string;

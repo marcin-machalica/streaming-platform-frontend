@@ -1,9 +1,16 @@
-package com.mmsm.streamingplatform.video.model;
+package com.mmsm.streamingplatform.video;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
 import com.mmsm.streamingplatform.comment.Comment;
+import com.mmsm.streamingplatform.comment.CommentController;
+import com.mmsm.streamingplatform.video.VideoController.*;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController;
+import com.mmsm.streamingplatform.keycloak.KeycloakController.*;
 import com.mmsm.streamingplatform.video.videorating.VideoRating;
+import com.mmsm.streamingplatform.video.videorating.VideoRatingController;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -17,6 +24,8 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "video")
 public class Video {
@@ -63,6 +72,26 @@ public class Video {
 
     @Embedded
     private Auditor auditor;
+
+    public static Video of(String filename, String title, String description) {
+        return new Video(null, filename, title, description, 0L, 0L,
+            0L, 0L, new ArrayList<>(), new ArrayList<>() , Auditor.of());
+    }
+
+    public VideoRepresentation toRepresentation(UserDto author) {
+        return new VideoRepresentation(id, author, title, description, getCreatedDate());
+    }
+
+    public VideoDetails toVideoDetails(UserDto videoAuthor, VideoRatingController.VideoRatingRepresentation currentUserVideoRating,
+                                       List<CommentController.CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors) {
+        return new VideoDetails(id, videoAuthor, title, description, upVoteCount, downVoteCount, viewCount, shareCount,
+            getCreatedDate(), currentUserVideoRating, Comment.getCommentRepresentationListWithReplies(commentWithRepliesAndAuthors));
+    }
+
+    public Video updateVideo(UpdateVideo updateVideo) {
+        description = updateVideo.getDescription();
+        return this;
+    }
 
     public Video upVote(VideoRating videoRating) {
         Boolean wasUpVote = videoRating.getIsUpVote();
