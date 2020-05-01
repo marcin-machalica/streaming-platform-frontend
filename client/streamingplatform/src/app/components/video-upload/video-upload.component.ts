@@ -2,6 +2,8 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {VideoService} from '../../services/api/video/video.service';
 import {NgForm} from '@angular/forms';
 import {VideoSaveDto} from '../../services/api/video/VideoDto';
+import {ToastService} from '../../services/toast/toast.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-video-upload',
@@ -14,7 +16,9 @@ export class VideoUploadComponent implements OnInit {
   file: File;
   @ViewChild(NgForm, { static: false }) form;
 
-  constructor(private videoService: VideoService) { }
+  constructor(private router: Router,
+              private videoService: VideoService,
+              private toastService: ToastService) { }
 
   ngOnInit() {
   }
@@ -41,7 +45,10 @@ export class VideoUploadComponent implements OnInit {
     formData.set('file', this.file);
     formData.set('description', this.videoSaveDto.description);
     formData.set('title', this.videoSaveDto.title);
+
     this.videoService.uploadVideo(formData).subscribe(response => {
+      this.router.navigateByUrl('videos/' + response.body.id);
+      this.toastService.showToast('Successfully created video!');
     });
   }
 }

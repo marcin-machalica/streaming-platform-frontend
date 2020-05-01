@@ -19,6 +19,7 @@ import { VideoUploadComponent } from './components/video-upload/video-upload.com
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatTreeModule} from '@angular/material/tree';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,8 @@ import {MatTreeModule} from '@angular/material/tree';
     MatVideoModule,
     MatFormFieldModule,
     MatInputModule,
-    MatTreeModule
+    MatTreeModule,
+    MatSnackBarModule
   ],
   providers: [
     {

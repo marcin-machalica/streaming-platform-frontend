@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -98,11 +99,15 @@ public class VideoController {
 
     @GetMapping("/{videoId}/download")
     public ResponseEntity<InputStreamResource> downloadVideoById(@PathVariable Long videoId) throws FileNotFoundException {
-        File file = videoService.downloadFile(videoId);
+        Pair<File, String> fileAndFilename = videoService.getFileAndFilenameWithExtension(videoId);
+        File file = fileAndFilename.getFirst();
+        String filename = fileAndFilename.getSecond();
+
         InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
         return ResponseEntity.ok()
             .contentLength(file.length())
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
+            .header("Content-Disposition", "attachment; filename=" + filename)
             .body(resource);
     }
 }

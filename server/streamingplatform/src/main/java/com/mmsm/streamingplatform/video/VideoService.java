@@ -14,6 +14,7 @@ import com.mmsm.streamingplatform.video.videorating.VideoRatingController.*;
 import com.mmsm.streamingplatform.video.videorating.VideoRatingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,9 +138,9 @@ public class VideoService {
         videoRepository.delete(video);
     }
 
-    public File downloadFile(Long videoId) {
+    public Pair<File, String> getFileAndFilenameWithExtension(Long videoId) {
         Video video = videoRepository.findById(videoId).orElseThrow(() -> new VideoNotFoundException(videoId));
-        return new File(VIDEOS_STORAGE_PATH + "/" + video.getFilename());
+        return Pair.of(new File(VIDEOS_STORAGE_PATH + "/" + video.getFilename()), video.getTitle() + "." + FileUtils.getFileExtension(video.getFilename()));
     }
 
     private void storeFile(MultipartFile file, String filename) throws IOException {
