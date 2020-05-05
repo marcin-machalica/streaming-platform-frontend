@@ -4,6 +4,7 @@ import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingRepository;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.comment.CommentController.*;
+import com.mmsm.streamingplatform.keycloak.KeycloakController.*;
 import com.mmsm.streamingplatform.keycloak.KeycloakService;
 import com.mmsm.streamingplatform.video.Video;
 import com.mmsm.streamingplatform.video.VideoRepository;
@@ -93,21 +94,23 @@ public class CommentService {
 
         comment = commentRepository.save(comment);
         CommentRatingRepresentation commentRatingRepresentation = CommentRating.of().toRepresentation(comment.getId());
-        return comment.toRepresentation(keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
+        UserDto author = keycloakService.getUserDtoById(comment.getCreatedById());
+        return comment.toRepresentation(author, commentRatingRepresentation);
     }
 
-    CommentRepresentation updateComment(UpdateComment updateComment, String userId, Long commentId) {
+    CommentRepresentation updateComment(CommentUpdate commentUpdate, Long commentId, String userId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new CommentNotFoundException(commentId));
 
         if (!userId.equals(comment.getCreatedById())) {
             throw new CanOnlyBePerformedByAuthorException();
         }
 
-        comment.updateComment(updateComment);
+        comment = comment.updateComment(commentUpdate);
         comment = commentRepository.save(comment);
         CommentRating commentRating = commentRatingRepository.findCommentRatingByCommentIdAndUserId(comment.getId(), userId).orElseGet(CommentRating::of);
         CommentRatingRepresentation commentRatingRepresentation = commentRating.toRepresentation(comment.getId());
-        return comment.toRepresentation(keycloakService.getUserDtoById(comment.getCreatedById()), commentRatingRepresentation);
+        UserDto author = keycloakService.getUserDtoById(comment.getCreatedById());
+        return comment.toRepresentation(author, commentRatingRepresentation);
     }
 
     void deleteCommentById(Long videoId, Long commentId, String userId) {

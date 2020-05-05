@@ -126,8 +126,8 @@ public class Comment {
         incrementParentsAllRepliesCount(this);
     }
 
-    public Comment updateComment(UpdateComment updateComment) {
-        message = updateComment.getMessage();
+    public Comment updateComment(CommentUpdate commentUpdate) {
+        message = commentUpdate.getMessage();
         wasEdited = true;
         return this;
     }

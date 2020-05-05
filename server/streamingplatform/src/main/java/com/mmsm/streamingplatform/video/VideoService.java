@@ -1,5 +1,7 @@
 package com.mmsm.streamingplatform.video;
 
+import com.mmsm.streamingplatform.channel.Channel;
+import com.mmsm.streamingplatform.channel.ChannelRepository;
 import com.mmsm.streamingplatform.video.VideoController.*;
 import com.mmsm.streamingplatform.comment.CommentController.*;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
@@ -34,6 +36,13 @@ import java.util.stream.Collectors;
 public class VideoService {
 
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    static class ChannelNotFoundException extends RuntimeException {
+        ChannelNotFoundException(String userId) {
+            super("Channel not found with userId: " + userId);
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
     static class VideoNotFoundException extends RuntimeException {
         VideoNotFoundException(Long id) {
             super("Video not found with id: " + id);
@@ -66,6 +75,7 @@ public class VideoService {
     private final VideoRatingRepository videoRatingRepository;
     private final CommentService commentService;
     private final CommentRatingRepository commentRatingRepository;
+    private final ChannelRepository channelRepository;
 
     @Value("${VIDEOS_STORAGE_PATH}")
     public String VIDEOS_STORAGE_PATH;
@@ -97,9 +107,12 @@ public class VideoService {
     }
 
     @Transactional
-    public VideoRepresentation createVideo(MultipartFile file, String title, String description) throws NotSupportedException, IOException {
+    public VideoRepresentation createVideo(MultipartFile file, String title, String description, String userId) throws NotSupportedException, IOException {
+        Channel channel = channelRepository.findByAuditorCreatedById(userId).orElseThrow(() -> new ChannelNotFoundException(userId));
+
         String filename = generateFilename(file.getOriginalFilename());
         Video video = Video.of(filename, title, description);
+        channel.addVideo(video);
 
         video = videoRepository.save(video);
         storeFile(file, filename);
@@ -108,16 +121,16 @@ public class VideoService {
         return video.toRepresentation(author);
     }
 
-    public VideoRepresentation updateVideo(UpdateVideo updateVideo, String userId, Long videoId) {
+    public VideoRepresentation updateVideo(VideoUpdate videoUpdate, Long videoId, String userId) {
         Video video = videoRepository.findById(videoId).orElseThrow(() -> new VideoNotFoundException(videoId));
 
         if (!userId.equals(video.getCreatedById())) {
             throw new CanOnlyBePerformedByAuthorException();
         }
 
-        video.updateVideo(updateVideo);
-        Video updatedVideo = videoRepository.save(video);
-        UserDto author = keycloakService.getUserDtoById(updatedVideo.getCreatedById());
+        video = video.updateVideo(videoUpdate);
+        video = videoRepository.save(video);
+        UserDto author = keycloakService.getUserDtoById(video.getCreatedById());
         return video.toRepresentation(author);
     }
 

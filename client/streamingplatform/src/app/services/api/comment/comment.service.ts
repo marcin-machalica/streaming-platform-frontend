@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient, HttpResponse} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {environment} from '../../../../environments/environment';
-import {CommentRepresentation, SaveComment, UpdateComment} from './CommentDto';
+import {CommentRepresentation, SaveComment, CommentUpdate} from './CommentDto';
 
 type CommentRepresentationResponseType = HttpResponse<CommentRepresentation>;
 
@@ -19,8 +19,8 @@ export class CommentService {
     return this.http.post<CommentRepresentation>(this.resourceUrl(videoId), saveComment, { observe: 'response' });
   }
 
-  updateComment(updateComment: UpdateComment, videoId: number, commentId: number): Observable<CommentRepresentationResponseType> {
-    return this.http.put<CommentRepresentation>(`${this.resourceUrl(videoId)}/${commentId}`, updateComment, { observe: 'response' });
+  updateComment(commentUpdate: CommentUpdate, videoId: number, commentId: number): Observable<CommentRepresentationResponseType> {
+    return this.http.put<CommentRepresentation>(`${this.resourceUrl(videoId)}/${commentId}`, commentUpdate, { observe: 'response' });
   }
 
   deleteComment(videoId: number, commentId: number): Observable<HttpResponse<void>> {

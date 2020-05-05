@@ -2,11 +2,11 @@
   <form ngForm="form">
     <h1>Upload video</h1>
     <mat-form-field>
-      <input matInput required type="text" placeholder="Title" [(ngModel)]="videoSaveDto.title" name="title">
+      <input matInput required type="text" placeholder="Title" [(ngModel)]="videoUpdate.title" name="title">
     </mat-form-field>
     <br/>
     <mat-form-field>
-      <textarea matInput required placeholder="Description" [(ngModel)]="videoSaveDto.description" name="description"></textarea>
+      <textarea matInput required placeholder="Description" [(ngModel)]="videoUpdate.description" name="description"></textarea>
     </mat-form-field>
     <br/>
     <input required type="file" (change)="selectFile($event)" (dragover)="onDragOverFile($event)" (drop)="onDropFile($event)" placeholder="Upload video" accept=".mp4,.webm">

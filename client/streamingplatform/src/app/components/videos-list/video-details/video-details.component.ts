@@ -10,7 +10,7 @@ import {KeycloakService} from 'keycloak-angular';
 import {CommentRatingService} from '../../../services/api/comment/comment-rating/comment-rating.service';
 import {VideoRatingService} from '../../../services/api/video/video-rating/video-rating.service';
 import {VideoDetails} from '../../../services/api/video/VideoDto';
-import {CommentRepresentation, SaveComment, UpdateComment} from '../../../services/api/comment/CommentDto';
+import {CommentRepresentation, SaveComment, CommentUpdate} from '../../../services/api/comment/CommentDto';
 
 @Component({
   selector: 'app-video-details',
@@ -151,14 +151,14 @@ export class VideoDetailsComponent implements OnInit {
 
   updateComment(node: CommentNode) {
     const commentId = node.id;
-    const updateComment = new UpdateComment();
-    updateComment.message = (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value;
+    const commentUpdate = new CommentUpdate();
+    commentUpdate.message = (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value;
 
-    if (updateComment.message.length < 1 || updateComment.message.length > 5000) {
+    if (commentUpdate.message.length < 1 || commentUpdate.message.length > 5000) {
       return;
     }
 
-    this.commentService.updateComment(updateComment, this.videoId, commentId).subscribe(response => {
+    this.commentService.updateComment(commentUpdate, this.videoId, commentId).subscribe(response => {
       if (response.status === 200) {
         (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value = '';
         node.isEditActive = false;

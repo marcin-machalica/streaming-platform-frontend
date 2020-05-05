@@ -30,7 +30,7 @@ export class VideoDetails {
   }
 }
 
-export class VideoSaveDto {
+export class VideoUpdate {
   public title: string;
   public description: string;
 }

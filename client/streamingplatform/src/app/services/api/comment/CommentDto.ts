@@ -25,6 +25,6 @@ export class SaveComment {
   public message: string;
 }
 
-export class UpdateComment {
+export class CommentUpdate {
   public message: string;
 }

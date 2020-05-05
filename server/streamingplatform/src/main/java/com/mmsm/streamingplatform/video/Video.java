@@ -4,7 +4,6 @@ import com.mmsm.streamingplatform.auditor.Auditor;
 import com.mmsm.streamingplatform.comment.Comment;
 import com.mmsm.streamingplatform.comment.CommentController;
 import com.mmsm.streamingplatform.video.VideoController.*;
-import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController;
 import com.mmsm.streamingplatform.keycloak.KeycloakController.*;
 import com.mmsm.streamingplatform.video.videorating.VideoRating;
 import com.mmsm.streamingplatform.video.videorating.VideoRatingController;
@@ -49,11 +48,11 @@ public class Video {
 
     @NotNull
     @Column(name = "view_count", nullable = false)
-    private Long viewCount = 0L;
+    private Long viewCount = 0L;    // todo
 
     @NotNull
     @Column(name = "share_count", nullable = false)
-    private Long shareCount = 0L;
+    private Long shareCount = 0L;   // todo
 
     @NotNull
     @Column(name = "up_vote_count", nullable = false)
@@ -88,8 +87,8 @@ public class Video {
             getCreatedDate(), currentUserVideoRating, Comment.getCommentRepresentationListWithReplies(commentWithRepliesAndAuthors));
     }
 
-    public Video updateVideo(UpdateVideo updateVideo) {
-        description = updateVideo.getDescription();
+    public Video updateVideo(VideoUpdate videoUpdate) {
+        description = videoUpdate.getDescription();
         return this;
     }
 

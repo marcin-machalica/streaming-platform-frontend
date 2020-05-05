@@ -65,7 +65,7 @@ public class CommentController {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateComment {
+    public static class CommentUpdate {
         private String message;
     }
 
@@ -85,10 +85,10 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    CommentRepresentation updateComment(@RequestBody UpdateComment updateComment, @PathVariable Long videoId,
+    CommentRepresentation updateComment(@RequestBody CommentUpdate commentUpdate, @PathVariable Long videoId,
                                         @PathVariable Long commentId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
-        return commentService.updateComment(updateComment, userId, commentId);
+        return commentService.updateComment(commentUpdate, commentId, userId);
     }
 
     @DeleteMapping("/{commentId}")
