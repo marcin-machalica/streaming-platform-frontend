@@ -1,17 +1,26 @@
 <div class="page-content">
   <form ngForm="form">
     <h1>Upload video</h1>
-    <mat-form-field>
-      <input matInput required type="text" placeholder="Title" [(ngModel)]="videoUpdate.title" name="title">
-    </mat-form-field>
-    <br/>
-    <mat-form-field>
-      <textarea matInput required placeholder="Description" [(ngModel)]="videoUpdate.description" name="description"></textarea>
-    </mat-form-field>
-    <br/>
-    <input required type="file" (change)="selectFile($event)" (dragover)="onDragOverFile($event)" (drop)="onDropFile($event)" placeholder="Upload video" accept=".mp4,.webm">
-    <br/>
-    <button mat-button (click)="uploadFile()">
+
+    <div>
+      <mat-form-field>
+        <input matInput required type="text" placeholder="Title" [(ngModel)]="videoUpdate.title" name="title">
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field  class="margin-top-30">
+        <textarea matInput required placeholder="Description" [(ngModel)]="videoUpdate.description" name="description"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div>
+      <input required type="file" class="margin-top-30"
+             (change)="selectFile($event)" (dragover)="onDragOverFile($event)" (drop)="onDropFile($event)"
+             placeholder="Upload video" accept=".mp4,.webm">
+    </div>
+
+    <button mat-button class="margin-top-30" (click)="uploadFile()">
       <span>Upload</span>
     </button>
   </form>

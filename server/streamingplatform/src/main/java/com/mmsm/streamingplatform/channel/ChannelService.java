@@ -31,8 +31,26 @@ public class ChannelService {
         }
     }
 
+    @ResponseStatus(code = HttpStatus.CONFLICT)
+    static class UserAlreadyHasChannelException extends RuntimeException {
+        UserAlreadyHasChannelException() {
+            super("Only one channel can exist for single user");
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.CONFLICT)
+    static class ChannelNameAlreadyExistsException extends RuntimeException {
+        ChannelNameAlreadyExistsException() {
+            super("Channel's name has to be unique");
+        }
+    }
+
     private final KeycloakService keycloakService;
     private final ChannelRepository channelRepository;
+
+    public Boolean isChannelCreated(String userId) {
+        return channelRepository.existsChannelByAuditorCreatedById(userId);
+    }
 
     public List<VideoRepresentation> getAllVideos(String channelName) {
         Channel channel = channelRepository.findByName(channelName).orElseThrow(() -> new ChannelNotFoundException(channelName));
@@ -46,7 +64,17 @@ public class ChannelService {
         return channel.toChannelAbout(keycloakService.getUserDtoById(channel.getCreatedById()));
     }
 
-    public ChannelAbout createChannel(ChannelUpdate channelUpdate) {
+    public ChannelAbout createChannel(ChannelUpdate channelUpdate, String userId) {
+        boolean channelExists = channelRepository.existsChannelByAuditorCreatedById(userId);
+        if (channelExists) {
+            throw new UserAlreadyHasChannelException();
+        }
+
+        boolean newChannelNameExists = channelRepository.existsChannelByName(channelUpdate.getName());
+        if (newChannelNameExists) {
+            throw new ChannelNameAlreadyExistsException();
+        }
+
         Channel channel = Channel.of(channelUpdate.getName(), channelUpdate.getDescription());
         channel = channelRepository.save(channel);
         UserDto author = keycloakService.getUserDtoById(channel.getCreatedById());
@@ -58,6 +86,11 @@ public class ChannelService {
 
         if (!userId.equals(channel.getCreatedById())) {
             throw new CanOnlyBePerformedByAuthorException();
+        }
+
+        boolean newChannelNameExists = channelRepository.existsChannelByName(channelUpdate.getName());
+        if (!channelUpdate.getName().equals(channelName) && newChannelNameExists) {
+            throw new ChannelNameAlreadyExistsException();
         }
 
         channel.updateChannel(channelUpdate);

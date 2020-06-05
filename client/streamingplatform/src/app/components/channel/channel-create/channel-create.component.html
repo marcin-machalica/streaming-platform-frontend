@@ -1,0 +1,21 @@
+<div class="page-content">
+  <form ngForm="form">
+    <h1>Create channel</h1>
+
+    <div>
+      <mat-form-field>
+        <input matInput required type="text" placeholder="Title" [(ngModel)]="channelUpdate.name" name="name">
+      </mat-form-field>
+    </div>
+
+    <div>
+      <mat-form-field  class="margin-top-30">
+        <textarea matInput placeholder="Description" [(ngModel)]="channelUpdate.description" name="description"></textarea>
+      </mat-form-field>
+    </div>
+
+    <button mat-button class="margin-top-30" (click)="createChannel()">
+      <span>Create</span>
+    </button>
+  </form>
+</div>

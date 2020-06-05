@@ -53,15 +53,17 @@ class ChannelController {
     }
 
     @PostMapping
-    public ResponseEntity<ChannelAbout> createChannel(@RequestBody ChannelUpdate channelUpdate) throws URISyntaxException {
-        ChannelAbout channelAbout = channelService.createChannel(channelUpdate);
+    public ResponseEntity<ChannelAbout> createChannel(@RequestBody ChannelUpdate channelUpdate,
+                                                      HttpServletRequest request) throws URISyntaxException {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        ChannelAbout channelAbout = channelService.createChannel(channelUpdate, userId);
         URI uri = new URI("/api/v1/videos/" + channelAbout.getName());
         return ControllerUtils.getCreatedResponse(channelAbout, uri);
     }
 
     @PutMapping("/{channelName}")
     public ChannelAbout updateChannel(@RequestBody ChannelUpdate channelUpdate, @PathVariable String channelName,
-                                              HttpServletRequest request) {
+                                      HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
         return channelService.updateChannel(channelUpdate, channelName, userId);
     }

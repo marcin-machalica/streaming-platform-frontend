@@ -8,7 +8,7 @@ import {MatListModule} from '@angular/material/list';
 import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {KeycloakAngularModule, KeycloakService} from 'keycloak-angular';
-import {initializer} from './services/keycloak/keycloak-app-init';
+import {initializer} from './services/security/keycloak/keycloak-app-init';
 import {MatButtonModule, MatIconModule, MatSidenavModule, MatToolbarModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FlexModule} from '@angular/flex-layout';
@@ -20,6 +20,11 @@ import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatTreeModule} from '@angular/material/tree';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {
+  ChannelGuardService,
+  ReversedChannelGuardService
+} from './services/security/channel-guard/channel-guard.service';
+import { ChannelCreateComponent } from './components/channel/channel-create/channel-create.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +32,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     HomeComponent,
     VideosListComponent,
     VideoDetailsComponent,
-    VideoUploadComponent
+    VideoUploadComponent,
+    ChannelCreateComponent,
   ],
   imports: [
     BrowserModule,
@@ -54,7 +60,9 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
       useFactory: initializer,
       multi: true,
       deps: [KeycloakService]
-    }
+    },
+    ChannelGuardService,
+    ReversedChannelGuardService
   ],
   bootstrap: [AppComponent]
 })
