@@ -25,6 +25,7 @@ import {
   ReversedChannelGuardService
 } from './services/security/channel-guard/channel-guard.service';
 import { ChannelCreateComponent } from './components/channel/channel-create/channel-create.component';
+import { ChannelComponent } from './components/channel/channel/channel.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { ChannelCreateComponent } from './components/channel/channel-create/chan
     VideoDetailsComponent,
     VideoUploadComponent,
     ChannelCreateComponent,
+    ChannelComponent,
   ],
   imports: [
     BrowserModule,

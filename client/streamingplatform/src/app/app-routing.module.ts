@@ -9,6 +9,7 @@ import {
   ReversedChannelGuardService
 } from './services/security/channel-guard/channel-guard.service';
 import {ChannelCreateComponent} from './components/channel/channel-create/channel-create.component';
+import {ChannelComponent} from './components/channel/channel/channel.component';
 
 
 const routes: Routes = [
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'videos', component: VideosListComponent, canActivate: [ChannelGuardService] },
   { path: 'videos/upload', component: VideoUploadComponent, canActivate: [ChannelGuardService] },
   { path: 'videos/:id', component: VideoDetailsComponent, canActivate: [ChannelGuardService] },
+  { path: 'channels/:name', component: ChannelComponent, canActivate: [ChannelGuardService] },
 ];
 
 @NgModule({
