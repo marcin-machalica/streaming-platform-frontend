@@ -4,6 +4,7 @@ import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
 import com.mmsm.streamingplatform.keycloak.KeycloakService;
 import com.mmsm.streamingplatform.video.VideoController.*;
 import com.mmsm.streamingplatform.channel.ChannelController.*;
+import com.mmsm.streamingplatform.video.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,12 @@ public class ChannelService {
 
     public Boolean isChannelCreated(String userId) {
         return channelRepository.existsChannelByAuditorCreatedById(userId);
+    }
+
+    public ChannelIdentity getChannelIdentity(String userId) {
+        return channelRepository.findByAuditorCreatedById(userId)
+            .map(Channel::toChannelIdentity)
+            .orElseThrow(() -> new VideoService.ChannelNotFoundException(userId));
     }
 
     public List<VideoRepresentation> getAllVideos(String channelName) {

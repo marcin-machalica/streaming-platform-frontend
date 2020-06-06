@@ -36,8 +36,8 @@ import java.util.stream.Collectors;
 public class VideoService {
 
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    static class ChannelNotFoundException extends RuntimeException {
-        ChannelNotFoundException(String userId) {
+    public static class ChannelNotFoundException extends RuntimeException {
+        public ChannelNotFoundException(String userId) {
             super("Channel not found with userId: " + userId);
         }
     }

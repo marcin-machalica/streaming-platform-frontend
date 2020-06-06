@@ -12,3 +12,7 @@ export class ChannelUpdate {
   public name: string;
   public description: string;
 }
+
+export class ChannelIdentity {
+  public name: string;
+}

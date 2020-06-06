@@ -14,11 +14,12 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/channels")
 class ChannelController {
 
     @Getter
@@ -40,19 +41,32 @@ class ChannelController {
         private String description;
     }
 
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class ChannelIdentity {
+        private String name;
+    }
+
     private final ChannelService channelService;
 
-    @GetMapping("/{channelName}/videos")
+    @GetMapping("/current-channel")
+    public ChannelIdentity getChannelIdentity(HttpServletRequest request) {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        return channelService.getChannelIdentity(userId);
+    }
+
+    @GetMapping("/channels/{channelName}/videos")
     public List<VideoRepresentation> getAllVideos(@PathVariable String channelName) {
         return channelService.getAllVideos(channelName);
     }
 
-    @GetMapping("/{channelName}")
+    @GetMapping("/channels/{channelName}")
     public ChannelAbout getChannelAbout(@PathVariable String channelName) {
         return channelService.getChannelAbout(channelName);
     }
 
-    @PostMapping
+    @PostMapping("/channels")
     public ResponseEntity<ChannelAbout> createChannel(@RequestBody ChannelUpdate channelUpdate,
                                                       HttpServletRequest request) throws URISyntaxException {
         String userId = SecurityUtils.getUserIdFromRequest(request);
@@ -61,14 +75,14 @@ class ChannelController {
         return ControllerUtils.getCreatedResponse(channelAbout, uri);
     }
 
-    @PutMapping("/{channelName}")
+    @PutMapping("/channels/{channelName}")
     public ChannelAbout updateChannel(@RequestBody ChannelUpdate channelUpdate, @PathVariable String channelName,
                                       HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
         return channelService.updateChannel(channelUpdate, channelName, userId);
     }
 
-    @DeleteMapping("/{channelName}")
+    @DeleteMapping("/channels/{channelName}")
     public void deleteChannelByName(@PathVariable String channelName, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
         channelService.deleteChannelByName(channelName, userId);

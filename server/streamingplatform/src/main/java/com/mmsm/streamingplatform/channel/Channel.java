@@ -58,6 +58,10 @@ public class Channel {
         return new ChannelAbout(author, name, description, subscriptionCount, getCreatedDate());
     }
 
+    public ChannelIdentity toChannelIdentity() {
+        return new ChannelIdentity(name);
+    }
+
     public Channel updateChannel(ChannelUpdate channelUpdate) {
         name = channelUpdate.getName();
         description = channelUpdate.getDescription();
