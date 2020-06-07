@@ -1,6 +1,5 @@
 package com.mmsm.streamingplatform.channel;
 
-import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
 import com.mmsm.streamingplatform.keycloak.KeycloakService;
 import com.mmsm.streamingplatform.video.VideoController.*;
 import com.mmsm.streamingplatform.channel.ChannelController.*;
@@ -66,9 +65,9 @@ public class ChannelService {
             .collect(Collectors.toList());
     }
 
-    public ChannelAbout getChannelAbout(String channelName) {
+    public ChannelAbout getChannelAbout(String channelName, String userId) {
         Channel channel = channelRepository.findByName(channelName).orElseThrow(() -> new ChannelNotFoundException(channelName));
-        return channel.toChannelAbout(keycloakService.getUserDtoById(channel.getCreatedById()));
+        return channel.toChannelAbout(userId);
     }
 
     public ChannelAbout createChannel(ChannelUpdate channelUpdate, String userId) {
@@ -84,8 +83,7 @@ public class ChannelService {
 
         Channel channel = Channel.of(channelUpdate.getName(), channelUpdate.getDescription());
         channel = channelRepository.save(channel);
-        UserDto author = keycloakService.getUserDtoById(channel.getCreatedById());
-        return channel.toChannelAbout(author);
+        return channel.toChannelAbout(userId);
     }
 
     public ChannelAbout updateChannel(ChannelUpdate channelUpdate, String channelName, String userId) {
@@ -102,8 +100,7 @@ public class ChannelService {
 
         channel.updateChannel(channelUpdate);
         channel = channelRepository.save(channel);
-        UserDto author = keycloakService.getUserDtoById(channel.getCreatedById());
-        return channel.toChannelAbout(author);
+        return channel.toChannelAbout(userId);
     }
 
     @Transactional

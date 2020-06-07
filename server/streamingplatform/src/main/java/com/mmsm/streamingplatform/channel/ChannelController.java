@@ -1,6 +1,5 @@
 package com.mmsm.streamingplatform.channel;
 
-import com.mmsm.streamingplatform.keycloak.KeycloakController.*;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
@@ -14,9 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @AllArgsConstructor
 @RestController
@@ -26,8 +23,8 @@ class ChannelController {
     @NoArgsConstructor
     @AllArgsConstructor
     static class ChannelAbout {
-        private UserDto author;
         private String name;
+        private Boolean isAuthor;
         private String description;
         private Long subscriptionCount;
         private Instant createdDate;
@@ -62,8 +59,9 @@ class ChannelController {
     }
 
     @GetMapping("/channels/{channelName}")
-    public ChannelAbout getChannelAbout(@PathVariable String channelName) {
-        return channelService.getChannelAbout(channelName);
+    public ChannelAbout getChannelAbout(@PathVariable String channelName, HttpServletRequest request) {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        return channelService.getChannelAbout(channelName, userId);
     }
 
     @PostMapping("/channels")

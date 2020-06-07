@@ -54,8 +54,8 @@ public class Channel {
         return new Channel(null, name, description, 0L, new ArrayList<>(), Auditor.of());
     }
 
-    public ChannelAbout toChannelAbout(UserDto author) {
-        return new ChannelAbout(author, name, description, subscriptionCount, getCreatedDate());
+    public ChannelAbout toChannelAbout(String userId) {
+        return new ChannelAbout(name, this.getCreatedById().equals(userId), description, subscriptionCount, getCreatedDate());
     }
 
     public ChannelIdentity toChannelIdentity() {

@@ -26,7 +26,7 @@ export class ChannelService {
   }
 
   getChannelAbout(channelName: string): Observable<ChannelAboutResponseType> {
-    return this.http.get<ChannelAbout>(this.resourceUrl, { observe: 'response' });
+    return this.http.get<ChannelAbout>(`${this.resourceUrl}/${channelName}`, { observe: 'response' });
   }
 
   getChannelVideos(channelName: string): Observable<VideoRepresentationArrayResponseType> {
@@ -35,5 +35,9 @@ export class ChannelService {
 
   createChannel(channelUpdate: ChannelUpdate): Observable<ChannelAboutResponseType> {
     return this.http.post<ChannelAbout>(this.resourceUrl, channelUpdate, { observe: 'response' });
+  }
+
+  updateChannel(channelName: string, channelUpdate: ChannelUpdate): Observable<ChannelAboutResponseType> {
+    return this.http.put<ChannelAbout>(`${this.resourceUrl}/${channelName}`, channelUpdate, { observe: 'response' });
   }
 }

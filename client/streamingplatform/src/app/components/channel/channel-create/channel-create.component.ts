@@ -35,7 +35,7 @@ export class ChannelCreateComponent implements OnInit {
       if (error.status === 409 && error.error.message) {
         this.toastService.showToast(error.error.message, 5000);
       } else {
-        this.toastService.showToast('An exception occurred during channel creation', 5000);
+        this.toastService.showToast('An error occurred during channel creation', 5000);
       }
     });
   }

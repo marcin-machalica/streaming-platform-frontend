@@ -1,1 +1,54 @@
-<p>channel works!</p>
+<div class="page-content">
+  <form ngForm="form">
+    <div *ngIf="!isEditMode">
+      <div>
+        <h3>{{channelAbout.name}}</h3>
+        <p>{{channelAbout.subscriptionCount}} subscribers</p>
+        <p>Joined {{channelAbout.createdDate}}</p>
+      </div>
+
+      <button mat-raised-button color="primary" *ngIf="!channelAbout.isAuthor">Subscribe</button>
+
+      <button mat-raised-button color="warn" *ngIf="channelAbout.isAuthor" (click)="startEditMode()">Edit</button>
+
+      <mat-tab-group (selectedTabChange)="loadTabData($event)">
+        <mat-tab label="About">
+          <div>
+            <p>{{channelAbout.description}}</p>
+          </div>
+        </mat-tab>
+        <mat-tab label="Videos">
+          <div *ngFor="let video of videos" routerLink="{{'/videos/' + video.id}}" class="margin-top-30 cursor-pointer">
+            <h4>{{video.title}}</h4>
+            <p>{{video.author.username}} {{video.createdDate}}</p>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+
+    </div>
+
+    <div *ngIf="isEditMode">
+      <div>
+        <mat-form-field>
+          <input matInput required type="text" placeholder="Channel name" [(ngModel)]="channelUpdate.name" name="name">
+        </mat-form-field>
+        <p>{{channelAbout.subscriptionCount}} subscribers</p>
+        <p>Joined {{channelAbout.createdDate}}</p>
+      </div>
+
+      <div>
+        <mat-form-field  class="margin-top-30">
+          <textarea matInput placeholder="Description" [(ngModel)]="channelUpdate.description" name="description"></textarea>
+        </mat-form-field>
+      </div>
+
+      <button mat-button (click)="updateChannel()">
+        <span>Save</span>
+      </button>
+
+      <button mat-button (click)="cancelEditMode()">
+        <span>Cancel</span>
+      </button>
+    </div>
+  </form>
+</div>

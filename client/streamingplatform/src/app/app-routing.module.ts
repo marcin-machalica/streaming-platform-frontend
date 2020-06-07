@@ -18,7 +18,7 @@ const routes: Routes = [
   { path: 'videos', component: VideosListComponent, canActivate: [ChannelGuardService] },
   { path: 'videos/upload', component: VideoUploadComponent, canActivate: [ChannelGuardService] },
   { path: 'videos/:id', component: VideoDetailsComponent, canActivate: [ChannelGuardService] },
-  { path: 'channels/:name', component: ChannelComponent, canActivate: [ChannelGuardService] },
+  { path: 'channels/:channelName', component: ChannelComponent, canActivate: [ChannelGuardService] },
 ];
 
 @NgModule({

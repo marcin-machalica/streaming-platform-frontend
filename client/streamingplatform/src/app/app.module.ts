@@ -26,6 +26,7 @@ import {
 } from './services/security/channel-guard/channel-guard.service';
 import { ChannelCreateComponent } from './components/channel/channel-create/channel-create.component';
 import { ChannelComponent } from './components/channel/channel/channel.component';
+import {MatTabsModule} from "@angular/material/tabs";
 
 @NgModule({
   declarations: [
@@ -54,7 +55,8 @@ import { ChannelComponent } from './components/channel/channel/channel.component
     MatFormFieldModule,
     MatInputModule,
     MatTreeModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatTabsModule
   ],
   providers: [
     {
