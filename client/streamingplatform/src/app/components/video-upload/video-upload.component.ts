@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {VideoService} from '../../services/api/video/video.service';
 import {NgForm} from '@angular/forms';
-import {VideoSaveDto} from '../../services/api/video/VideoDto';
+import {VideoUpdate} from '../../services/api/video/VideoDto';
 import {ToastService} from '../../services/toast/toast.service';
 import {Router} from '@angular/router';
 
@@ -12,7 +12,7 @@ import {Router} from '@angular/router';
 })
 export class VideoUploadComponent implements OnInit {
 
-  videoSaveDto: VideoSaveDto = new VideoSaveDto();
+  videoUpdate: VideoUpdate = new VideoUpdate();
   file: File;
   @ViewChild(NgForm, { static: false }) form;
 
@@ -43,8 +43,8 @@ export class VideoUploadComponent implements OnInit {
     }
     const formData = new FormData();
     formData.set('file', this.file);
-    formData.set('description', this.videoSaveDto.description);
-    formData.set('title', this.videoSaveDto.title);
+    formData.set('description', this.videoUpdate.description);
+    formData.set('title', this.videoUpdate.title);
 
     this.videoService.uploadVideo(formData).subscribe(response => {
       this.router.navigateByUrl('videos/' + response.body.id);

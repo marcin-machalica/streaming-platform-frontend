@@ -1,10 +1,12 @@
 package com.mmsm.streamingplatform.video;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
+import com.mmsm.streamingplatform.channel.Channel;
+import com.mmsm.streamingplatform.channel.ChannelController;
+import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.Comment;
 import com.mmsm.streamingplatform.comment.CommentController;
 import com.mmsm.streamingplatform.video.VideoController.*;
-import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController;
 import com.mmsm.streamingplatform.keycloak.KeycloakController.*;
 import com.mmsm.streamingplatform.video.videorating.VideoRating;
 import com.mmsm.streamingplatform.video.videorating.VideoRatingController;
@@ -49,11 +51,11 @@ public class Video {
 
     @NotNull
     @Column(name = "view_count", nullable = false)
-    private Long viewCount = 0L;
+    private Long viewCount = 0L;    // todo
 
     @NotNull
     @Column(name = "share_count", nullable = false)
-    private Long shareCount = 0L;
+    private Long shareCount = 0L;   // todo
 
     @NotNull
     @Column(name = "up_vote_count", nullable = false)
@@ -70,26 +72,30 @@ public class Video {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
     @Embedded
     private Auditor auditor;
 
-    public static Video of(String filename, String title, String description) {
+    public static Video of(String filename, String title, String description, Channel channel) {
         return new Video(null, filename, title, description, 0L, 0L,
-            0L, 0L, new ArrayList<>(), new ArrayList<>() , Auditor.of());
+            0L, 0L, new ArrayList<>(), new ArrayList<>(), channel, Auditor.of());
     }
 
-    public VideoRepresentation toRepresentation(UserDto author) {
-        return new VideoRepresentation(id, author, title, description, getCreatedDate());
+    public VideoRepresentation toRepresentation() {
+        return new VideoRepresentation(id, channel.toChannelIdentity(), title, description, getCreatedDate());
     }
 
-    public VideoDetails toVideoDetails(UserDto videoAuthor, VideoRatingController.VideoRatingRepresentation currentUserVideoRating,
+    public VideoDetails toVideoDetails(VideoRatingController.VideoRatingRepresentation currentUserVideoRating,
                                        List<CommentController.CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors) {
-        return new VideoDetails(id, videoAuthor, title, description, upVoteCount, downVoteCount, viewCount, shareCount,
+        return new VideoDetails(id, channel.toChannelIdentity(), getCreatedById(), title, description, upVoteCount, downVoteCount, viewCount, shareCount,
             getCreatedDate(), currentUserVideoRating, Comment.getCommentRepresentationListWithReplies(commentWithRepliesAndAuthors));
     }
 
-    public Video updateVideo(UpdateVideo updateVideo) {
-        description = updateVideo.getDescription();
+    public Video updateVideo(VideoUpdate videoUpdate) {
+        description = videoUpdate.getDescription();
         return this;
     }
 

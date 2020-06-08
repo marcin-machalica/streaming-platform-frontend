@@ -10,7 +10,8 @@ import {KeycloakService} from 'keycloak-angular';
 import {CommentRatingService} from '../../../services/api/comment/comment-rating/comment-rating.service';
 import {VideoRatingService} from '../../../services/api/video/video-rating/video-rating.service';
 import {VideoDetails} from '../../../services/api/video/VideoDto';
-import {CommentRepresentation, SaveComment, UpdateComment} from '../../../services/api/comment/CommentDto';
+import {CommentRepresentation, SaveComment, CommentUpdate} from '../../../services/api/comment/CommentDto';
+import {ChannelService} from '../../../services/api/channel/channel.service';
 
 @Component({
   selector: 'app-video-details',
@@ -30,7 +31,8 @@ export class VideoDetailsComponent implements OnInit {
     return {
       id: node.id,
       parentId: node.parentId,
-      author: node.author,
+      channelIdentity: node.channelIdentity,
+      authorId: node.authorId,
       message: node.message,
       upVoteCount: node.upVoteCount,
       downVoteCount: node.downVoteCount,
@@ -62,6 +64,7 @@ export class VideoDetailsComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               @Inject(DOCUMENT) document,
               private keycloakService: KeycloakService,
+              private channelService: ChannelService,
               private videoService: VideoService,
               private commentService: CommentService,
               private videoRatingService: VideoRatingService,
@@ -73,7 +76,7 @@ export class VideoDetailsComponent implements OnInit {
     this.loadVideoDetails();
     this.keycloakService.getKeycloakInstance().loadUserInfo().success(user => {
       this.currentUserId = (user as any).sub;
-      this.isVideoAuthor = this.currentUserId !== null && this.currentUserId === this.videoDetails.author.id;
+      this.isVideoAuthor = this.videoDetails.authorId && this.videoDetails.authorId === this.currentUserId;
     });
   }
 
@@ -81,7 +84,7 @@ export class VideoDetailsComponent implements OnInit {
     this.videoService.getVideoDetails(this.videoId).subscribe(response => {
       if (response.body) {
         this.videoDetails = response.body;
-        this.isVideoAuthor = this.currentUserId !== null && this.currentUserId === this.videoDetails.author.id;
+        this.isVideoAuthor = this.currentUserId && this.videoDetails.authorId === this.currentUserId;
         this.reloadComments();
       }
     });
@@ -151,14 +154,14 @@ export class VideoDetailsComponent implements OnInit {
 
   updateComment(node: CommentNode) {
     const commentId = node.id;
-    const updateComment = new UpdateComment();
-    updateComment.message = (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value;
+    const commentUpdate = new CommentUpdate();
+    commentUpdate.message = (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value;
 
-    if (updateComment.message.length < 1 || updateComment.message.length > 5000) {
+    if (commentUpdate.message.length < 1 || commentUpdate.message.length > 5000) {
       return;
     }
 
-    this.commentService.updateComment(updateComment, this.videoId, commentId).subscribe(response => {
+    this.commentService.updateComment(commentUpdate, this.videoId, commentId).subscribe(response => {
       if (response.status === 200) {
         (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value = '';
         node.isEditActive = false;

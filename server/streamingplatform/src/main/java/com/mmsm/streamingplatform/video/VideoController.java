@@ -1,5 +1,7 @@
 package com.mmsm.streamingplatform.video;
 
+import com.mmsm.streamingplatform.channel.ChannelController;
+import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.CommentController;
 import com.mmsm.streamingplatform.keycloak.KeycloakController;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
@@ -33,7 +35,8 @@ public class VideoController {
     @AllArgsConstructor
     static class VideoDetails {
         private Long id;
-        private KeycloakController.UserDto author;
+        private ChannelIdentity channelIdentity;
+        private String authorId;
         private String title;
         private String description;
         private Long upVoteCount;
@@ -48,9 +51,9 @@ public class VideoController {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    static class VideoRepresentation {
+    public static class VideoRepresentation {
         private Long id;
-        private KeycloakController.UserDto author;
+        private ChannelIdentity channelIdentity;
         private String title;
         private String description;
         private Instant createdDate;
@@ -59,7 +62,7 @@ public class VideoController {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateVideo {
+    public static class VideoUpdate {
         private String description;
     }
 
@@ -71,24 +74,25 @@ public class VideoController {
     }
 
     @GetMapping("/{videoId}")
-    public VideoDetails getVideoDetailsDtoById(@PathVariable Long videoId, HttpServletRequest request) {
+    public VideoDetails getVideoDetails(@PathVariable Long videoId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
         return videoService.getVideoDetails(videoId, userId);
     }
 
     @PostMapping
-    public ResponseEntity<VideoRepresentation> createVideoDetailsDto(@RequestParam MultipartFile file, @RequestParam String title,
-                                                                     @RequestParam String description) throws URISyntaxException, IOException, NotSupportedException {
-        VideoRepresentation savedVideo = videoService.createVideo(file, title, description);
-        URI uri = new URI("/api/v1/videos/" + savedVideo.getId());
-        return ControllerUtils.getCreatedResponse(savedVideo, uri);
+    public ResponseEntity<VideoRepresentation> createVideo(@RequestParam MultipartFile file, @RequestParam String title,
+                                                           @RequestParam String description, HttpServletRequest request)
+                                                             throws URISyntaxException, IOException, NotSupportedException {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        VideoRepresentation videoRepresentation = videoService.createVideo(file, title, description, userId);
+        URI uri = new URI("/api/v1/videos/" + videoRepresentation.getId());
+        return ControllerUtils.getCreatedResponse(videoRepresentation, uri);
     }
 
     @PutMapping("/{videoId}")
-    public VideoRepresentation updateVideoDetailsDto(@RequestBody UpdateVideo updateVideo, @PathVariable Long id,
-                                                     HttpServletRequest request) {
+    public VideoRepresentation updateVideo(@RequestBody VideoUpdate videoUpdate, @PathVariable Long videoId, HttpServletRequest request) {
         String userId = SecurityUtils.getUserIdFromRequest(request);
-        return videoService.updateVideo(updateVideo, userId, id);
+        return videoService.updateVideo(videoUpdate, videoId, userId);
     }
 
     @DeleteMapping("/{videoId}")

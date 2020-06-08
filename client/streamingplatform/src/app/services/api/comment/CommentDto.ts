@@ -1,10 +1,11 @@
-import {UserDto} from '../keycloak-admin-api/UserDto';
 import {CommentRatingRepresentation} from './comment-rating/CommentRatingDto';
+import { ChannelIdentity } from '../channel/ChannelDto';
 
 export class CommentRepresentation {
   public id: number;
   public parentId: number;
-  public author: UserDto;
+  public channelIdentity: ChannelIdentity;
+  public authorId: string;
   public message: string;
   public upVoteCount: number;
   public downVoteCount: number;
@@ -25,6 +26,6 @@ export class SaveComment {
   public message: string;
 }
 
-export class UpdateComment {
+export class CommentUpdate {
   public message: string;
 }
