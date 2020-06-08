@@ -1,5 +1,7 @@
 package com.mmsm.streamingplatform.comment;
 
+import com.mmsm.streamingplatform.channel.ChannelController;
+import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
@@ -28,7 +30,8 @@ public class CommentController {
     public static class CommentRepresentation {
         private Long id;
         private Long parentId;
-        private UserDto author;
+        private ChannelIdentity channelIdentity;
+        private String authorId;
         private String message;
         private Long upVoteCount;
         private Long downVoteCount;
@@ -49,7 +52,7 @@ public class CommentController {
     @AllArgsConstructor
     public static class CommentWithRepliesAndAuthors {
         private Comment comment;
-        private UserDto author;
+        private UserDto author; // todo
         private CommentRatingRepresentation commentRatingRepresentation;
         private List<CommentWithRepliesAndAuthors> commentsAndAuthors;
     }
@@ -78,8 +81,10 @@ public class CommentController {
     }
 
     @PostMapping
-    ResponseEntity<CommentRepresentation> saveComment(@RequestBody SaveComment saveComment, @PathVariable Long videoId) throws URISyntaxException {
-        CommentRepresentation savedComment = commentService.saveComment(saveComment, videoId);
+    ResponseEntity<CommentRepresentation> saveComment(@RequestBody SaveComment saveComment, @PathVariable Long videoId,
+                                                      HttpServletRequest request) throws URISyntaxException {
+        String userId = SecurityUtils.getUserIdFromRequest(request);
+        CommentRepresentation savedComment = commentService.saveComment(saveComment, videoId, userId);
         URI uri = savedComment != null ? new URI("/api/v1/videos/" + videoId + "/comments/" + savedComment.getId()) : null;
         return ControllerUtils.getCreatedResponse(savedComment, uri);
     }

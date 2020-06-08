@@ -11,6 +11,7 @@ import {CommentRatingService} from '../../../services/api/comment/comment-rating
 import {VideoRatingService} from '../../../services/api/video/video-rating/video-rating.service';
 import {VideoDetails} from '../../../services/api/video/VideoDto';
 import {CommentRepresentation, SaveComment, CommentUpdate} from '../../../services/api/comment/CommentDto';
+import {ChannelService} from '../../../services/api/channel/channel.service';
 
 @Component({
   selector: 'app-video-details',
@@ -30,7 +31,8 @@ export class VideoDetailsComponent implements OnInit {
     return {
       id: node.id,
       parentId: node.parentId,
-      author: node.author,
+      channelIdentity: node.channelIdentity,
+      authorId: node.authorId,
       message: node.message,
       upVoteCount: node.upVoteCount,
       downVoteCount: node.downVoteCount,
@@ -62,6 +64,7 @@ export class VideoDetailsComponent implements OnInit {
   constructor(private route: ActivatedRoute,
               @Inject(DOCUMENT) document,
               private keycloakService: KeycloakService,
+              private channelService: ChannelService,
               private videoService: VideoService,
               private commentService: CommentService,
               private videoRatingService: VideoRatingService,
@@ -73,7 +76,7 @@ export class VideoDetailsComponent implements OnInit {
     this.loadVideoDetails();
     this.keycloakService.getKeycloakInstance().loadUserInfo().success(user => {
       this.currentUserId = (user as any).sub;
-      this.isVideoAuthor = this.currentUserId !== null && this.currentUserId === this.videoDetails.author.id;
+      this.isVideoAuthor = this.videoDetails.authorId && this.videoDetails.authorId === this.currentUserId;
     });
   }
 
@@ -81,7 +84,7 @@ export class VideoDetailsComponent implements OnInit {
     this.videoService.getVideoDetails(this.videoId).subscribe(response => {
       if (response.body) {
         this.videoDetails = response.body;
-        this.isVideoAuthor = this.currentUserId !== null && this.currentUserId === this.videoDetails.author.id;
+        this.isVideoAuthor = this.currentUserId && this.videoDetails.authorId === this.currentUserId;
         this.reloadComments();
       }
     });

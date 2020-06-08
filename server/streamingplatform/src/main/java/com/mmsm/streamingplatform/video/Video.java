@@ -1,6 +1,9 @@
 package com.mmsm.streamingplatform.video;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
+import com.mmsm.streamingplatform.channel.Channel;
+import com.mmsm.streamingplatform.channel.ChannelController;
+import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.Comment;
 import com.mmsm.streamingplatform.comment.CommentController;
 import com.mmsm.streamingplatform.video.VideoController.*;
@@ -69,21 +72,25 @@ public class Video {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     List<Comment> comments = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
     @Embedded
     private Auditor auditor;
 
-    public static Video of(String filename, String title, String description) {
+    public static Video of(String filename, String title, String description, Channel channel) {
         return new Video(null, filename, title, description, 0L, 0L,
-            0L, 0L, new ArrayList<>(), new ArrayList<>() , Auditor.of());
+            0L, 0L, new ArrayList<>(), new ArrayList<>(), channel, Auditor.of());
     }
 
-    public VideoRepresentation toRepresentation(UserDto author) {
-        return new VideoRepresentation(id, author, title, description, getCreatedDate());
+    public VideoRepresentation toRepresentation() {
+        return new VideoRepresentation(id, channel.toChannelIdentity(), title, description, getCreatedDate());
     }
 
-    public VideoDetails toVideoDetails(UserDto videoAuthor, VideoRatingController.VideoRatingRepresentation currentUserVideoRating,
+    public VideoDetails toVideoDetails(VideoRatingController.VideoRatingRepresentation currentUserVideoRating,
                                        List<CommentController.CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors) {
-        return new VideoDetails(id, videoAuthor, title, description, upVoteCount, downVoteCount, viewCount, shareCount,
+        return new VideoDetails(id, channel.toChannelIdentity(), getCreatedById(), title, description, upVoteCount, downVoteCount, viewCount, shareCount,
             getCreatedDate(), currentUserVideoRating, Comment.getCommentRepresentationListWithReplies(commentWithRepliesAndAuthors));
     }
 

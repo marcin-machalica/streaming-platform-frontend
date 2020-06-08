@@ -1,6 +1,9 @@
 package com.mmsm.streamingplatform.comment;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
+import com.mmsm.streamingplatform.channel.Channel;
+import com.mmsm.streamingplatform.channel.ChannelController;
+import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.*;
 import com.mmsm.streamingplatform.comment.CommentController.*;
@@ -82,27 +85,32 @@ public class Comment {
     @JoinColumn(name = "comment_id")
     private List<CommentRating> commentRatings = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private Channel channel;
+
     @Embedded
     private Auditor auditor;
 
-    public static Comment of(String message) {
-        return new Comment(null, message, 0L, 0L, 0L,
-            0, 0, false, false,
-            false, false, null, new ArrayList<>(), new ArrayList<>() , Auditor.of());
+    public static Comment of(String message, Channel channel) {
+        return new Comment(null, message, 0L, 0L, 0L, 0, 0, false, false, false, false,
+                null, new ArrayList<>(), new ArrayList<>(), channel, Auditor.of());
     }
 
-    public CommentRepresentation toRepresentation(UserDto author, CommentRatingRepresentation currentUserCommentRating) {
-        return new CommentRepresentation(id, parentComment != null ? parentComment.id : null, author, isDeleted ? null : message,
-            upVoteCount, downVoteCount, favouriteCount, directRepliesCount, allRepliesCount, isVideoAuthorFavourite, isPinned,
-            wasEdited, isDeleted, getCreatedDate(), currentUserCommentRating, null);
+    public CommentRepresentation toRepresentation(CommentRatingRepresentation currentUserCommentRating) {
+        return new CommentRepresentation(id, parentComment != null ? parentComment.id : null, channel.toChannelIdentity(),
+            getCreatedById(), isDeleted ? null : message, upVoteCount, downVoteCount, favouriteCount, directRepliesCount,
+            allRepliesCount, isVideoAuthorFavourite, isPinned, wasEdited, isDeleted, getCreatedDate(), currentUserCommentRating,
+            null);
     }
 
     public static CommentRepresentation getCommentRepresentationWithReplies(CommentWithRepliesAndAuthors commentWithRepliesAndAuthors) {
         Comment comment = commentWithRepliesAndAuthors.getComment();
 
         return new CommentRepresentation(comment.getId(), comment.getParentComment() != null ? comment.getParentComment().id : null,
-            commentWithRepliesAndAuthors.getAuthor(), comment.getIsDeleted() ? null : comment.getMessage(), comment.getUpVoteCount(),
-            comment.getDownVoteCount(), comment.getFavouriteCount(), comment.getDirectRepliesCount(), comment.getAllRepliesCount(),
+            comment.getChannel().toChannelIdentity(), commentWithRepliesAndAuthors.getAuthor().getId(),
+            comment.getIsDeleted() ? null : comment.getMessage(), comment.getUpVoteCount(), comment.getDownVoteCount(),
+            comment.getFavouriteCount(), comment.getDirectRepliesCount(), comment.getAllRepliesCount(),
             comment.getIsVideoAuthorFavourite(), comment.getIsPinned(), comment.getWasEdited(), comment.getIsDeleted(),
             comment.getCreatedDate(), commentWithRepliesAndAuthors.getCommentRatingRepresentation(),
             getCommentRepresentationListWithReplies(commentWithRepliesAndAuthors.getCommentsAndAuthors()));

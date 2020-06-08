@@ -1,10 +1,10 @@
-import {UserDto} from '../keycloak-admin-api/UserDto';
 import {VideoRatingDto} from './video-rating/VideoRatingDto';
 import {CommentRepresentation} from '../comment/CommentDto';
+import {ChannelIdentity} from '../channel/ChannelDto';
 
 export class VideoRepresentation {
   public id: number;
-  public author: UserDto;
+  public channelIdentity: ChannelIdentity;
   public title: string;
   public description: string;
   public createdDate: Date;
@@ -12,7 +12,8 @@ export class VideoRepresentation {
 
 export class VideoDetails {
   id: number;
-  author: UserDto;
+  channelIdentity: ChannelIdentity;
+  authorId: string;
   title: string;
   description: string;
   upVoteCount: number;
@@ -24,7 +25,7 @@ export class VideoDetails {
   directCommentDtos: CommentRepresentation[];
 
   constructor() {
-    this.author = new UserDto();
+    this.channelIdentity = new ChannelIdentity();
     this.currentUserVideoRating = new VideoRatingDto();
     this.directCommentDtos = [];
   }

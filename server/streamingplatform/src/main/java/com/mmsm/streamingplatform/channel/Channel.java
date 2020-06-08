@@ -43,8 +43,7 @@ public class Channel {
     @Column(name = "subscription_count", nullable = false)
     private Long subscriptionCount = 0L;        // todo
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JoinColumn(name = "channel_id")
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Video> videos = new ArrayList<>();
 
     @Embedded
@@ -65,11 +64,6 @@ public class Channel {
     public Channel updateChannel(ChannelUpdate channelUpdate) {
         name = channelUpdate.getName();
         description = channelUpdate.getDescription();
-        return this;
-    }
-
-    public Channel addVideo(Video video) {
-        videos.add(video);
         return this;
     }
 

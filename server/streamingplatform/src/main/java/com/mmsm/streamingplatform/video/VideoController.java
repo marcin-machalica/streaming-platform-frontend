@@ -1,5 +1,7 @@
 package com.mmsm.streamingplatform.video;
 
+import com.mmsm.streamingplatform.channel.ChannelController;
+import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.CommentController;
 import com.mmsm.streamingplatform.keycloak.KeycloakController;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
@@ -33,7 +35,8 @@ public class VideoController {
     @AllArgsConstructor
     static class VideoDetails {
         private Long id;
-        private KeycloakController.UserDto author;
+        private ChannelIdentity channelIdentity;
+        private String authorId;
         private String title;
         private String description;
         private Long upVoteCount;
@@ -50,7 +53,7 @@ public class VideoController {
     @AllArgsConstructor
     public static class VideoRepresentation {
         private Long id;
-        private KeycloakController.UserDto author;
+        private ChannelIdentity channelIdentity;
         private String title;
         private String description;
         private Instant createdDate;

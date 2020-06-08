@@ -17,7 +17,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-class ChannelController {
+public class ChannelController {
 
     @Getter
     @NoArgsConstructor
@@ -41,7 +41,7 @@ class ChannelController {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    static class ChannelIdentity {
+    public static class ChannelIdentity {
         private String name;
     }
 

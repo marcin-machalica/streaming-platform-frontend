@@ -20,7 +20,7 @@
         <mat-tab label="Videos">
           <div *ngFor="let video of videos" routerLink="{{'/videos/' + video.id}}" class="margin-top-30 cursor-pointer">
             <h4>{{video.title}}</h4>
-            <p>{{video.author.username}} {{video.createdDate}}</p>
+            <p>{{video.channelIdentity.name}} {{video.createdDate}}</p>
           </div>
         </mat-tab>
       </mat-tab-group>

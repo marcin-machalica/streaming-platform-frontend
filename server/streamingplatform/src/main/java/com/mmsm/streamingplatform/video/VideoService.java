@@ -2,6 +2,7 @@ package com.mmsm.streamingplatform.video;
 
 import com.mmsm.streamingplatform.channel.Channel;
 import com.mmsm.streamingplatform.channel.ChannelRepository;
+import com.mmsm.streamingplatform.channel.ChannelService;
 import com.mmsm.streamingplatform.video.VideoController.*;
 import com.mmsm.streamingplatform.comment.CommentController.*;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
@@ -83,7 +84,7 @@ public class VideoService {
     public List<VideoRepresentation> getAllVideos() {
         return videoRepository.findAll()
             .stream()
-            .map(video -> video.toRepresentation(keycloakService.getUserDtoById(video.getCreatedById())))
+            .map(Video::toRepresentation)
             .collect(Collectors.toList());
     }
 
@@ -99,11 +100,10 @@ public class VideoService {
             ));
         List<CommentWithRepliesAndAuthors> commentWithRepliesAndAuthors = commentService.getCommentsListWithRepliesAndAuthors(commentsAndRatings, userId);
 
-        UserDto videoAuthor = keycloakService.getUserDtoById(video.getCreatedById());
         VideoRatingRepresentation videoRatingRepresentation = videoRatingRepository
             .findVideoRatingByVideoIdAndUserId(video.getId(), userId).orElseGet(VideoRating::of)
             .toRepresentation();
-        return video.toVideoDetails(videoAuthor, videoRatingRepresentation, commentWithRepliesAndAuthors);
+        return video.toVideoDetails(videoRatingRepresentation, commentWithRepliesAndAuthors);
     }
 
     @Transactional
@@ -111,14 +111,12 @@ public class VideoService {
         Channel channel = channelRepository.findByAuditorCreatedById(userId).orElseThrow(() -> new ChannelNotFoundException(userId));
 
         String filename = generateFilename(file.getOriginalFilename());
-        Video video = Video.of(filename, title, description);
-        channel.addVideo(video);
+        Video video = Video.of(filename, title, description, channel);
 
         video = videoRepository.save(video);
         storeFile(file, filename);
 
-        UserDto author = keycloakService.getUserDtoById(video.getCreatedById());
-        return video.toRepresentation(author);
+        return video.toRepresentation();
     }
 
     public VideoRepresentation updateVideo(VideoUpdate videoUpdate, Long videoId, String userId) {
@@ -130,8 +128,7 @@ public class VideoService {
 
         video = video.updateVideo(videoUpdate);
         video = videoRepository.save(video);
-        UserDto author = keycloakService.getUserDtoById(video.getCreatedById());
-        return video.toRepresentation(author);
+        return video.toRepresentation();
     }
 
     @Transactional

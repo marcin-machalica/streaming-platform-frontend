@@ -6,19 +6,19 @@
   <h2>{{videoDetails.title}}</h2>
 
   <div>
-    <strong>{{videoDetails.author.username}}</strong>
+    <strong>{{videoDetails.channelIdentity.name}}</strong>
     <span class="margin-left-right-30">{{videoDetails.createdDate}}</span>
 
     <button mat-button disabled id="videoViewCount">
       <mat-icon>visibility</mat-icon>
       <span>{{videoDetails.viewCount}}</span>
     </button>
-    <button mat-button [disabled]="isOwner(videoDetails.author.id)" [class.rating-active]="videoDetails.currentUserVideoRating.isUpVote"
+    <button mat-button [disabled]="isOwner(videoDetails.authorId)" [class.rating-active]="videoDetails.currentUserVideoRating.isUpVote"
             (click)="upVoteVideo()">
       <mat-icon>thumb_up</mat-icon>
       <span>{{videoDetails.upVoteCount}}</span>
     </button>
-    <button mat-button  [disabled]="isOwner(videoDetails.author.id)" [class.rating-active]="videoDetails.currentUserVideoRating.isDownVote"
+    <button mat-button  [disabled]="isOwner(videoDetails.authorId)" [class.rating-active]="videoDetails.currentUserVideoRating.isDownVote"
             (click)="downVoteVideo()">
       <mat-icon>thumb_down</mat-icon>
       <span>{{videoDetails.downVoteCount}}</span>
@@ -43,16 +43,16 @@
       <!-- use a disabled button to provide padding for tree leaf -->
       <div>
         <button mat-button disabled></button>
-        <p>{{node.author.username}} {{node.dateCreated}} {{node.wasEdited ? '(edited)' : ''}}</p>
+        <p>{{node.channelIdentity.name}} {{node.dateCreated}} {{node.wasEdited ? '(edited)' : ''}}</p>
         <p [class.italic]="node.isDeleted">{{node.isDeleted ? 'Deleted' : node.message}}</p>
 
         <div>
-          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isUpVote"
+          <button mat-button [disabled]="isOwner(node.authorId)" [class.rating-active]="node.currentUserCommentRating.isUpVote"
                   (click)="upVoteComment(node)">
             <mat-icon>thumb_up</mat-icon>
             <span>{{node.upVoteCount}}</span>
           </button>
-          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isDownVote"
+          <button mat-button [disabled]="isOwner(node.authorId)" [class.rating-active]="node.currentUserCommentRating.isDownVote"
                   (click)="downVoteComment(node)">
             <mat-icon>thumb_down</mat-icon>
             <span>{{node.downVoteCount}}</span>
@@ -75,10 +75,10 @@
           <button mat-button (click)="setReplyActive(node)">
             <span>Reply</span>
           </button>
-          <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="setEditActive(node)">
+          <button mat-button *ngIf="isOwner(node.authorId) && !node.isDeleted" (click)="setEditActive(node)">
             <span>Edit</span>
           </button>
-          <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="deleteComment(node)">
+          <button mat-button *ngIf="isOwner(node.authorId) && !node.isDeleted" (click)="deleteComment(node)">
             <span>Delete</span>
           </button>
         </div>
@@ -110,16 +110,16 @@
     <!-- This is the tree node template for expandable nodes -->
     <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
       <div>
-        <p>{{node.author.username}} {{node.dateCreated}} {{node.wasEdited ? '(edited)' : ''}}</p>
+        <p>{{node.channelIdentity.name}} {{node.dateCreated}} {{node.wasEdited ? '(edited)' : ''}}</p>
         <p [class.italic]="node.isDeleted">{{node.isDeleted ? 'Deleted' : node.message}}</p>
 
         <div>
-          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isUpVote"
+          <button mat-button [disabled]="isOwner(node.authorId)" [class.rating-active]="node.currentUserCommentRating.isUpVote"
                   (click)="upVoteComment(node)">
             <mat-icon>thumb_up</mat-icon>
             <span>{{node.upVoteCount}}</span>
           </button>
-          <button mat-button [disabled]="isOwner(node.author.id)" [class.rating-active]="node.currentUserCommentRating.isDownVote"
+          <button mat-button [disabled]="isOwner(node.authorId)" [class.rating-active]="node.currentUserCommentRating.isDownVote"
                   (click)="downVoteComment(node)">
             <mat-icon>thumb_down</mat-icon>
             <span>{{node.downVoteCount}}</span>
@@ -142,10 +142,10 @@
           <button mat-button (click)="setReplyActive(node)">
             <span>Reply</span>
           </button>
-          <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="setEditActive(node)">
+          <button mat-button *ngIf="isOwner(node.authorId) && !node.isDeleted" (click)="setEditActive(node)">
             <span>Edit</span>
           </button>
-          <button mat-button *ngIf="isOwner(node.author.id) && !node.isDeleted" (click)="deleteComment(node)">
+          <button mat-button *ngIf="isOwner(node.authorId) && !node.isDeleted" (click)="deleteComment(node)">
             <span>Delete</span>
           </button>
           <button mat-button matTreeNodeToggle>

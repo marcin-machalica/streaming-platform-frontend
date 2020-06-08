@@ -1,6 +1,7 @@
 package com.mmsm.streamingplatform.channel;
 
 import com.mmsm.streamingplatform.keycloak.KeycloakService;
+import com.mmsm.streamingplatform.video.Video;
 import com.mmsm.streamingplatform.video.VideoController.*;
 import com.mmsm.streamingplatform.channel.ChannelController.*;
 import com.mmsm.streamingplatform.video.VideoService;
@@ -61,7 +62,7 @@ public class ChannelService {
     public List<VideoRepresentation> getAllVideos(String channelName) {
         Channel channel = channelRepository.findByName(channelName).orElseThrow(() -> new ChannelNotFoundException(channelName));
         return channel.getVideos().stream()
-            .map(video -> video.toRepresentation(keycloakService.getUserDtoById(video.getCreatedById())))
+            .map(Video::toRepresentation)
             .collect(Collectors.toList());
     }
 
