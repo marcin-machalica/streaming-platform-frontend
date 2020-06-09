@@ -5,6 +5,7 @@ import com.mmsm.streamingplatform.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.mmsm.streamingplatform.video.VideoController.*;
@@ -18,6 +19,34 @@ import java.util.List;
 @AllArgsConstructor
 @RestController
 public class ChannelController {
+
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    static class ChannelNotFoundByNameException extends RuntimeException {
+        ChannelNotFoundByNameException(String name) {
+            super("Channel not found with name: " + name);
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    public static class ChannelNotFoundByUserIdException extends RuntimeException {
+        public ChannelNotFoundByUserIdException(String userId) {
+            super("Channel not found with userId: " + userId);
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.CONFLICT)
+    static class ChannelAlreadyCreatedException extends RuntimeException {
+        ChannelAlreadyCreatedException() {
+            super("Channel was already created by the user");
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.CONFLICT)
+    static class ChannelNameAlreadyExistsException extends RuntimeException {
+        ChannelNameAlreadyExistsException() {
+            super("Channel's name has to be unique");
+        }
+    }
 
     @Getter
     @NoArgsConstructor

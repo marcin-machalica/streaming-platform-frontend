@@ -1,15 +1,15 @@
 package com.mmsm.streamingplatform.comment;
 
-import com.mmsm.streamingplatform.channel.ChannelController;
 import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
-import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
+import com.mmsm.streamingplatform.security.keycloak.KeycloakController.UserDto;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +23,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/videos/{videoId}/comments")
 public class CommentController {
+
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    public static class CommentNotFoundException extends RuntimeException {
+        public CommentNotFoundException(Long id) {
+            super("Comment not found with id: " + id);
+        }
+    }
 
     @Getter
     @NoArgsConstructor

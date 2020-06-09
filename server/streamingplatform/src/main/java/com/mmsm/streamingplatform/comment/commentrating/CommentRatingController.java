@@ -4,6 +4,7 @@ import com.mmsm.streamingplatform.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +14,20 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/videos/{videoId}/comments/{commentId}")
 @AllArgsConstructor
 public class CommentRatingController {
+
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    static class CanOnlyBePerformedByVideoAuthorException extends RuntimeException {
+        CanOnlyBePerformedByVideoAuthorException() {
+            super("This action can only be performed by the author");
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.FORBIDDEN)
+    static class NotDirectVideoCommentException extends RuntimeException {
+        NotDirectVideoCommentException() {
+            super("This action can only be performed on a direct video comment");
+        }
+    }
 
     @Getter
     @NoArgsConstructor

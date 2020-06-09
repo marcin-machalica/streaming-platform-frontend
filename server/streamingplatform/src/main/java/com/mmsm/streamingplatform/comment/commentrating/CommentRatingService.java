@@ -1,57 +1,25 @@
 package com.mmsm.streamingplatform.comment.commentrating;
 
 import com.mmsm.streamingplatform.comment.Comment;
+import com.mmsm.streamingplatform.comment.CommentController.CommentNotFoundException;
 import com.mmsm.streamingplatform.comment.CommentRepository;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CanOnlyBePerformedByVideoAuthorException;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentFavouriteDto;
+import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.NotDirectVideoCommentException;
+import com.mmsm.streamingplatform.utils.CommonExceptionsUtils.CannotBePerformedByAuthorException;
 import com.mmsm.streamingplatform.video.Video;
+import com.mmsm.streamingplatform.video.VideoController.VideoNotFoundException;
 import com.mmsm.streamingplatform.video.VideoRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class CommentRatingService {
-
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    static class VideoNotFoundException extends RuntimeException {
-        VideoNotFoundException(Long id) {
-            super("Video not found with id: " + id);
-        }
-    }
-
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    static class CommentNotFoundException extends RuntimeException {
-        CommentNotFoundException(Long id) {
-            super("Comment not found with id: " + id);
-        }
-    }
-
-    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    static class CannotBePerformedByAuthorException extends RuntimeException {
-        CannotBePerformedByAuthorException() {
-            super("This action cannot be performed by the author");
-        }
-    }
-
-    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    static class CanOnlyBePerformedByVideoAuthorException extends RuntimeException {
-        CanOnlyBePerformedByVideoAuthorException() {
-            super("This action can only be performed by the author");
-        }
-    }
-
-    @ResponseStatus(code = HttpStatus.FORBIDDEN)
-    static class NotDirectVideoCommentException extends RuntimeException {
-        NotDirectVideoCommentException() {
-            super("This action can only be performed on a direct video comment");
-        }
-    }
 
     private final VideoRepository videoRepository;
     private final CommentRepository commentRepository;

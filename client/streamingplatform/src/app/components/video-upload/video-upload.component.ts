@@ -48,7 +48,7 @@ export class VideoUploadComponent implements OnInit {
 
     this.videoService.uploadVideo(formData).subscribe(response => {
       this.router.navigateByUrl('videos/' + response.body.id);
-      this.toastService.showToast('Successfully created video!');
+      this.toastService.showToast('Successfully uploaded video!');
     });
   }
 }

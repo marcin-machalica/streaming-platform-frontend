@@ -1,6 +1,6 @@
-package com.mmsm.streamingplatform.keycloak;
+package com.mmsm.streamingplatform.security.keycloak;
 
-import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
+import com.mmsm.streamingplatform.security.keycloak.KeycloakController.UserDto;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.representations.idm.UserRepresentation;

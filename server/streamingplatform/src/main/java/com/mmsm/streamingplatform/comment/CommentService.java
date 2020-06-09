@@ -1,54 +1,26 @@
 package com.mmsm.streamingplatform.comment;
 
 import com.mmsm.streamingplatform.channel.Channel;
+import com.mmsm.streamingplatform.channel.ChannelController.ChannelNotFoundByUserIdException;
 import com.mmsm.streamingplatform.channel.ChannelRepository;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRating;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingRepository;
 import com.mmsm.streamingplatform.comment.commentrating.CommentRatingController.CommentRatingRepresentation;
 import com.mmsm.streamingplatform.comment.CommentController.*;
-import com.mmsm.streamingplatform.keycloak.KeycloakController.*;
-import com.mmsm.streamingplatform.keycloak.KeycloakService;
+import com.mmsm.streamingplatform.security.keycloak.KeycloakService;
+import com.mmsm.streamingplatform.utils.CommonExceptionsUtils.CanOnlyBePerformedByAuthorException;
+import com.mmsm.streamingplatform.utils.CommonExceptionsUtils.NotSufficientPermissionsException;
 import com.mmsm.streamingplatform.video.Video;
+import com.mmsm.streamingplatform.video.VideoController.VideoNotFoundException;
 import com.mmsm.streamingplatform.video.VideoRepository;
-import com.mmsm.streamingplatform.video.VideoService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.*;
 
 @RequiredArgsConstructor
 @Service
 public class CommentService {
-
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    static class VideoNotFoundException extends RuntimeException {
-        VideoNotFoundException(Long id) {
-            super("Video not found with id: " + id);
-        }
-    }
-
-    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-    static class CommentNotFoundException extends RuntimeException {
-        CommentNotFoundException(Long id) {
-            super("Comment not found with id: " + id);
-        }
-    }
-
-    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    static class CanOnlyBePerformedByAuthorException extends RuntimeException {
-        CanOnlyBePerformedByAuthorException() {
-            super("This action can only be performed by the author");
-        }
-    }
-
-    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
-    static class NotSufficientPermissionsException extends RuntimeException {
-        NotSufficientPermissionsException() {
-            super("Not sufficient permissions to perform this operations");
-        }
-    }
 
     private final CommentRepository commentRepository;
     private final CommentRatingRepository commentRatingRepository;
@@ -84,7 +56,7 @@ public class CommentService {
     }
 
     CommentRepresentation saveComment(SaveComment saveComment, Long videoId, String userId) {
-        Channel channel = channelRepository.findByAuditorCreatedById(userId).orElseThrow(() -> new VideoService.ChannelNotFoundException(userId));
+        Channel channel = channelRepository.findByAuditorCreatedById(userId).orElseThrow(() -> new ChannelNotFoundByUserIdException(userId));
 
         Comment comment = Comment.of(saveComment.getMessage(), channel);
         Optional<Comment> parentCommentOptional = Optional.ofNullable(saveComment.getParentId())

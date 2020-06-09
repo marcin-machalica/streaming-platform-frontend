@@ -1,4 +1,4 @@
-package com.mmsm.streamingplatform.keycloak;
+package com.mmsm.streamingplatform.security.keycloak;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

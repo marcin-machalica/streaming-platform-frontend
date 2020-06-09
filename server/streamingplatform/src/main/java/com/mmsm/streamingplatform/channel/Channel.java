@@ -1,7 +1,7 @@
 package com.mmsm.streamingplatform.channel;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
-import com.mmsm.streamingplatform.keycloak.KeycloakController.UserDto;
+import com.mmsm.streamingplatform.security.keycloak.KeycloakController.UserDto;
 import com.mmsm.streamingplatform.video.Video;
 import com.mmsm.streamingplatform.channel.ChannelController.*;
 import lombok.AllArgsConstructor;

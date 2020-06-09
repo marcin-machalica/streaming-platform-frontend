@@ -1,9 +1,7 @@
 package com.mmsm.streamingplatform.video;
 
-import com.mmsm.streamingplatform.channel.ChannelController;
 import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.CommentController;
-import com.mmsm.streamingplatform.keycloak.KeycloakController;
 import com.mmsm.streamingplatform.utils.ControllerUtils;
 import com.mmsm.streamingplatform.utils.SecurityUtils;
 import com.mmsm.streamingplatform.video.videorating.VideoRatingController;
@@ -12,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +28,27 @@ import java.util.List;
 @RestController
 @RequestMapping("/videos")
 public class VideoController {
+
+    @ResponseStatus(code = HttpStatus.NOT_FOUND)
+    public static class VideoNotFoundException extends RuntimeException {
+        public VideoNotFoundException(Long id) {
+            super("Video not found with id: " + id);
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
+    static class CannotDeleteFileException extends RuntimeException {
+        CannotDeleteFileException() {
+            super("Error during deleting the file");
+        }
+    }
+
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    static class NotSupportedVideoFormatException extends RuntimeException {
+        NotSupportedVideoFormatException() {
+            super("Not supported video extension");
+        }
+    }
 
     @Getter
     @NoArgsConstructor

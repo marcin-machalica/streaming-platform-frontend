@@ -2,12 +2,10 @@ package com.mmsm.streamingplatform.video;
 
 import com.mmsm.streamingplatform.auditor.Auditor;
 import com.mmsm.streamingplatform.channel.Channel;
-import com.mmsm.streamingplatform.channel.ChannelController;
-import com.mmsm.streamingplatform.channel.ChannelController.ChannelIdentity;
 import com.mmsm.streamingplatform.comment.Comment;
 import com.mmsm.streamingplatform.comment.CommentController;
 import com.mmsm.streamingplatform.video.VideoController.*;
-import com.mmsm.streamingplatform.keycloak.KeycloakController.*;
+import com.mmsm.streamingplatform.security.keycloak.KeycloakController.*;
 import com.mmsm.streamingplatform.video.videorating.VideoRating;
 import com.mmsm.streamingplatform.video.videorating.VideoRatingController;
 import lombok.AllArgsConstructor;
