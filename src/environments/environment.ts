@@ -5,14 +5,15 @@
 import {KeycloakConfig} from 'keycloak-angular';
 
 const keycloakConfig: KeycloakConfig = {
-  url: 'http://localhost:8180/auth/',
+  url: 'http://192.168.0.25:8180/auth/',
   realm: 'streaming-platform',
   clientId: 'streaming-platform',
 };
 
 export const environment = {
   production: false,
-  serverUrl: 'http://localhost:8082/',
+  // serverUrl: 'http://localhost:8082/',
+  serverUrl: 'http://192.168.0.25:8082/',
   keycloak: keycloakConfig,
   keycloakConfig
 };
