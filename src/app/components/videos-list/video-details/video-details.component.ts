@@ -1,4 +1,10 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  Inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import {VideoService} from '../../../services/api/video/video.service';
 import {ActivatedRoute} from '@angular/router';
 import {environment} from '../../../../environments/environment';
@@ -12,19 +18,26 @@ import {VideoRatingService} from '../../../services/api/video/video-rating/video
 import {VideoDetails} from '../../../services/api/video/VideoDto';
 import {CommentRepresentation, SaveComment, CommentUpdate} from '../../../services/api/comment/CommentDto';
 import {ChannelService} from '../../../services/api/channel/channel.service';
+import {NgForm} from '@angular/forms';
+import {MatVideoComponent} from 'mat-video/lib/video.component';
 
 @Component({
   selector: 'app-video-details',
   templateUrl: './video-details.component.html',
   styleUrls: ['./video-details.component.sass']
 })
-export class VideoDetailsComponent implements OnInit {
+export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   isVideoAuthor = false;
   currentUserId: string;
   videoDetails: VideoDetails = new VideoDetails();
   videoId: number;
   dataSource;
+  video;
+  duration;
+  viewCountdown;
+  intervalId;
+  watchedVideosIds;
   videoResourceUrl = (id) => `${environment.serverUrl}api/v1/videos/${id}/download`;
 
   private _transformer = (node: CommentNode, level: number) => {
@@ -78,6 +91,40 @@ export class VideoDetailsComponent implements OnInit {
       this.currentUserId = (user as any).sub;
       this.isVideoAuthor = this.videoDetails.authorId && this.videoDetails.authorId === this.currentUserId;
     });
+    const watchedVideos = localStorage.getItem('watchedVideosIds');
+    this.watchedVideosIds = watchedVideos !== null ? JSON.parse(watchedVideos) : [];
+  }
+
+  ngAfterViewInit() {
+    this.video = document.getElementsByTagName('video')[0];
+
+    if (this.watchedVideosIds.includes(this.videoId)) {
+      return;
+    }
+
+    this.video.addEventListener('loadeddata', () => {
+      this.duration = parseInt(this.video.duration);
+      this.viewCountdown = this.duration >= 30 ? 30 : this.duration;
+      this.intervalId = setInterval(() => {
+        if (this.viewCountdown <= 0) {
+          this.videoService.upViewCount(this.videoId).subscribe(response => {
+            this.watchedVideosIds.push(this.videoId);
+            localStorage.setItem('watchedVideosIds', JSON.stringify(this.watchedVideosIds));
+          });
+          clearInterval(this.intervalId);
+          return;
+        }
+        if (!this.video.paused) {
+          this.viewCountdown--;
+        }
+      }, 1000);
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
   }
 
   loadVideoDetails() {

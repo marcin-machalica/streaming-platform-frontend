@@ -26,4 +26,8 @@ export class VideoService {
   uploadVideo(fileFormData: FormData): Observable<VideoRepresentationResponseType> {
     return this.http.post<VideoRepresentation>(this.resourceUrl, fileFormData, { observe: 'response' });
   }
+
+  upViewCount(id: number): Observable<HttpResponse<void>> {
+    return this.http.put<void>(`${this.resourceUrl}/${id}/up-view-count`, null, { observe: 'response' });
+  }
 }
