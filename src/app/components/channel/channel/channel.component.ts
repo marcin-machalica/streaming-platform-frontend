@@ -66,6 +66,10 @@ export class ChannelComponent implements OnInit {
       });
     }
   }
+
+  getFormattedDate(date: Date) {
+    return new Date (date).toLocaleDateString();
+  }
 }
 
 enum TAB {

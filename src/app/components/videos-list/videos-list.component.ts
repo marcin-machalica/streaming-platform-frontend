@@ -24,4 +24,8 @@ export class VideosListComponent implements OnInit {
       }
     });
   }
+
+  getFormattedDate(date: Date) {
+    return new Date (date).toLocaleDateString();
+  }
 }

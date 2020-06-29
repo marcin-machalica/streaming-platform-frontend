@@ -7,7 +7,7 @@
 
   <div>
     <strong>{{videoDetails.channelIdentity.name}}</strong>
-    <span class="margin-left-right-30">{{videoDetails.createdDate}}</span>
+    <span class="margin-left-right-30">{{getFormattedDate(videoDetails.createdDate)}}</span>
 
     <button mat-button disabled id="videoViewCount">
       <mat-icon>visibility</mat-icon>

@@ -43,7 +43,7 @@ export class VideoDetailsComponent implements OnInit {
       isPinned: node.isPinned,
       wasEdited: node.wasEdited,
       isDeleted: node.isDeleted,
-      dateCreated: node.dateCreated,
+      dateCreated: new Date(node.dateCreated).toLocaleDateString(),
       currentUserCommentRating: node.currentUserCommentRating,
       directReplies: node.directReplies,
       isReplyActive: node.isReplyActive,
@@ -259,6 +259,10 @@ export class VideoDetailsComponent implements OnInit {
     node.isReplyActive = false;
     node.isEditActive = false;
   }
+
+  getFormattedDate(date: Date) {
+    return new Date (date).toLocaleDateString();
+  }
 }
 
 export class CommentNode extends CommentRepresentation {
@@ -267,4 +271,5 @@ export class CommentNode extends CommentRepresentation {
   public level: number;
   public isReplyActive: boolean;
   public isEditActive: boolean;
+  public dateCreated: any;
 }

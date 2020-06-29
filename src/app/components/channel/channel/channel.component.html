@@ -4,7 +4,7 @@
       <div>
         <h3>{{channelAbout.name}}</h3>
         <p>{{channelAbout.subscriptionCount}} subscribers</p>
-        <p>Joined {{channelAbout.createdDate}}</p>
+        <p>Joined {{getFormattedDate(channelAbout.createdDate)}}</p>
       </div>
 
       <button mat-raised-button color="primary" *ngIf="!channelAbout.isAuthor">Subscribe</button>
@@ -20,7 +20,7 @@
         <mat-tab label="Videos">
           <div *ngFor="let video of videos" routerLink="{{'/videos/' + video.id}}" class="margin-top-30 cursor-pointer">
             <h4>{{video.title}}</h4>
-            <p>{{video.channelIdentity.name}} {{video.createdDate}}</p>
+            <p>{{video.channelIdentity.name}} {{getFormattedDate(video.createdDate)}}</p>
           </div>
         </mat-tab>
       </mat-tab-group>
@@ -33,7 +33,7 @@
           <input matInput required type="text" placeholder="Channel name" [(ngModel)]="channelUpdate.name" name="name">
         </mat-form-field>
         <p>{{channelAbout.subscriptionCount}} subscribers</p>
-        <p>Joined {{channelAbout.createdDate}}</p>
+        <p>Joined {{getFormattedDate(channelAbout.createdDate)}}</p>
       </div>
 
       <div>
