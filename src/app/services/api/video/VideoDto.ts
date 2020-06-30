@@ -32,6 +32,18 @@ export class VideoDetails {
 }
 
 export class VideoUpdate {
+
   public title: string;
   public description: string;
+  public visibility: VideoVisibility;
+
+  constructor(title?: string, description?: string, visibility?: VideoVisibility) {
+    this.visibility = visibility || VideoVisibility.PUBLIC;
+  }
+}
+
+export enum VideoVisibility {
+  PUBLIC = 'PUBLIC',
+  LINK_ONLY = 'LINK_ONLY',
+  PRIVATE = 'PRIVATE',
 }

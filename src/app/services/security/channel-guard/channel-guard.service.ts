@@ -66,7 +66,7 @@ export class ReversedChannelGuardService implements CanActivate {
     return this.checkIsChannelCreated().pipe(map(response => {
       this.isChannelCreated = response.body;
       if (response.body) {
-        this.router.navigateByUrl('');
+        this.router.navigateByUrl('/404');
       }
       return !response.body;
     }));

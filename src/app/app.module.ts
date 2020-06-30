@@ -9,7 +9,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {KeycloakAngularModule, KeycloakService} from 'keycloak-angular';
 import {initializer} from './services/security/keycloak/keycloak-app-init';
-import {MatButtonModule, MatIconModule, MatSidenavModule, MatToolbarModule} from '@angular/material';
+import {MatButtonModule, MatIconModule, MatSelectModule, MatSidenavModule, MatToolbarModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FlexModule} from '@angular/flex-layout';
 import {MatVideoModule} from 'mat-video';
@@ -27,6 +27,8 @@ import {
 import { ChannelCreateComponent } from './components/channel/channel-create/channel-create.component';
 import { ChannelComponent } from './components/channel/channel/channel.component';
 import {MatTabsModule} from "@angular/material/tabs";
+import { NotFoundComponent } from './components/not-found/not-found.component';
+import {VideoGuardService} from './services/security/video-guard/video-guard.service';
 
 @NgModule({
   declarations: [
@@ -37,6 +39,7 @@ import {MatTabsModule} from "@angular/material/tabs";
     VideoUploadComponent,
     ChannelCreateComponent,
     ChannelComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,7 +59,8 @@ import {MatTabsModule} from "@angular/material/tabs";
     MatInputModule,
     MatTreeModule,
     MatSnackBarModule,
-    MatTabsModule
+    MatTabsModule,
+    MatSelectModule
   ],
   providers: [
     {
@@ -66,7 +70,8 @@ import {MatTabsModule} from "@angular/material/tabs";
       deps: [KeycloakService]
     },
     ChannelGuardService,
-    ReversedChannelGuardService
+    ReversedChannelGuardService,
+    VideoGuardService
   ],
   bootstrap: [AppComponent]
 })

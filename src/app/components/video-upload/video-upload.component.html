@@ -14,6 +14,14 @@
       </mat-form-field>
     </div>
 
+    <mat-form-field>
+      <mat-select required [(ngModel)]="videoUpdate.visibility" name="visibility">
+        <mat-option *ngFor="let visibility of visibilities" [value]="visibility">
+          {{getVideoVisibilityLabel(visibility)}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <div>
       <input required type="file" class="margin-top-30"
              (change)="selectFile($event)" (dragover)="onDragOverFile($event)" (drop)="onDropFile($event)"

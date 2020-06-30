@@ -18,8 +18,6 @@ import {VideoRatingService} from '../../../services/api/video/video-rating/video
 import {VideoDetails} from '../../../services/api/video/VideoDto';
 import {CommentRepresentation, SaveComment, CommentUpdate} from '../../../services/api/comment/CommentDto';
 import {ChannelService} from '../../../services/api/channel/channel.service';
-import {NgForm} from '@angular/forms';
-import {MatVideoComponent} from 'mat-video/lib/video.component';
 
 @Component({
   selector: 'app-video-details',

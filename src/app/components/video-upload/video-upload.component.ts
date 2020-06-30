@@ -1,7 +1,7 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {VideoService} from '../../services/api/video/video.service';
 import {NgForm} from '@angular/forms';
-import {VideoUpdate} from '../../services/api/video/VideoDto';
+import {VideoUpdate, VideoVisibility} from '../../services/api/video/VideoDto';
 import {ToastService} from '../../services/toast/toast.service';
 import {Router} from '@angular/router';
 
@@ -11,6 +11,8 @@ import {Router} from '@angular/router';
   styleUrls: ['./video-upload.component.sass']
 })
 export class VideoUploadComponent implements OnInit {
+
+  visibilities = Object.keys(VideoVisibility);
 
   videoUpdate: VideoUpdate = new VideoUpdate();
   file: File;
@@ -45,10 +47,22 @@ export class VideoUploadComponent implements OnInit {
     formData.set('file', this.file);
     formData.set('description', this.videoUpdate.description);
     formData.set('title', this.videoUpdate.title);
+    formData.set('visibility', this.videoUpdate.visibility);
 
     this.videoService.uploadVideo(formData).subscribe(response => {
       this.router.navigateByUrl('videos/' + response.body.id);
       this.toastService.showToast('Successfully uploaded video!');
     });
+  }
+
+  getVideoVisibilityLabel(visibility: string) {
+    switch (visibility) {
+      case VideoVisibility.PUBLIC:
+        return 'Public';
+      case VideoVisibility.LINK_ONLY:
+        return 'Link only';
+      case VideoVisibility.PRIVATE:
+        return 'Private';
+    }
   }
 }
