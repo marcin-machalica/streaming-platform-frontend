@@ -19,6 +19,9 @@ export class ChannelComponent implements OnInit {
   videos: VideoRepresentation[];
   isEditMode = false;
 
+  file: File;
+  avatarSrc;
+
   @ViewChild(NgForm, { static: false }) form;
 
   constructor(private route: ActivatedRoute,
@@ -69,6 +72,41 @@ export class ChannelComponent implements OnInit {
 
   getFormattedDate(date: Date) {
     return new Date (date).toLocaleDateString();
+  }
+
+  selectFile(event) {
+    this.file = event.target.files[0];
+  }
+
+  onDragOverFile(event) {
+    event.stopPropagation();
+    event.preventDefault();
+  }
+
+  onDropFile(event: DragEvent) {
+    event.preventDefault();
+    this.file = event.dataTransfer.files[0];
+  }
+
+  updateAvatar() {
+    if (!this.file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set('file', this.file);
+
+    this.channelService.uploadAvatar(this.channelName, formData).subscribe(response => {
+      this.toastService.showToast('Successfully updated avatar!');
+      this.channelService.getAvatar(this.channelName).subscribe(blob => {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          // result includes identifier 'data:image/png;base64,' plus the base64 data
+          this.avatarSrc = reader.result;
+        };
+      });
+    });
   }
 }
 

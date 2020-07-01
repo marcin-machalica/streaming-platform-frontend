@@ -49,6 +49,18 @@
       <button mat-button (click)="cancelEditMode()">
         <span>Cancel</span>
       </button>
+
+      <div>
+        <input type="file" class="margin-top-30"
+               (change)="selectFile($event)" (dragover)="onDragOverFile($event)" (drop)="onDropFile($event)"
+               placeholder="Avatar" accept=".jpg,.png">
+      </div>
+
+      <button mat-button class="margin-top-30" (click)="updateAvatar()">
+        <span>Update avatar</span>
+      </button>
+
+      <img [src]="avatarSrc" />
     </div>
   </form>
 </div>

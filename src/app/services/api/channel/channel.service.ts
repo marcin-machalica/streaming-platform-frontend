@@ -40,4 +40,12 @@ export class ChannelService {
   updateChannel(channelName: string, channelUpdate: ChannelUpdate): Observable<ChannelAboutResponseType> {
     return this.http.put<ChannelAbout>(`${this.resourceUrl}/${channelName}`, channelUpdate, { observe: 'response' });
   }
+
+  uploadAvatar(channelName: string, fileFormData: FormData): Observable<HttpResponse<void>> {
+    return this.http.post<void>(`${this.resourceUrl}/${channelName}/avatar`, fileFormData, { observe: 'response' });
+  }
+
+  getAvatar(channelName: string): Observable<Blob> {
+    return this.http.get(`${this.resourceUrl}/${channelName}/avatar`, { responseType: 'blob' });
+  }
 }
