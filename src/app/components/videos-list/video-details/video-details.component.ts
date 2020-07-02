@@ -36,6 +36,9 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   viewCountdown;
   intervalId;
   watchedVideosIds;
+
+  avatarSrc;
+
   videoResourceUrl = (id) => `${environment.serverUrl}api/v1/videos/${id}/download`;
 
   private _transformer = (node: CommentNode, level: number) => {
@@ -55,6 +58,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
       wasEdited: node.wasEdited,
       isDeleted: node.isDeleted,
       dateCreated: new Date(node.dateCreated).toLocaleDateString(),
+      avatarSrc: node.avatarSrc,
       currentUserCommentRating: node.currentUserCommentRating,
       directReplies: node.directReplies,
       isReplyActive: node.isReplyActive,
@@ -91,6 +95,11 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     const watchedVideos = localStorage.getItem('watchedVideosIds');
     this.watchedVideosIds = watchedVideos !== null ? JSON.parse(watchedVideos) : [];
+
+    this.loadAvatar(this.channelService.avatar);
+    this.channelService.avatarUpdateEvent.subscribe((blob) => {
+      this.loadAvatar(blob);
+    });
   }
 
   ngAfterViewInit() {
@@ -130,7 +139,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (response.body) {
         this.videoDetails = response.body;
         this.isVideoAuthor = this.currentUserId && this.videoDetails.authorId === this.currentUserId;
-        this.reloadComments();
+        this.loadAvatars();
       }
     });
   }
@@ -308,6 +317,57 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   getFormattedDate(date: Date) {
     return new Date (date).toLocaleDateString();
   }
+
+  private loadAvatar(blob: Blob) {
+    if (!blob) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      this.avatarSrc = reader.result;
+    };
+  }
+
+  private loadAvatars() {
+    const groupedComments: CommentsWithChannelName[] = [];
+    this.updateCommentsGroupedByChannelName(groupedComments, this.videoDetails.directCommentDtos);
+    groupedComments.forEach(groupedComment => {
+      this.channelService.getAvatar(groupedComment.channelName).subscribe(blob => {
+        if (!blob) {
+          return;
+        }
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => {
+          groupedComment.comments.forEach(comment => {
+            comment.avatarSrc = reader.result;
+          });
+        };
+      });
+    });
+    this.reloadComments();
+  }
+
+  private updateCommentsGroupedByChannelName(groupedComments: CommentsWithChannelName[], directComments: CommentRepresentation[]) {
+    directComments.forEach(comment => {
+      const existingGroupedComment = groupedComments.filter(comm => comm.channelName === comment.channelIdentity.name)[0] || null;
+      if (existingGroupedComment !== null) {
+        existingGroupedComment.comments.push(comment);
+      } else {
+        groupedComments.push({ channelName: comment.channelIdentity.name, comments: [comment] });
+      }
+
+      if (!!comment.directReplies && comment.directReplies.length > 0) {
+        this.updateCommentsGroupedByChannelName(groupedComments, comment.directReplies);
+      }
+    });
+  }
+}
+
+class CommentsWithChannelName {
+  channelName: string;
+  comments: CommentRepresentation[];
 }
 
 export class CommentNode extends CommentRepresentation {

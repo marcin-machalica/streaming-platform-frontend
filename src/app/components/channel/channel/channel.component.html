@@ -51,6 +51,8 @@
       </button>
 
       <div>
+        <img class="avatar margin-right-10" [src]="avatarSrc" />
+
         <input type="file" class="margin-top-30"
                (change)="selectFile($event)" (dragover)="onDragOverFile($event)" (drop)="onDropFile($event)"
                placeholder="Avatar" accept=".jpg,.png">
@@ -60,7 +62,6 @@
         <span>Update avatar</span>
       </button>
 
-      <img [src]="avatarSrc" />
     </div>
   </form>
 </div>

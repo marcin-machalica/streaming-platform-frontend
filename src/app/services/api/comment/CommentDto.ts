@@ -17,6 +17,7 @@ export class CommentRepresentation {
   public wasEdited: boolean;
   public isDeleted: boolean;
   public dateCreated: Date;
+  public avatarSrc;
   public currentUserCommentRating: CommentRatingRepresentation;
   public directReplies: CommentRepresentation[];
 }

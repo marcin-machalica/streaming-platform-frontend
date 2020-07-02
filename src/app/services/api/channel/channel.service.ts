@@ -18,6 +18,9 @@ export class ChannelService {
   currentChannelResourceUrl = `${environment.serverUrl}api/v1/current-channel`;
 
   public channelIdentityUpdateEvent = new EventEmitter();
+  public avatarUpdateEvent = new EventEmitter();
+
+  public avatar: Blob;
 
   constructor(private http: HttpClient) { }
 

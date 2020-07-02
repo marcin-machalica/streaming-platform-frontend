@@ -34,6 +34,11 @@ export class ChannelComponent implements OnInit {
     this.channelService.getChannelAbout(this.channelName).subscribe(response => {
       this.channelAbout = response.body;
     });
+
+    this.loadAvatar(this.channelService.avatar);
+    this.channelService.avatarUpdateEvent.subscribe((blob) => {
+      this.loadAvatar(blob);
+    });
   }
 
   startEditMode() {
@@ -76,6 +81,7 @@ export class ChannelComponent implements OnInit {
 
   selectFile(event) {
     this.file = event.target.files[0];
+    this.loadAvatar(event.target.files[0]);
   }
 
   onDragOverFile(event) {
@@ -99,14 +105,20 @@ export class ChannelComponent implements OnInit {
     this.channelService.uploadAvatar(this.channelName, formData).subscribe(response => {
       this.toastService.showToast('Successfully updated avatar!');
       this.channelService.getAvatar(this.channelName).subscribe(blob => {
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          // result includes identifier 'data:image/png;base64,' plus the base64 data
-          this.avatarSrc = reader.result;
-        };
+        this.channelService.avatarUpdateEvent.emit(blob);
       });
     });
+  }
+
+  private loadAvatar(blob: Blob) {
+    if (!blob) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      this.avatarSrc = reader.result;
+    };
   }
 }
 
