@@ -1,6 +1,6 @@
 import {
   AfterViewInit,
-  Component,
+  Component, EventEmitter,
   Inject,
   OnDestroy,
   OnInit,
@@ -38,6 +38,8 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   watchedVideosIds;
 
   avatarSrc;
+
+  private avatarsLoadedEvent = new EventEmitter();
 
   videoResourceUrl = (id) => `${environment.serverUrl}api/v1/videos/${id}/download`;
 
@@ -100,9 +102,14 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.channelService.avatarUpdateEvent.subscribe((blob) => {
       this.loadAvatar(blob);
     });
+
+    this.avatarsLoadedEvent.subscribe(() => {
+      this.reloadComments();
+    });
   }
 
   ngAfterViewInit() {
+    setTimeout(() => this.loadAvatars(), 500);
     this.video = document.getElementsByTagName('video')[0];
 
     if (this.watchedVideosIds.includes(this.videoId)) {
@@ -139,6 +146,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (response.body) {
         this.videoDetails = response.body;
         this.isVideoAuthor = this.currentUserId && this.videoDetails.authorId === this.currentUserId;
+        this.reloadComments();
         this.loadAvatars();
       }
     });
@@ -193,7 +201,9 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
     this.commentService.saveComment(saveComment, this.videoId).subscribe(response => {
       if (response.status === 201) {
         if (!response.body.parentId) {
-          this.videoDetails.directCommentDtos.push(response.body);
+          const comment = response.body;
+          comment.avatarSrc = this.avatarSrc;
+          this.videoDetails.directCommentDtos.push(comment);
           this.reloadComments();
           (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value = '';
           if (node) {
@@ -201,6 +211,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         } else {
           this.loadVideoDetails();
+          setTimeout(() => this.loadAvatars(), 500);
         }
       }
     });
@@ -332,6 +343,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   private loadAvatars() {
     const groupedComments: CommentsWithChannelName[] = [];
     this.updateCommentsGroupedByChannelName(groupedComments, this.videoDetails.directCommentDtos);
+    let countDown = groupedComments.length;
     groupedComments.forEach(groupedComment => {
       this.channelService.getAvatar(groupedComment.channelName).subscribe(blob => {
         if (!blob) {
@@ -344,9 +356,12 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
             comment.avatarSrc = reader.result;
           });
         };
+
+        if (--countDown <= 0) {
+          this.avatarsLoadedEvent.emit();
+        }
       });
     });
-    this.reloadComments();
   }
 
   private updateCommentsGroupedByChannelName(groupedComments: CommentsWithChannelName[], directComments: CommentRepresentation[]) {
