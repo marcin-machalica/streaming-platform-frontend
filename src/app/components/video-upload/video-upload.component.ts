@@ -27,6 +27,12 @@ export class VideoUploadComponent implements OnInit {
 
   onDropFile(event: DragEvent) {
     event.preventDefault();
+
+    const filename = event.dataTransfer.files[0].name;
+    if (!filename || !filename.toLowerCase().match(/\.(mp4|webm)$/)) {
+      return;
+    }
+
     this.file = event.dataTransfer.files[0];
   }
 

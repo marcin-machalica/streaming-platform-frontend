@@ -51,9 +51,10 @@
       </button>
 
       <div>
-        <img class="avatar margin-right-10" [src]="avatarSrc" />
+        <img class="avatar cursor-pointer margin-right-10" [src]="avatarSrc" (click)="avatarInput.click()"
+            (dragover)="onDragOverFile($event)" (drop)="onDropFile($event)"/>
 
-        <input type="file" class="margin-top-30"
+        <input #avatarInput type="file" class="hidden-input margin-top-30"
                (change)="selectFile($event)" (dragover)="onDragOverFile($event)" (drop)="onDropFile($event)"
                placeholder="Avatar" accept=".jpg,.png">
       </div>

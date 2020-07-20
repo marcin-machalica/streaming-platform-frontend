@@ -4,7 +4,7 @@ import {ChannelService} from '../../../services/api/channel/channel.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {NgForm} from '@angular/forms';
 import {ToastService} from '../../../services/toast/toast.service';
-import {VideoRepresentation} from "../../../services/api/video/VideoDto";
+import {VideoRepresentation} from '../../../services/api/video/VideoDto';
 
 @Component({
   selector: 'app-channel',
@@ -91,7 +91,14 @@ export class ChannelComponent implements OnInit {
 
   onDropFile(event: DragEvent) {
     event.preventDefault();
+
+    const filename = event.dataTransfer.files[0].name;
+    if (!filename || !filename.toLowerCase().match(/\.(jpg|png)$/)) {
+      return;
+    }
+
     this.file = event.dataTransfer.files[0];
+    this.loadAvatar(event.dataTransfer.files[0]);
   }
 
   updateAvatar() {
