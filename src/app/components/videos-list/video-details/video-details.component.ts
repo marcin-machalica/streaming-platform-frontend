@@ -37,7 +37,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   intervalId;
   watchedVideosIds;
 
-  avatarSrc;
+  currentUserAvatarSrc;
 
   private avatarsLoadedEvent = new EventEmitter();
 
@@ -98,9 +98,9 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
     const watchedVideos = localStorage.getItem('watchedVideosIds');
     this.watchedVideosIds = watchedVideos !== null ? JSON.parse(watchedVideos) : [];
 
-    this.loadAvatar(this.channelService.avatar);
+    this.loadCurrentUserAvatar(this.channelService.avatar);
     this.channelService.avatarUpdateEvent.subscribe((blob) => {
-      this.loadAvatar(blob);
+      this.loadCurrentUserAvatar(blob);
     });
 
     this.avatarsLoadedEvent.subscribe(() => {
@@ -109,7 +109,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    setTimeout(() => this.loadAvatars(), 500);
+    setTimeout(() => this.loadCommentAuthorsAvatars(), 500);
     this.video = document.getElementsByTagName('video')[0];
 
     if (this.watchedVideosIds.includes(this.videoId)) {
@@ -147,7 +147,8 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
         this.videoDetails = response.body;
         this.isVideoAuthor = this.currentUserId && this.videoDetails.authorId === this.currentUserId;
         this.reloadComments();
-        this.loadAvatars();
+        this.loadCommentAuthorsAvatars();
+        this.loadVideoAuthorAvatar();
       }
     });
   }
@@ -202,7 +203,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (response.status === 201) {
         if (!response.body.parentId) {
           const comment = response.body;
-          comment.avatarSrc = this.avatarSrc;
+          comment.avatarSrc = this.currentUserAvatarSrc;
           this.videoDetails.directCommentDtos.push(comment);
           this.reloadComments();
           (document.getElementById(`comment_input_${commentId}`) as HTMLInputElement).value = '';
@@ -211,7 +212,7 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         } else {
           this.loadVideoDetails();
-          setTimeout(() => this.loadAvatars(), 500);
+          setTimeout(() => this.loadCommentAuthorsAvatars(), 500);
         }
       }
     });
@@ -329,18 +330,18 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
     return new Date (date).toLocaleDateString();
   }
 
-  private loadAvatar(blob: Blob) {
+  private loadCurrentUserAvatar(blob: Blob) {
     if (!blob) {
       return;
     }
     const reader = new FileReader();
     reader.readAsDataURL(blob);
     reader.onloadend = () => {
-      this.avatarSrc = reader.result;
+      this.currentUserAvatarSrc = reader.result;
     };
   }
 
-  private loadAvatars() {
+  private loadCommentAuthorsAvatars() {
     const groupedComments: CommentsWithChannelName[] = [];
     this.updateCommentsGroupedByChannelName(groupedComments, this.videoDetails.directCommentDtos);
     let countDown = groupedComments.length;
@@ -376,6 +377,19 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!!comment.directReplies && comment.directReplies.length > 0) {
         this.updateCommentsGroupedByChannelName(groupedComments, comment.directReplies);
       }
+    });
+  }
+
+  private loadVideoAuthorAvatar() {
+    this.channelService.getAvatar(this.videoDetails.channelIdentity.name).subscribe(blob => {
+      if (!blob) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => {
+        this.videoDetails.avatarSrc = reader.result;
+      };
     });
   }
 }

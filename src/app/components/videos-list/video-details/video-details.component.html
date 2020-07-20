@@ -4,7 +4,7 @@
   <h2>{{videoDetails.title}}</h2>
 
   <div>
-    <strong>{{videoDetails.channelIdentity.name}}</strong>
+    <img class="avatar margin-right-10" [src]="videoDetails.avatarSrc"/> <strong>{{videoDetails.channelIdentity.name}}</strong>
     <span class="margin-left-right-30">{{getFormattedDate(videoDetails.createdDate)}}</span>
 
     <button mat-button disabled id="videoViewCount">
@@ -27,7 +27,7 @@
 
   <h3 class="margin-top-30">Comments:</h3>
   <div id="comment_form_0">
-    <img class="avatar margin-right-10" [src]="avatarSrc" />
+    <img class="avatar margin-right-10" [src]="currentUserAvatarSrc" />
     <mat-form-field>
       <textarea matInput required placeholder="Comment" id="comment_input_0"></textarea>
     </mat-form-field>
@@ -82,7 +82,7 @@
           </button>
         </div>
         <div *ngIf="node.isReplyActive && !node.isEditActive">
-          <img class="avatar margin-right-10" [src]="avatarSrc" />
+          <img class="avatar margin-right-10" [src]="currentUserAvatarSrc" />
           <mat-form-field>
             <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
           </mat-form-field>
@@ -154,7 +154,7 @@
         </div>
 
         <div *ngIf="node.isReplyActive && !node.isEditActive">
-          <img class="avatar margin-right-10" [src]="avatarSrc" />
+          <img class="avatar margin-right-10" [src]="currentUserAvatarSrc" />
           <mat-form-field>
             <textarea matInput required placeholder="Comment" id="comment_input_{{node.id}}"></textarea>
           </mat-form-field>

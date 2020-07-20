@@ -8,6 +8,7 @@ export class VideoRepresentation {
   public title: string;
   public description: string;
   public createdDate: Date;
+  public avatarSrc;
 }
 
 export class VideoDetails {
@@ -21,6 +22,7 @@ export class VideoDetails {
   viewCount: number;
   shareCount: number;
   createdDate: Date;
+  avatarSrc;
   currentUserVideoRating: VideoRatingDto;
   directCommentDtos: CommentRepresentation[];
 
