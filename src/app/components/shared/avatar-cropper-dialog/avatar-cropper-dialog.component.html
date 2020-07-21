@@ -1,0 +1,23 @@
+<mat-dialog-content>
+  <img-cropper #cropper [image]="imageWrapper" [settings]="cropperSettings"></img-cropper>
+  <br>
+  <span *ngIf="imageWrapper.image" >
+      <img [src]="imageWrapper.image" [width]="cropperSettings.croppedWidth" [height]="cropperSettings.croppedHeight">
+  </span>
+
+  <input #avatarInput type="file" class="hidden-input margin-top-30"
+         (change)="selectFile($event)"
+         placeholder="Avatar" accept=".jpg,.png">
+
+  <button mat-button (click)="avatarInput.click()">Browse files</button>
+</mat-dialog-content>
+
+<mat-dialog-actions class="margin-top-30">
+  <button mat-button (click)="confirmAvatar()">
+    <span>Save</span>
+  </button>
+
+  <button mat-button mat-dialog-close>
+    <span>Close</span>
+  </button>
+</mat-dialog-actions>

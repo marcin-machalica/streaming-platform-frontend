@@ -9,7 +9,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {KeycloakAngularModule, KeycloakService} from 'keycloak-angular';
 import {initializer} from './services/security/keycloak/keycloak-app-init';
-import {MatButtonModule, MatIconModule, MatSelectModule, MatSidenavModule, MatToolbarModule} from '@angular/material';
+import {MatButtonModule, MatDialogModule, MatIconModule, MatSelectModule, MatSidenavModule, MatToolbarModule} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FlexModule} from '@angular/flex-layout';
 import {MatVideoModule} from 'mat-video';
@@ -29,6 +29,8 @@ import { ChannelComponent } from './components/channel/channel/channel.component
 import {MatTabsModule} from "@angular/material/tabs";
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import {VideoGuardService} from './services/security/video-guard/video-guard.service';
+import {ImageCropperModule} from 'ng2-img-cropper';
+import { AvatarCropperDialogComponent } from './components/shared/avatar-cropper-dialog/avatar-cropper-dialog.component';
 
 @NgModule({
   declarations: [
@@ -40,28 +42,31 @@ import {VideoGuardService} from './services/security/video-guard/video-guard.ser
     ChannelCreateComponent,
     ChannelComponent,
     NotFoundComponent,
+    AvatarCropperDialogComponent,
   ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    AppRoutingModule,
-    HttpClientModule,
-    FormsModule,
-    KeycloakAngularModule,
-    MatListModule,
-    MatToolbarModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatButtonModule,
-    FlexModule,
-    MatVideoModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatTreeModule,
-    MatSnackBarModule,
-    MatTabsModule,
-    MatSelectModule
-  ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        AppRoutingModule,
+        HttpClientModule,
+        FormsModule,
+        KeycloakAngularModule,
+        MatListModule,
+        MatToolbarModule,
+        MatSidenavModule,
+        MatIconModule,
+        MatButtonModule,
+        FlexModule,
+        MatVideoModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatTreeModule,
+        MatSnackBarModule,
+        MatTabsModule,
+        MatDialogModule,
+        MatSelectModule,
+        ImageCropperModule
+    ],
   providers: [
     {
       provide: APP_INITIALIZER,
@@ -72,6 +77,9 @@ import {VideoGuardService} from './services/security/video-guard/video-guard.ser
     ChannelGuardService,
     ReversedChannelGuardService,
     VideoGuardService
+  ],
+  entryComponents: [
+    AvatarCropperDialogComponent
   ],
   bootstrap: [AppComponent]
 })

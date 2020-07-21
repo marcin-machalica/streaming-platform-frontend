@@ -4,6 +4,8 @@ import {ChannelService} from '../../../services/api/channel/channel.service';
 import {NgForm} from '@angular/forms';
 import {ToastService} from '../../../services/toast/toast.service';
 import {Router} from '@angular/router';
+import {AvatarCropperDialogComponent} from '../../shared/avatar-cropper-dialog/avatar-cropper-dialog.component';
+import {MatDialog} from '@angular/material';
 
 @Component({
   selector: 'app-channel-create',
@@ -14,11 +16,13 @@ export class ChannelCreateComponent implements OnInit {
 
   channelUpdate: ChannelUpdate = new ChannelUpdate();
   file: File;
+  fileRaw: File;
   avatarSrc;
 
   @ViewChild(NgForm, { static: false }) form;
 
   constructor(private router: Router,
+              private dialog: MatDialog,
               private toastService: ToastService,
               private channelService: ChannelService) { }
 
@@ -43,11 +47,6 @@ export class ChannelCreateComponent implements OnInit {
     });
   }
 
-  selectFile(event) {
-    this.file = event.target.files[0];
-    this.loadAvatar(event.target.files[0]);
-  }
-
   onDragOverFile(event) {
     event.stopPropagation();
     event.preventDefault();
@@ -63,6 +62,22 @@ export class ChannelCreateComponent implements OnInit {
 
     this.file = event.dataTransfer.files[0];
     this.loadAvatar(event.dataTransfer.files[0]);
+  }
+
+  openAvatarCropperDialog() {
+    const dialogRef = this.dialog.open(AvatarCropperDialogComponent, {
+      width: '600px',
+      data: {
+        file: this.fileRaw,
+      }
+    });
+    dialogRef.afterClosed().subscribe(rawAndCroppedImage => {
+      if (!!rawAndCroppedImage) {
+        this.file = rawAndCroppedImage.cropped;
+        this.fileRaw = rawAndCroppedImage.raw;
+        this.loadAvatar(this.file);
+      }
+    });
   }
 
   updateAvatar(channelName: string) {
