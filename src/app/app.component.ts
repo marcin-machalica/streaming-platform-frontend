@@ -40,7 +40,8 @@ export class AppComponent implements OnInit {
   }
 
   private loadAvatar(blob: Blob) {
-    if (!blob) {
+    if (!blob || blob.size <= 0) {
+      this.avatarSrc = 'assets/default_avatar.png';
       return;
     }
     const reader = new FileReader();

@@ -46,7 +46,10 @@ export class VideosListComponent implements OnInit {
 
     groupedVideos.forEach(videoWithChannelName => {
       this.channelService.getAvatar(videoWithChannelName.channelName).subscribe(blob => {
-        if (!blob) {
+        if (!blob || blob.size <= 0) {
+          videoWithChannelName.videos.forEach(video => {
+            video.avatarSrc = 'assets/default_avatar.png';
+          });
           return;
         }
         const reader = new FileReader();

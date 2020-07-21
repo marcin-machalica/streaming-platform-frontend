@@ -331,7 +331,8 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadCurrentUserAvatar(blob: Blob) {
-    if (!blob) {
+    if (!blob || blob.size <= 0) {
+      this.currentUserAvatarSrc = 'assets/default_avatar.png';
       return;
     }
     const reader = new FileReader();
@@ -347,22 +348,28 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
     let countDown = groupedComments.length;
     groupedComments.forEach(groupedComment => {
       this.channelService.getAvatar(groupedComment.channelName).subscribe(blob => {
-        if (!blob) {
-          return;
-        }
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => {
-          groupedComment.comments.forEach(comment => {
-            comment.avatarSrc = reader.result;
-          });
-        };
-
+        this.loadAvatar(blob, groupedComment);
         if (--countDown <= 0) {
           this.avatarsLoadedEvent.emit();
         }
       });
     });
+  }
+
+  private loadAvatar(blob, groupedComment) {
+    if (!blob || blob.size <= 0) {
+      groupedComment.comments.forEach(comment => {
+        comment.avatarSrc = 'assets/default_avatar.png';
+      });
+      return;
+    }
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      groupedComment.comments.forEach(comment => {
+        comment.avatarSrc = reader.result;
+      });
+    };
   }
 
   private updateCommentsGroupedByChannelName(groupedComments: CommentsWithChannelName[], directComments: CommentRepresentation[]) {
@@ -382,7 +389,8 @@ export class VideoDetailsComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private loadVideoAuthorAvatar() {
     this.channelService.getAvatar(this.videoDetails.channelIdentity.name).subscribe(blob => {
-      if (!blob) {
+      if (!blob || blob.size <= 0) {
+        this.videoDetails.avatarSrc = 'assets/default_avatar.png';
         return;
       }
       const reader = new FileReader();
